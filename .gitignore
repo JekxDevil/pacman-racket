@@ -1,2 +1,4 @@
 # ignore files starting with '#'
 \#*
+# ignore tmp racket files ending with '~'
+*~
