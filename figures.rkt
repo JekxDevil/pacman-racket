@@ -1,6 +1,22 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-beginner-reader.ss" "lang")((modname figures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+<<<<<<< HEAD
+=======
+; modularity
+(require racket/base)
+(provide PACMAN-OPEN)
+(provide PACMAN-CLOSE)
+(provide GHOST-RED)
+(provide GHOST-PINK)
+(provide GHOST-CYAN)
+(provide GHOST-ORANGE)
+(provide GHOST-BLUE)   ;TODISCUSS change to GHOST-EDIBLE ? need to state clearly its behaviour is different
+(provide DOT)
+(provide PP)
+(provide CHERRY)
+
+>>>>>>> 31f29d27e1865f20579c3236e1674afd7c9b48c7
 (require 2htdp/image)
 (require 2htdp/universe)
 (define BG (square 60  "solid" "white"))
@@ -18,7 +34,7 @@
                    (underlay/offset (circle 7 "solid" "white")
                                    -30 0
                                    (circle 7 "solid" "white"))))
-(define GHOSTRED (underlay/offset GHOR2
+(define GHOST-RED (underlay/offset GHOR2
                    0 -10
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
@@ -34,7 +50,7 @@
                    (underlay/offset (circle 7 "solid" "white")
                                    -30 0
                                    (circle 7 "solid" "white"))))
-(define GHOSTPINK (underlay/offset GHOP2
+(define GHOST-PINK (underlay/offset GHOP2
                    0 -10
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
@@ -51,7 +67,7 @@
                    (underlay/offset (circle 7 "solid" "white")
                                    -30 0
                                    (circle 7 "solid" "white"))))
-(define GHOSTCYAN (underlay/offset GHOC2
+(define GHOST-CYAN (underlay/offset GHOC2
                    0 -10
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
@@ -68,7 +84,7 @@
                    (underlay/offset (circle 7 "solid" "white")
                                    -30 0
                                    (circle 7 "solid" "white"))))
-(define GHOSTORANGE (underlay/offset GHOO2
+(define GHOST-ORANGE (underlay/offset GHOO2
                    0 -10
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
@@ -92,7 +108,7 @@
                                    (circle 7 "solid" "white"))))
 (define GHOSTBLUE1 (underlay/offset GHOB2
                    0 5 T4))
-(define GHOSTBLUE (underlay/offset GHOSTBLUE1
+(define GHOST-BLUE (underlay/offset GHOSTBLUE1
                    2 7 (rotate 180 T4)))
 (define BLUE (place-image/align GHOSTBLUE 30 30 "center" "center" BG))
 ;-----------------------------
