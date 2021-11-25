@@ -1,13 +1,11 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname figures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname pacman) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/image)
 (require 2htdp/universe)
-(define BG (square 60  "solid" "white"))
 
 (define PACMAN-OPEN (rotate 30 (wedge 30 300 "solid" "gold")))
 (define PACMAN-CLOSE (circle 30 "solid" "gold"))
-(define PACMAN1 (place-image/align PACMAN-OPEN 30 30 "center" "center" BG))
 ;-----------------------------------
 ;RED GHOST
 (define GHOR1 (overlay/offset (rectangle 50 30 "solid" "red")
@@ -23,7 +21,6 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define RED (place-image/align GHOSTRED 30 30 "center" "center" BG))
 ;-------------------------------
 ;PINK GHOST
 (define GHOP1 (overlay/offset (rectangle 50 30 "solid" "pink")
@@ -39,7 +36,6 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define PINK (place-image/align GHOSTPINK 30 30 "center" "center" BG))
 ;-----------------------------
 ;CYAN GHOST
 
@@ -56,7 +52,6 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define CYAN (place-image/align GHOSTCYAN 30 30 "center" "center" BG))
 ;-----------------------------
 ;ORANGE GHOST
 
@@ -73,7 +68,7 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define ORANGE (place-image/align GHOSTORANGE 30 30 "center" "center" BG))
+
 ;---------------------------
 ;BLUEGHOST
 
@@ -94,17 +89,14 @@
                    0 5 T4))
 (define GHOSTBLUE (underlay/offset GHOSTBLUE1
                    2 7 (rotate 180 T4)))
-(define BLUE (place-image/align GHOSTBLUE 30 30 "center" "center" BG))
 ;-----------------------------
 ;DOT
 (define DOT (circle 6 "solid" "Papaya Whip"))
-(define POINT(place-image/align DOT 30 30 "center" "center" BG))
 
 ;-----------------------------
 ;POWERPELLETS
 
-(define POWER (circle 10 "solid" "Khaki"))
-(define PP (place-image/align POWER 30 30 "center" "center" BG))
+(define PP (circle 10 "solid" "Khaki"))
 
 ;-----------------------------
 ;CHERRY
@@ -117,22 +109,4 @@
                   (circle 10 "solid" "light coral")))
 (define CHERRY2 (overlay/offset CHERRY1 20 0 CHERRY1))
 
-(define CHERRY3 (overlay/offset GAMBO 0 10 CHERRY2))
-(define CHERRY (place-image/align CHERRY3 30 30 "center" "center" BG))
-
-;---------------------------
-;WALL
-(define VW (place-image/align (rectangle 10 60 "solid""blue") 30 30 "center" "center" BG))
-
-;--------------------------
-;CORNER
-(define C (place-image/align (rectangle 30 10 "solid""blue") 30 30 "left" "center" BG))
-(define CORNER (place-image/align (rectangle 10 30 "solid" "blue") 30 30 "center" "top" C))
-
-;DOUBLE-CORNER
-;-------------------------
-(define DCORNER (place-image/align (rectangle 30 10 "solid" "blue") 30 30 "left" "center" VW))
-
-;GATE
-;------------------------
-(define GATE (place-image/align (rectangle 60 5 "solid""Deep Sky Blue") 30 30 "center" "center" BG))
+(define CHERRY (overlay/offset GAMBO 0 10 CHERRY2))
