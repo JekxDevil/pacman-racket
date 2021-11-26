@@ -53,12 +53,13 @@ Discussion, User guide, Developer guide, README, Design, Test/correctness, Code 
 
 ## Labyrinth map
 
-Labyrinth is a `Vector<Vector<String>>`, so a matrix (2 dimension vector)
+Map is a `Vector<String>`
 
 map representation :
 - "W" wall
 - " " empty cell space
 - "." dot point
+- "@" power pellet
 - "P" pacman
 - ghosts:
   - "e" **edible**

@@ -21,13 +21,31 @@
 
 ;*****************************************************************
 ;*****************************************************************
+; Map is a Vector<String>
+; map elements representation:
+;- "W" wall
+;- " " empty cell space
+;- "." dot point
+;- "@" power pellet
+;- "P" pacman
+;- ghosts:
+;  - "e" special edible ghost
+;  - "o" orange
+;  - "r" red
+;  - "p" pink
+;  - "c" cyan
+;- "_" ghost gate
+;- "Y" cherry
+
+;*****************************************************************
+;*****************************************************************
 
 ; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth) 
 ; where     map : Vector<String>
 ;         score : Natural
 ;    pp-active? : Boolean
-;  pacman-mouth : Boolean
-(define-struct labyrinth [map score pp-active? pacman-mouth])
+;  pacman-mouth : Boolean (VFX)
+(define-struct appstate [map score pp-active? pacman-mouth])
 
 ;*****************************************************************
 ;*****************************************************************

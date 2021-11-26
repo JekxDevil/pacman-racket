@@ -166,18 +166,18 @@
 
 (define (conversion-char char)
   (cond
-    [(equal? char " ") BG]
-    [(equal? char "W") WALL]
-    [(equal? char ".") DOT]
-    [(equal? char "@") PP]
-    [(equal? char "P") PACMAN-OPEN] ; or close VFX
-    [(equal? char "Y") CHERRY]
-    [(equal? char "_") GATE]
-    [(equal? char "o") GHOST-ORANGE]
-    [(equal? char "r") GHOST-RED]
-    [(equal? char "p") GHOST-PINK]
-    [(equal? char "c") GHOST-CYAN]
-    [(equal? char "e") GHOST-EDIBLE]))
+    [(equal? char #\ ) BG]
+    [(equal? char #\W) WALL]
+    [(equal? char #\.) DOT]
+    [(equal? char #\@) PP]
+    [(equal? char #\P) PACMAN-OPEN] ; or close VFX
+    [(equal? char #\Y) CHERRY]
+    [(equal? char #\_) GATE]
+    [(equal? char #\o) GHOST-ORANGE]
+    [(equal? char #\r) GHOST-RED]
+    [(equal? char #\p) GHOST-PINK]
+    [(equal? char #\c) GHOST-CYAN]
+    [(equal? char #\e) GHOST-EDIBLE]))
 
 ; map : Vector<String>
 ; conv -> image
