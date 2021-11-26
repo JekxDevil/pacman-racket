@@ -128,7 +128,7 @@
 (define PACROW (list " " "|" "P" "-" "-" "-" "-" "." "-" "-" "-" "-" "-" "." "|" "." "-" "-" "-" "-" "-" "." "-" "-" "-" "-" "." "|"))
 (define LAB (list ROW0 ROW1 ROW2 PACROW))
 
-(define EX-MAP (vector
+(define EX-MAP1 (vector
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
                 "W............WW............W"
                 "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -159,6 +159,39 @@
                 "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
                 "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
                 "W..........................W"
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+
+(define EX-MAP2 (vector
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                "W.....Y......WW......Y.....W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W@W  W.W   W.WW.W   W.W  W@W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W..........................W"
+                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                "W......WW....WW....WW......W"
+                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                "     W.WWWWW WW WWWWW.W     "
+                "     W.WW          WW.W     "
+                "     W.WW WWW__WWW WW.W     "
+                "WWWWWW.WW W    r W WW.WWWWWW"
+                "      .   W o    W   .      "
+                "WWWWWW.WW W p  c W WW.WWWWWW"
+                "     W.WW WWWWWWWW WW.W     "
+                "     W.WW    P     WW.W     "
+                "     W.WW WWWWWWWW WW.W     "
+                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                "W............WW............W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W@..WW.......  .......WW..@W"
+                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                "W......WW....WW....WW......W"
+                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                "W.....Y..............Y.....W"
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
 ;RENDER FUNCTION
@@ -208,10 +241,16 @@
 
 (define (render list)
   (cond
-    [(empty? list) (render-row ROW0)]
-    [else (above (render-row (first list)) (render (rest list)))]))
+    [(empty? (rest list)) (first list)]
+    [else (above (first list) (render (rest list)))]))
 
 
+;;; delete tests
+(define TR1 (render-row (map conversion-char (string->list "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"))))
+(define TR2 (render-row (map conversion-char (string->list "W.WWWWpWW.WWWWWWWW@WWPWWWWoW"))))
+
+
+(render (map (λ (string-row) (render-row (map conversion-char (string->list string-row)))) (vector->list EX-MAP2)))
 
 
 ;FIND ELEMENT AT POSITION
