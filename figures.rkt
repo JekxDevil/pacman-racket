@@ -24,6 +24,7 @@
 (define PACMAN-OPEN (rotate 30 (wedge 30 300 "solid" "gold")))
 (define PACMAN-CLOSE (circle 30 "solid" "gold"))
 (define PACMAN1 (place-image/align PACMAN-OPEN 30 30 "center" "center" BG))
+(define PACMAN2 (place-image/align PACMAN-CLOSE 30 30 "center" "center" BG))
 ;-----------------------------------
 ;RED GHOST
 (define GHOR1 (overlay/offset (rectangle 50 30 "solid" "red")
@@ -155,58 +156,71 @@
 
 ;TESTS
 ;------------------
-(define ROW1 (list BG CORNER (rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)
-                     (rotate -90 DCORNER) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW)
-                     (rotate -90 CORNER)))
-(define ROW2 (list BG VW POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT VW POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT VW))
-(define ROW0 (list BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG))
-(define PACROW (list BG VW (rotate 90 PACMAN1) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT VW
-                     POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT VW))
+(define ROW1 (list " " "+" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "T" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "7"))
+(define ROW2 (list " " "|" "." "." "." "." "." "." "." "." "." "." "." "." "|" "." "." "." ".""."".""." "." "." "." "." "." "|" ))
+(define ROW0 (list " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "))
+(define PACROW (list " " "|" "P" "-" "-" "-" "-" "." "-" "-" "-" "-" "-" "." "|" "." "-" "-" "-" "-" "-" "." "-" "-" "-" "-" "." "|"))
 (define LAB (list ROW0 ROW1 ROW2 PACROW))
 
 ;RENDER FUNCTION
 ;--------------------
+
+(define (conversion el)
+  (cond
+    [(equal? el " ") BG]
+    [(equal? el "+") CORNER]
+    [(equal? el "l") (rotate 90 CORNER)]
+    [(equal? el "7") (rotate -90 CORNER)]
+    [(equal? el ")") (rotate 180 CORNER)]
+    [(equal? el "-") (rotate 90 VW)]
+    [(equal? el "|") VW]
+    [(equal? el ".") POINT]
+    [(equal? el "*") PP]
+    [(equal? el "O") ORANGE]
+    [(equal? el "R") RED]
+    [(equal? el "P") PACMAN1]
+    [(equal? el "P1") PINK]
+    [(equal? el "C") CYAN]
+    [(equal? el "B") BLUE]
+    [(equal? el "T") DCORNER]
+    [(equal? el "Y") CHERRY]))
+
+(define (conv list)
+  (cond
+    [(empty? list) '()]
+    [else (cons (map conversion (first list)) (conv (rest list)))]))
+; Square are a List<Image>
+
+;input/output
+; render-row: List<Image> --> Image
+;the function takes a list of list of Square and put them toghether horizontally
+; header (define (render-row list) Image)
+
 (define (render-row list)
   (cond
     [(empty? list) BG]
     [else (beside (first list) (render-row (rest list)))]))
+
+;list is a List<Square>
+;it can either be
+; - '()
+; - List<Square>
+
+;input/output
+;render: List<Square> --> Image
+; header (define (render list) Image)
 
 (define (render list)
   (cond
     [(empty? list) (render-row ROW0)]
     [else (above (render-row (first list)) (render (rest list)))]))
 
-;FIND PACMAN POSITION IN THE LABYRINTH
-;--------------------------------------
-(define (PAC? list pos)
-  (cond
-    [(empty? list) #false]
-    [else
-     (cond
-       [(posn? (PAC-1 (first list) pos)) (PAC-1 (first list) pos)]
-       [else (PAC? (rest list) (make-posn 0 (+ 1 (posn-y pos))))])]))
 
-(define (PAC-1 list pos)
-  (cond
-    [(empty? list) '()]
-    [else
-     (cond
-       [(or (equal? PACMAN1 (first list)) (equal? (rotate 90 PACMAN1) (first list)) (equal? (rotate -90 PACMAN1) (first list)) (equal? (rotate 180 PACMAN1) (first list))) pos]
-       [else (PAC-1 (rest list) (make-posn (+ 1 (posn-x pos)) (posn-y pos)))])]))
+
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
 
-(define (find-tot list pos start)
-  (cond
-    [(= (posn-y start) (posn-y pos)) (find? (first list) pos start)]
-    [else (find-tot (rest list) pos (make-posn 0 (+ 1 (posn-y start))))]))
-
-(define (find? list pos start)
-  (cond
-    [(empty? list) '()]
-    [else
-     (cond
-       [(equal? (posn-x pos) (posn-x start)) (first list)]
-       [else (find? (rest list) pos (make-posn (+ 1 (posn-x start)) (posn-y start)))])]))
+(define (find list pos)
+  (list-ref (list-ref list (posn-y pos)) (posn-x pos)))
   
