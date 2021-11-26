@@ -1,4 +1,9 @@
 # ignore files starting with '#'
 \#*
 # ignore tmp racket files ending with '~'
-*~
+*.rkt~
+# ignore latex files
+*.pdf
+*.aux
+*.log
+*swp

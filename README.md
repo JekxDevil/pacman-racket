@@ -17,61 +17,76 @@ Discussion, User guide, Developer guide, README, Design, Test/correctness, Code 
 
 ---------------------
 
-- Revised definition of data type WorldState to support any number of players
-- Implemented all auxiliary functions for editor module
-- Wrote first draft of user guide
-- Added several tests to main functions of rendering module
-- Discussed whether to change the palette of buttons to using greens; decided against it, since it would make reading text harder
+- Research about game rules , logic and racket implementation
+- Data types discussion and definition
+- UX and UI discussion
+- Setup git repository on GitHub
+- Added .gitignore
+- Divide program in modules to split workload
+- Divide workload to team members
+- Implemented figures
+- Testing and implementening import/export figures (API)
+- Discussion about how to store score 
+	- csv file
+- Side features conceptualization 
+	- music
+	- sound effects
+	- VFX
+	- game menu
+	- scoreboard 
+- Create empty user guide in LaTeX
 
 ## Skins characters
 
-- PACMAN
+- **pacman**
   - open
   - closed
-- Ghosts
+- **ghosts**
   - red
   - cyan
   - pink
   - orange
-  - blue (edible)
-- dots (points)
-- power pellets
-- cherry (+100 points)
+  - blue :  edible
+- **dot** : 1 point
+- **cherry** : +100 points
+- **power pellets** : make ghosts edible 
 
-## Map
+## Labyrinth map
 
-The map Labyrinth
+Labyrinth is a `Vector<Vector<String>>`, so a matrix (2 dimension vector)
 
-## State
+map representation :
+- "W" wall
+- " " empty cell space
+- "." dot point
+- "P" pacman
+- ghosts:
+  - "e" **edible**
+  - "o" orange
+  - "r" red
+  - "p" pink
+  - "c" cyan
+- "_" ghost gate
+- "Y" cherry
 
-Appstate will be composed by:
-labyrinth structure
+## Characters
 
-## Labyrinth
-
-"+" corner
-
-"|" vertical wall
-
-"-" horizontal wall
-
-" " empty cell space
-
-"_" ghost doorway
+Character is a structure `(make-character name direction position)`
+- name is `String`
+- direction is `Enumerator`
+- position is `Posn`
 
 ## Appstate
 
-Appstate
+Appstate is a struct `(make-appstate map score pp-active? pacman-mouth)`
+- labyrinth is `Vector<String>`
+- score is a `Natural`
+- pp-active is `Boolean`
+- pacman-mouth is `Boolean`
 
 ## Render
 
-render labyrinth
-
-render characters (input labyrinth)
-
-- render pacman
-- render ghost
-- render points [dots, powerpellets, cherries]
+render (labyrinth) 
 
 ## Handler
 
