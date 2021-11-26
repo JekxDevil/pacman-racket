@@ -1,8 +1,8 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname figures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
-<<<<<<< HEAD
-=======
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname figures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+;<<<<<<< HEAD
+;=======
 ; modularity
 (require racket/base)
 (provide PACMAN-OPEN)
@@ -16,10 +16,10 @@
 (provide PP)
 (provide CHERRY)
 
->>>>>>> 31f29d27e1865f20579c3236e1674afd7c9b48c7
+;>>>>>>> 31f29d27e1865f20579c3236e1674afd7c9b48c7
 (require 2htdp/image)
 (require 2htdp/universe)
-(define BG (square 60  "solid" "white"))
+(define BG (square 60  "solid" "black"))
 
 (define PACMAN-OPEN (rotate 30 (wedge 30 300 "solid" "gold")))
 (define PACMAN-CLOSE (circle 30 "solid" "gold"))
@@ -39,7 +39,7 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define RED (place-image/align GHOSTRED 30 30 "center" "center" BG))
+(define RED (place-image/align GHOST-RED 30 30 "center" "center" BG))
 ;-------------------------------
 ;PINK GHOST
 (define GHOP1 (overlay/offset (rectangle 50 30 "solid" "pink")
@@ -55,7 +55,7 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define PINK (place-image/align GHOSTPINK 30 30 "center" "center" BG))
+(define PINK (place-image/align GHOST-PINK 30 30 "center" "center" BG))
 ;-----------------------------
 ;CYAN GHOST
 
@@ -72,7 +72,7 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define CYAN (place-image/align GHOSTCYAN 30 30 "center" "center" BG))
+(define CYAN (place-image/align GHOST-CYAN 30 30 "center" "center" BG))
 ;-----------------------------
 ;ORANGE GHOST
 
@@ -89,7 +89,7 @@
                    (underlay/offset (circle 3 "solid" "blue")
                                    -30 0
                                    (circle 3 "solid" "blue"))))
-(define ORANGE (place-image/align GHOSTORANGE 30 30 "center" "center" BG))
+(define ORANGE (place-image/align GHOST-ORANGE 30 30 "center" "center" BG))
 ;---------------------------
 ;BLUEGHOST
 
@@ -110,7 +110,7 @@
                    0 5 T4))
 (define GHOST-BLUE (underlay/offset GHOSTBLUE1
                    2 7 (rotate 180 T4)))
-(define BLUE (place-image/align GHOSTBLUE 30 30 "center" "center" BG))
+(define BLUE (place-image/align GHOST-BLUE 30 30 "center" "center" BG))
 ;-----------------------------
 ;DOT
 (define DOT (circle 6 "solid" "Papaya Whip"))
@@ -152,3 +152,46 @@
 ;GATE
 ;------------------------
 (define GATE (place-image/align (rectangle 60 5 "solid""Deep Sky Blue") 30 30 "center" "center" BG))
+
+;TESTS
+;------------------
+(define ROW1 (list BG CORNER (rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)(rotate 90 VW)
+                     (rotate -90 DCORNER) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW)
+                     (rotate -90 CORNER)))
+(define ROW2 (list BG VW POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT VW POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT POINT VW))
+(define ROW0 (list BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG BG))
+(define PACROW (list BG VW (rotate 90 PACMAN1) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT VW
+                     POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) (rotate 90 VW) POINT VW))
+(define LAB (list ROW0 ROW1 ROW2 PACROW))
+
+;RENDER FUNCTION
+;--------------------
+(define (render-row list)
+  (cond
+    [(empty? list) BG]
+    [else (beside (first list) (render-row (rest list)))]))
+
+(define (render list)
+  (cond
+    [(empty? list) (render-row ROW0)]
+    [else (above (render-row (first list)) (render (rest list)))]))
+
+;FIND PACMAN POSITION IN THE LABYRINTH
+;--------------------------------------
+(define (PAC? list pos)
+  (cond
+    [(empty? list) #false]
+    [else
+     (cond
+       [(posn? (PAC-1 (first list) pos)) (PAC-1 (first list) pos)]
+       [else (PAC? (rest list) (make-posn 0 (+ 1 (posn-y pos))))])]))
+
+(define (PAC-1 list pos)
+  (cond
+    [(empty? list) '()]
+    [else
+     (cond
+       [(or (equal? PACMAN1 (first list)) (equal? (rotate 90 PACMAN1) (first list)) (equal? (rotate -90 PACMAN1) (first list)) (equal? (rotate 180 PACMAN1) (first list))) pos]
+       [else (PAC-1 (rest list) (make-posn (+ 1 (posn-x pos)) (posn-y pos)))])]))
+   
+  
