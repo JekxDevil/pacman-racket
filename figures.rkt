@@ -193,5 +193,20 @@
      (cond
        [(or (equal? PACMAN1 (first list)) (equal? (rotate 90 PACMAN1) (first list)) (equal? (rotate -90 PACMAN1) (first list)) (equal? (rotate 180 PACMAN1) (first list))) pos]
        [else (PAC-1 (rest list) (make-posn (+ 1 (posn-x pos)) (posn-y pos)))])]))
-   
+
+;FIND ELEMENT AT POSITION
+;---------------------------
+
+(define (find-tot list pos start)
+  (cond
+    [(= (posn-y start) (posn-y pos)) (find? (first list) pos start)]
+    [else (find-tot (rest list) pos (make-posn 0 (+ 1 (posn-y start))))]))
+
+(define (find? list pos start)
+  (cond
+    [(empty? list) '()]
+    [else
+     (cond
+       [(equal? (posn-x pos) (posn-x start)) (first list)]
+       [else (find? (rest list) pos (make-posn (+ 1 (posn-x start)) (posn-y start)))])]))
   
