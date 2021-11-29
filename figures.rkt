@@ -197,13 +197,22 @@
 ;RENDER FUNCTION
 ;--------------------
 
-(define (conversion-char char)
+
+
+
+
+(define (conversion-char state)
   (cond
-    [(equal? char #\ ) BG]
+    [(equal? state #\ ) BG]
     [(equal? char #\W) WALL]
     [(equal? char #\.) DOT]
     [(equal? char #\@) PP]
-    [(equal? char #\P) PACMAN-OPEN] ; or close VFX
+    [(equal? char #\P) PACMAN-OPEN
+     (cond
+       [(equal? (pacman-direction appstate) "r") PACMAN-OPEN]
+       [(equal? (pacman-direction appstate) "l") (rotate 180 PACMAN-OPEN)]
+       [(equal? (pacman-direction appstate) "u") (rotate 90 PACMAN-OPEN)]
+       [(equal? (pacman-direction pac) "d") (rotate -90 PACMAN-OPEN)])]; or close VFX
     [(equal? char #\Y) CHERRY]
     [(equal? char #\_) GATE]
     [(equal? char #\o) GHOST-ORANGE]
@@ -218,6 +227,7 @@
   (cond
     [(empty? list) '()]
     [else (cons (map conversion-char (first list)) (conv (rest list)))]))
+
 ; Square are a List<Image>
 
 ;input/output
@@ -246,16 +256,20 @@
 
 
 ;;; delete tests
-(define TR1 (render-row (map conversion-char (string->list "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"))))
-(define TR2 (render-row (map conversion-char (string->list "W.WWWWpWW.WWWWWWWW@WWPWWWWoW"))))
+(define TR1 (render-row (map conversion-char (string->list "W.WWWW.WW.WWWWWWWW.WW.WWWW.W")
+                             ))
+(define TR2 (render-row (map conversion-char (string->list "W.WWWWpWW.WWWWWWWW@WWPWWWWoW")
+                             (list (make-pacman "l" (make-posn 0 0)))
+                             )))
 
 
-(render (map (λ (string-row) (render-row (map conversion-char (string->list string-row)))) (vector->list EX-MAP2)))
+(render (map (λ (string-row) (render-row (map conversion-char (string->list string-row)))) (vector->list EX-MAP2))
+        (make-pacman "l" (make-posn 0 0))
+        )
 
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
-(define (find list pos)
-  (list-ref (list-ref list (posn-y pos)) (posn-x pos)))
+
 
   

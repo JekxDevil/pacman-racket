@@ -45,7 +45,8 @@
 ;         score : Natural
 ;    pp-active? : Boolean
 ;  pacman-mouth : Boolean (VFX)
-(define-struct appstate [map score pp-active? pacman-mouth])
+;` pacman       : character
+(define-struct appstate [map score pp-active? pacman-mouth pacman])
 
 ;*****************************************************************
 ;*****************************************************************
