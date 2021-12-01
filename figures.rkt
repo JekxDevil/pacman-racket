@@ -4,24 +4,25 @@
 ;;; API
 (require racket/base)
 ;characters
-(provide PACMAN-OPEN)
-(provide PACMAN-CLOSE)
-(provide GHOST-RED)
-(provide GHOST-PINK)
-(provide GHOST-CYAN)
-(provide GHOST-ORANGE)
-(provide GHOST-EDIBLE)
+(provide SKIN-PACMAN-OPEN)
+(provide SKIN-PACMAN-CLOSE)
+(provide SKIN-GHOST-RED)
+(provide SKIN-GHOST-PINK)
+(provide SKIN-GHOST-CYAN)
+(provide SKIN-GHOST-ORANGE)
+(provide SKIN-GHOST-EDIBLE)
 ; objects
-(provide DOT)
-(provide PP)
-(provide CHERRY)
+(provide SKIN-DOT)
+(provide SKIN-PP)
+(provide SKIN-CHERRY)
 ; map
-(provide WALL)
-(provide GATE)
+(provide SKIN-WALL)
+(provide SKIN-GATE)
+
+;************************************************************************************
 ;************************************************************************************
 ;; LIBRARIES
 (require 2htdp/image)
-(require 2htdp/universe)
 
 ;************************************************************************************
 
@@ -30,8 +31,8 @@
 ;; postfix "WB" stands for without border
 (define PACMAN-OPEN-WB (rotate 30 (wedge 30 300 "solid" "gold")))
 (define PACMAN-CLOSE-WB (circle 30 "solid" "gold"))
-(define PACMAN-OPEN (place-image/align PACMAN-OPEN-WB 30 30 "center" "center" BG))
-(define PACMAN-CLOSE (place-image/align PACMAN-CLOSE-WB 30 30 "center" "center" BG))
+(define SKIN-PACMAN-OPEN (place-image/align PACMAN-OPEN-WB 30 30 "center" "center" BG))
+(define SKIN-PACMAN-CLOSE (place-image/align PACMAN-CLOSE-WB 30 30 "center" "center" BG))
 ;-----------------------------------
 ;;;
 ;;; MAKE GHOSTS
@@ -63,16 +64,16 @@
                      BG))
 
 ;RED GHOST
-(define GHOST-RED (make-ghost "red"))
+(define SKIN-GHOST-RED (make-ghost "red"))
 ;-------------------------------
 ;PINK GHOST
-(define GHOST-PINK (make-ghost "pink"))
+(define SKIN-GHOST-PINK (make-ghost "pink"))
 ;-----------------------------
 ;CYAN GHOST
-(define GHOST-CYAN (make-ghost "cyan"))
+(define SKIN-GHOST-CYAN (make-ghost "cyan"))
 ;-----------------------------
 ;ORANGE GHOST
-(define GHOST-ORANGE (make-ghost "orange"))
+(define SKIN-GHOST-ORANGE (make-ghost "orange"))
 ;---------------------------
 ;EDIBLE GHOST
 (define T1 (overlay/offset (isosceles-triangle 5 300 "solid" "white") 5 0 (isosceles-triangle 5 300 "solid" "white")))
@@ -83,16 +84,16 @@
 (define GHOE2 (make-ghost "blue"))
 (define GHOE3 (underlay/offset GHOE2 0 5 T4))
 (define GHOST-EDIBLE-WB (underlay/offset GHOE3 2 7 (rotate 180 T4)))
-(define GHOST-EDIBLE (place-image/align GHOST-EDIBLE-WB 30 30 "center" "center" BG))
+(define SKIN-GHOST-EDIBLE (place-image/align GHOST-EDIBLE-WB 30 30 "center" "center" BG))
 ;-----------------------------
 ;DOT
 (define DOT-WB (circle 6 "solid" "Papaya Whip"))
-(define DOT (place-image/align DOT-WB 30 30 "center" "center" BG))
+(define SKIN-DOT (place-image/align DOT-WB 30 30 "center" "center" BG))
 
 ;-----------------------------
 ;POWERPELLETS
 (define PP-WB (circle 10 "solid" "Khaki"))
-(define PP (place-image/align PP-WB 30 30 "center" "center" BG))
+(define SKIN-PP (place-image/align PP-WB 30 30 "center" "center" BG))
 
 ;-----------------------------
 ; CHERRY
@@ -104,15 +105,15 @@
                                 (circle 10 "solid" "light coral")))
 (define CHERRY2 (overlay/offset CHERRY1 20 0 CHERRY1))
 (define CHERRY3 (overlay/offset BRANCH 0 10 CHERRY2))
-(define CHERRY (place-image/align CHERRY3 30 30 "center" "center" BG))
+(define SKIN-CHERRY (place-image/align CHERRY3 30 30 "center" "center" BG))
 
 ;---------------------------
 ;WALL
-(define WALL (rectangle 60 60 "solid" "blue"))
+(define SKIN-WALL (rectangle 60 60 "solid" "blue"))
 
 ;GATE
 ;------------------------
-(define GATE (place-image/align (rectangle 60 5 "solid" "Deep Sky Blue") 30 30 "center" "center" BG))
+(define SKIN-GATE (place-image/align (rectangle 60 5 "solid" "Deep Sky Blue") 30 30 "center" "center" BG))
 
 ;*********************************************************************************************************
 ;*********************************************************************************************************
@@ -178,7 +179,7 @@
 
 ;;; delete tests
 (define TR1 (render-row (map conversion-char (string->list "W.WWWW.WW.WWWWWWWW.WW.WWWW.W")
-                             ))
+                             )))
 (define TR2 (render-row (map conversion-char (string->list "W.WWWWpWW.WWWWWWWW@WWPWWWWoW")
                              (list (make-pacman "l" (make-posn 0 0)))
                              )))
@@ -191,14 +192,11 @@
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
-<<<<<<< HEAD
 (define (find state pos)
   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
-  
-=======
+
 ; Map Pac-posn -> Map
 
 (define (find appstate pos)
   (list-ref (list-ref (appstate-map appstate) (posn-y pos)) (posn-x pos)))
->>>>>>> 294d4cfa6759e8771e38dfae15a8023ed533a67b
