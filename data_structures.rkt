@@ -43,12 +43,12 @@
 ; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth) 
 ; where     map : Vector<String>
 ;         score : Natural
-;    pp-active? : Boolean
+;    pp-active : Boolean
 ;  pacman-mouth : Boolean (VFX)
 ;` pacman       : character
 ; ghost         : List<character>
 ; quit          : Boolean
-(define-struct appstate [map score pp-active? pacman-mouth pacman ghost quit])
+(define-struct appstate [map score pp-active pacman-mouth pacman ghost quit])
 
 ;*****************************************************************
 ;*****************************************************************

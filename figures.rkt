@@ -122,12 +122,6 @@
 ;*********************************************************************************************************
 ;TESTS
 ;------------------
-(define ROW1 (vector " " "+" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "T" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "-" "7"))
-(define ROW2 (list " " "|" "." "." "." "." "." "." "." "." "." "." "." "." "|" "." "." "." ".""."".""." "." "." "." "." "." "|" ))
-(define ROW0 (list " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "))
-(define PACROW (list " " "|" "P" "-" "-" "-" "-" "." "-" "-" "-" "-" "-" "." "|" "." "-" "-" "-" "-" "-" "." "-" "-" "-" "-" "." "|"))
-(define LAB (list ROW0 ROW1 ROW2 PACROW))
-
 (define EX-MAP1 (vector
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
                 "W............WW............W"
@@ -196,12 +190,7 @@
 
 ;RENDER FUNCTION
 ;--------------------
-
-
-
-
-
-(define (conversion-char state)
+(define (conversion-char char state)
   (cond
     [(equal? state #\ ) BG]
     [(equal? char #\W) WALL]
@@ -270,7 +259,14 @@
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
+<<<<<<< HEAD
 (define (find state pos)
   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
   
+=======
+; Map Pac-posn -> Map
+
+(define (find appstate pos)
+  (list-ref (list-ref (appstate-map appstate) (posn-y pos)) (posn-x pos)))
+>>>>>>> 294d4cfa6759e8771e38dfae15a8023ed533a67b
