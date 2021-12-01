@@ -270,6 +270,7 @@
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
-
+(define (find state pos)
+  (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
   

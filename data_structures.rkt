@@ -46,7 +46,9 @@
 ;    pp-active? : Boolean
 ;  pacman-mouth : Boolean (VFX)
 ;` pacman       : character
-(define-struct appstate [map score pp-active? pacman-mouth pacman quit])
+; ghost         : List<character>
+; quit          : Boolean
+(define-struct appstate [map score pp-active? pacman-mouth pacman ghost quit])
 
 ;*****************************************************************
 ;*****************************************************************
