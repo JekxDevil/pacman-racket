@@ -102,10 +102,25 @@
       [(or (equal? next "r") (equal? next "p") (equal? next "o") (equal? next "c")) (make-appstate (map-update state) (appstate-score state) (app-state-pp-active? state) (appstate-pacman-mouth state) (make-character ("Pac-Man" "u" pac-next)) #true)]
       [(equal? next " ") (make-appstate (map-update state) (appstate-score state) (app-state-pp-active? state) (appstate-pacman-mouth state) (make-character ("Pac-Man" "u" pac-next)) #false)])))
 
+;*******************************************************************************************************
 ;tests
 (define (find state pos)
   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
+;*******************************************************************************************************
 ;Quitter
 (define (quit? state)
   (appstate-quit state))
+
+;*******************************************************************************************************
+;; points handler
+(define DOT-POINTS 10)
+
+(define (add-points appstate obj)
+  (if [string? obj "."]
+      (make-appstate (appstate-map appstate)
+                     (+ (appstate-score appstate) DOT-POINTS)
+                     (appstate-pacman appstate)
+                     (appstate-pp-active appstate)
+                     (appstate-pacman-mouth appstate)
+                     (appstate-quit appstate))))

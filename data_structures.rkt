@@ -7,6 +7,7 @@
 (require "figures.rkt")
 
 (define SCORE 0)
+(define 
 (define TICK 50)
 
 ;;; Data types

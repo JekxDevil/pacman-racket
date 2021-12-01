@@ -5,7 +5,6 @@
 (require "figures.rkt")
 (require "data_structures.rkt")
 
-
 (define INIT-QUIT #false)
 (define INIT-PACMAN-MOUTH #true)
 (define INIT-PP-ACTIVE #false)

@@ -19,9 +19,12 @@
 (provide WALL)
 (provide GATE)
 ;************************************************************************************
-
+;; LIBRARIES
 (require 2htdp/image)
 (require 2htdp/universe)
+
+;************************************************************************************
+
 (define BG (square 60  "solid" "black"))
 
 ;; postfix "WB" stands for without border
@@ -72,17 +75,14 @@
 (define GHOST-ORANGE (make-ghost "orange"))
 ;---------------------------
 ;EDIBLE GHOST
-
 (define T1 (overlay/offset (isosceles-triangle 5 300 "solid" "white") 5 0 (isosceles-triangle 5 300 "solid" "white")))
 (define T2 (overlay/offset T1 8 0 (isosceles-triangle 5 300 "solid" "white")))
 (define T3 (overlay/offset T2 11 0 (isosceles-triangle 5 300 "solid" "white")))
 (define T4 (overlay/offset T3 14 0 (isosceles-triangle 5 300 "solid" "white")))
 
 (define GHOE2 (make-ghost "blue"))
-(define GHOE3 (underlay/offset GHOE2
-                               0 5 T4))
-(define GHOST-EDIBLE-WB (underlay/offset GHOE3
-                                       2 7 (rotate 180 T4)))
+(define GHOE3 (underlay/offset GHOE2 0 5 T4))
+(define GHOST-EDIBLE-WB (underlay/offset GHOE3 2 7 (rotate 180 T4)))
 (define GHOST-EDIBLE (place-image/align GHOST-EDIBLE-WB 30 30 "center" "center" BG))
 ;-----------------------------
 ;DOT
@@ -91,21 +91,18 @@
 
 ;-----------------------------
 ;POWERPELLETS
-
 (define PP-WB (circle 10 "solid" "Khaki"))
 (define PP (place-image/align PP-WB 30 30 "center" "center" BG))
 
 ;-----------------------------
-;CHERRY
+; CHERRY
 (define BRANCH (beside
                (line 10 -10 (pen "brown" 5 "long-dash" "butt" "round"))
-               (flip-horizontal
-                (line 10 -10 (pen "brown" 5 "long-dash" "butt" "round")))))
+               (flip-horizontal (line 10 -10 (pen "brown" 5 "long-dash" "butt" "round")))))
 (define CHERRY1 (overlay/offset (circle 10 "solid" "firebrick")
                                 2 2
                                 (circle 10 "solid" "light coral")))
 (define CHERRY2 (overlay/offset CHERRY1 20 0 CHERRY1))
-
 (define CHERRY3 (overlay/offset BRANCH 0 10 CHERRY2))
 (define CHERRY (place-image/align CHERRY3 30 30 "center" "center" BG))
 
@@ -120,73 +117,8 @@
 ;*********************************************************************************************************
 ;*********************************************************************************************************
 ;*********************************************************************************************************
-;TESTS
-;------------------
-(define EX-MAP1 (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W............WW............W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W      W WW.WWWWWW"
-                "      .   W      W   .      "
-                "WWWWWW.WW W      W WW.WWWWWW"
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW.......  .......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W..........................W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
-(define EX-MAP2 (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W.....Y......WW......Y.....W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W    r W WW.WWWWWW"
-                "      .   W o    W   .      "
-                "WWWWWW.WW W p  c W WW.WWWWWW"
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW    P     WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW.......  .......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.....Y..............Y.....W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+
 
 ;RENDER FUNCTION
 ;--------------------
