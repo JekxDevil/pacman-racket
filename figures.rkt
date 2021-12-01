@@ -191,7 +191,14 @@
 
 ;FIND ELEMENT AT POSITION
 ;---------------------------
+<<<<<<< HEAD
+(define (find state pos)
+  (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
+
+  
+=======
 ; Map Pac-posn -> Map
 
 (define (find appstate pos)
   (list-ref (list-ref (appstate-map appstate) (posn-y pos)) (posn-x pos)))
+>>>>>>> 294d4cfa6759e8771e38dfae15a8023ed533a67b
