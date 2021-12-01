@@ -292,12 +292,17 @@
 ;*******************************************************************************************************
 ;; points handler
 (define DOT-POINTS 10)
+(define CHERRY-POINTS 100)
 
 (define (add-points appstate obj)
-  (if [string? obj "."]
-      (make-appstate (appstate-map appstate)
-                     (+ (appstate-score appstate) DOT-POINTS)
-                     (appstate-pacman appstate)
-                     (appstate-pp-active appstate)
-                     (appstate-pacman-mouth appstate)
-                     (appstate-quit appstate))))
+  (make-appstate (appstate-map appstate)
+    (+ (appstate-score appstate) (cond [(equal? obj DOT) (DOT-POINTS)]
+                                        [(equal? obj CHERRY) (CHERRY-POINTS)]))
+    (appstate-pacman appstate)
+    (appstate-pp-active appstate)
+    (appstate-pacman-mouth appstate)
+    (appstate-quit appstate)))
+
+(define DOTS-TOT-POINTS 236)
+(define (points-finished appstate obj)
+  ()
