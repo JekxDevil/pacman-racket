@@ -37,6 +37,8 @@
 ; examples
 (provide INIT-APPSTATE)
 (provide EX-APPSTATE-EDIBLE)
+(provide INIT-MAP)
+(provide EX-MAP)
 
 ;*****************************************************************
 ;*****************************************************************
