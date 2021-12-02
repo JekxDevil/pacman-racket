@@ -8,6 +8,8 @@
 (provide SCORE)
 (provide MAX-SCORE-WO-PP)
 (provide TICK)
+(provide SPEED-PACMAN)
+(provide SPEED-GHOSTS)
 
 ; char map representation
 (provide MAP-WALL)
@@ -29,11 +31,12 @@
 (provide DIRECTION-RIGHT)
 
 ; struct
-(provide character)
-(provide appstate)
+(provide (struct-out character))
+(provide (struct-out appstate))
 
 ; examples
 (provide INIT-APPSTATE)
+(provide EX-APPSTATE-EDIBLE)
 
 ;*****************************************************************
 ;*****************************************************************
@@ -41,6 +44,8 @@
 (define SCORE 0)
 (define MAX-SCORE-WO-PP 236)
 (define TICK 50)
+(define SPEED-PACMAN 1)
+(define SPEED-GHOSTS 0.80)
 
 ;*****************************************************************
 ; Map is a Vector<String>
@@ -58,7 +63,7 @@
 ;   - "r" red
 ;   - "p" pink
 ;   - "c" cyan
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; char occupano meno spazio in memoria
 (define MAP-WALL #\W)
 (define MAP-EMPTY #\ )
 (define MAP-DOT #\.)
@@ -185,3 +190,4 @@
 (define INIT-QUIT #false)
 
 (define INIT-APPSTATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-PACMAN-MOUTH INIT-QUIT))
+(define EX-APPSTATE-EDIBLE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE #true INIT-PACMAN-MOUTH INIT-QUIT))
