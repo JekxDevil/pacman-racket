@@ -5,9 +5,9 @@
 
 
 ;; LIBRARIES
+(require 2htdp/image)
 (require "data_structures.rkt")
 (require "figures.rkt")
-(require 2htdp/image)
 ;*********************************************************************************
 ;;; RENDER FUNCTION
 ;*********************************************************************************

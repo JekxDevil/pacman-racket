@@ -10,6 +10,9 @@
 (provide TICK)
 (provide SPEED-PACMAN)
 (provide SPEED-GHOSTS)
+(provide POINTS-DOT)
+(provide POINTS-CHERRY)
+(provide POINTS-TOT-DOT)
 
 ; char map representation
 (provide MAP-WALL)
@@ -48,6 +51,10 @@
 (define TICK 50)
 (define SPEED-PACMAN 1)
 (define SPEED-GHOSTS 0.80)
+
+(define POINTS-DOT 10)
+(define POINTS-CHERRY 100)
+(define POINTS-TOT-DOT 236)
 
 ;*****************************************************************
 ; Map is a Vector<String>
@@ -154,10 +161,10 @@
 ; Left
 ; Right
 
-(define DIRECTION-UP "u")
-(define DIRECTION-DOWN "d")
-(define DIRECTION-LEFT "l")
-(define DIRECTION-RIGHT "r")
+(define DIRECTION-UP #\u)
+(define DIRECTION-DOWN #\d)
+(define DIRECTION-LEFT #\l)
+(define DIRECTION-RIGHT #\r)
 
 ;*****************************************************************
 ; Character is a struct: (make-pacman name direction position)

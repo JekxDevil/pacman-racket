@@ -1,42 +1,12 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname handler) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
-;structures
-(define-struct character [name direction position])
-(define-struct appstate [map score pp-active? pacman-mouth pacman ghost quit])
-(define EX-MAP2 (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W.....Y......WW......Y.....W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W    r W WW.WWWWWW"
-                "      .   W o    W   .      "
-                "WWWWWW.WW W p  c W WW.WWWWWW"
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW....... P.......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.....Y..............Y.....W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
-(define state1 (make-appstate  EX-MAP2 0 #false #false (make-character "Pac-man" "r" (make-posn 13 17))))
+;; LIBRARIES
+(require 2htdp/image)
+(require "data_structures.rkt")
+(require "figures.rkt")
+(require "render.rkt")
+;*********************************************************************************
 
 (define (edit key state)
   (cond
@@ -285,14 +255,39 @@
   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
 ;*******************************************************************************************************
-;Quitter
-(define (quit? state)
-  (appstate-quit state))
+;; Input/Output
+; quit : AppState -> AppState
+; given an AppState, it quits the app by changing the correspondent value in the appstate that records it
+;; header :
+; (define (quit appstate) AppState)
+
+;; Examples
+(check-expect ())
+
+;; Code
+(define (quit appstate)
+  (make-appstate (appstate-map appstate)
+                 (appstate-pacman appstate)
+                 (appstate-ghosts appstate)
+                 (appstate-score appstate)
+                 (appstate-pp-active appstate)
+                 (appstate-pacman-mouth appstate)
+                 #true))
+;*******************************************************************************************************
+;;; QUITTER
+;; Input/Output
+; quit? : AppState -> Boolean
+; takes an appstate and returns a bool indicating whether the app has quit or not
+; header :
+; (define (quit? appstate) Boolean)
+
+;; Code
+(define (quit? appstate)
+  (appstate-quit appstate))
 
 ;*******************************************************************************************************
 ;; points handler
-(define DOT-POINTS 10)
-(define CHERRY-POINTS 100)
+
 
 (define (add-points appstate obj)
   (make-appstate (appstate-map appstate)

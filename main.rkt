@@ -11,6 +11,7 @@
   (big-bang appstate
     [on-tick TICK]
     [to-draw render]
-    [on-key edit]))
+    [on-key edit]
+    [stop-when? quit?]))
 
 (run INIT-APPSTATE)
