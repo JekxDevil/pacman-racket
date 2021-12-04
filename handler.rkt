@@ -2,25 +2,52 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname handler) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 ;; LIBRARIES
+(require racket/base)
 (require 2htdp/image)
 (require "data_structures.rkt")
 (require "figures.rkt")
 (require "render.rkt")
+
 ;*********************************************************************************
+;*********************************************************************************
+;; API
+(provide key-handler)
+(provide quit?)
 
-(define (edit key state)
+;*********************************************************************************
+;*********************************************************************************
+;; Input/Output
+; key-handler : Appstate Key -> Appstate
+;
+; header :
+; (define (key-handler appstate key) Appstate)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (big-bang)
+(define (key-handler appstate key)
   (cond
-    [(equal? key "left") (move-left state)]
-    [(equal? key "right") (move-right state)]
-    [(equal? key "up") (move-up state)]
-    [(equal? key "down") (move-down state)]
-    [else state]))
+    [(equal? key "left") (move-left appstate)]
+    [(equal? key "right") (move-right appstate)]
+    [(equal? key "up") (move-up appstate)]
+    [(equal? key "down") (move-down appstate)]
+    [else appstate]))
 
-
+;*********************************************************************************
 ;MOVE-LEFT FUNCTION
-; I/O
-; move-left: appstate --> appstate
-; header (define (move-left appstate) appstate)
+;; Input/Output
+; move-left: Appstate -> Appstate
+;
+; header :
+; (define (move-left appstate) appstate)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (key-handler)
 (define (move-left state)
   (local (
           (define pac-pos (((character-position) ((appstate-pacman) state))))
@@ -74,10 +101,20 @@
                                         (make-character ("Pac-Man" "l" pac-next))
                                         (appstate-ghost state)
                                         #false)])))
-;MOVE-RIGHT FUNCTION
-; I/O
-; move-right: appstate --> appstate
-; header (define (move-right appstate) appstate)
+
+;*********************************************************************************
+; MOVE-RIGHT FUNCTION
+;; Input/Output
+; move-right: Appstate -> Appstate
+;
+; header :
+; (define (move-right appstate) Appstate)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (key-handler)
 (define (move-right state)
   (local (
           (define pac-pos (((character-position) ((appstate-pacman) state))))
@@ -133,11 +170,20 @@
                                         (make-character ("Pac-Man" "r" pac-next))
                                         (appstate-ghost state)
                                         #false)])))
-;MOVE-DOWN FUNCTION
-; I/O
-; move-down: appstate --> appstate
-; header (define (move-down appstate) appstate)
 
+;*********************************************************************************
+;MOVE-DOWN FUNCTION
+; Input/Output
+; move-down: Appstate -> Appstate
+;
+; header :
+; (define (move-down appstate) Appstate)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (key-handler)
 (define (move-down state)
   (local (
           (define pac-pos (((character-position) ((appstate-pacman) state))))
@@ -191,11 +237,20 @@
                                         (make-character ("Pac-Man" "d" pac-next))
                                         (appstate-ghost state)
                                         #false)])))
-;MOVE-UP FUNCTION
-; I/O
-; move-up: appstate --> appstate
-; header (define (move-up appstate) appstate)
 
+;*********************************************************************************
+; MOVE-UP FUNCTION
+; Input/Output
+; move-up: Appstate -> Appstate
+; 
+; header :
+; (define (move-up appstate) Appstate)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (key-handler) 
 (define (move-up state)
   (local (
           (define pac-pos (((character-position) ((appstate-pacman) state))))
@@ -256,13 +311,60 @@
 
 ;*******************************************************************************************************
 ;; Input/Output
-; quit : AppState -> AppState
-; given an AppState, it quits the app by changing the correspondent value in the appstate that records it
+; is-fullscore : Appstate -> Appstate
+; check if score is full, if it is the quit attribute in appstate becomes true
+; header:
+; (define (is-fullscore appstate) Appstate)
+
+;; Examples
+(define PRE-SCORE-APPSTATE0 (make-appstate INIT-MAP
+                                          INIT-PACMAN
+                                          INIT-GHOSTS
+                                          MAX-SCORE-WO-PP
+                                          INIT-PP-ACTIVE
+                                          INIT-PACMAN-MOUTH
+                                          #false))
+(define POST-SCORE-APPSTATE0 (make-appstate INIT-MAP
+                                           INIT-PACMAN
+                                           INIT-GHOSTS
+                                           MAX-SCORE-WO-PP
+                                           INIT-PP-ACTIVE
+                                           INIT-PACMAN-MOUTH
+                                           #true))
+(define PRE-SCORE-APPSTATE1 (make-appstate INIT-MAP
+                                          INIT-PACMAN
+                                          INIT-GHOSTS
+                                          (- MAX-SCORE-WO-PP 1)
+                                          INIT-PP-ACTIVE
+                                          INIT-PACMAN-MOUTH
+                                          #false))
+(define POST-SCORE-APPSTATE1 (make-appstate INIT-MAP
+                                           INIT-PACMAN
+                                           INIT-GHOSTS
+                                           (- MAX-SCORE-WO-PP 1)
+                                           INIT-PP-ACTIVE
+                                           INIT-PACMAN-MOUTH
+                                           #true))
+
+(check-expect (is-fullscore INIT-APPSTATE) INIT-APPSTATE)
+(check-expect (is-fullscore PRE-SCORE-APPSTATE0) POST-SCORE-APPSTATE0)
+(check-expect (is-fullscore PRE-SCORE-APPSTATE1) POST-SCORE-APPSTATE1)
+
+;; Code - used by ---TODO IMPLEMENTATION
+(define (is-fullscore appstate)
+  (local [(define score (appstate-score appstate))]
+  (if [>= score MAX-SCORE-WO-PP]
+      [quit appstate]
+      appstate)))
+
+;*******************************************************************************************************
+;; Input/Output
+; quit : Appstate -> Appstate
+; given an Appstate, it quits the app by changing the correspondent value in the appstate that records it
 ;; header :
 ; (define (quit appstate) AppState)
 
 ;; Examples
-(check-expect ())
 
 ;; Code
 (define (quit appstate)
@@ -276,14 +378,14 @@
 ;*******************************************************************************************************
 ;;; QUITTER
 ;; Input/Output
-; quit? : AppState -> Boolean
+; quit? : Appstate -> Boolean
 ; takes an appstate and returns a bool indicating whether the app has quit or not
 ; header :
 ; (define (quit? appstate) Boolean)
 
 ;; Code
 (define (quit? appstate)
-  (appstate-quit appstate))
+  (appstate-quit appstate)); edit
 
 ;*******************************************************************************************************
 ;; points handler
@@ -299,5 +401,18 @@
     (appstate-quit appstate)))
 
 (define DOTS-TOT-POINTS 236)
-(define (points-finished appstate obj)
-  ()
+;(define (points-finished appstate obj)
+;  ()
+
+;*********************************************************************************
+;*********************************************************************************
+;*********************************************************************************
+;FIND ELEMENT AT POSITION
+;(define (find-in-map state pos)
+;  (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
+
+
+; Map Pac-posn -> Map
+
+;(define (find appstate pos)
+ ; (list-ref (list-ref (appstate-map appstate) (posn-y pos)) (posn-x pos)))

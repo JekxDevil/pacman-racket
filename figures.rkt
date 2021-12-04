@@ -1,8 +1,14 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname figures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
-;;; API
+;; LIBRARIES
 (require racket/base)
+(require 2htdp/image)
+(require "data_structures.rkt")
+
+;************************************************************************************
+;************************************************************************************
+;; API
 ; characters
 (provide SKIN-PACMAN-OPEN)
 (provide SKIN-PACMAN-CLOSE)
@@ -19,16 +25,14 @@
 (provide SKIN-BG)
 (provide SKIN-WALL)
 (provide SKIN-GATE)
+; UI
+(provide SCORE-RECTANGLE)
 
 ;************************************************************************************
 ;************************************************************************************
-;; LIBRARIES
-(require 2htdp/image)
-(require "data_structures.rkt")
+;; CONTANTS
+; postfix "WB" stands for "Without Border"
 
-;************************************************************************************
-;************************************************************************************
-;; postfix "WB" stands for 'Without Border'
 ; BACKGROUND
 (define SKIN-BG (square 60  "solid" "black"))
 
@@ -38,9 +42,12 @@
 (define SKIN-PACMAN-OPEN (place-image/align PACMAN-OPEN-WB 30 30 "center" "center" SKIN-BG))
 (define SKIN-PACMAN-CLOSE (place-image/align PACMAN-CLOSE-WB 30 30 "center" "center" SKIN-BG))
 ;************************************************************************************
-;;; MAKE GHOSTS
+; MAKE GHOSTS
 (define EYE (circle 7 "solid" "white"))
 (define PUPIL (circle 3 "solid" "blue"))
+(define TOOTH (isosceles-triangle 5 300 "solid" "white"))
+(define TEETH (beside TOOTH TOOTH TOOTH TOOTH TOOTH))
+(define MOUTH (underlay/offset TEETH 2 3 (rotate 180 TEETH)))
 
 (define (make-ghost-body color)
   (overlay/offset (rectangle 50 30 "solid" color) 0 -19 (circle 25 "solid" color)))
@@ -63,9 +70,6 @@
 ; ORANGE GHOST
 (define SKIN-GHOST-ORANGE (make-ghost "orange"))
 ; EDIBLE GHOST
-(define TOOTH (isosceles-triangle 5 300 "solid" "white"))
-(define TEETH (beside TOOTH TOOTH TOOTH TOOTH TOOTH))
-(define MOUTH (underlay/offset TEETH 2 3 (rotate 180 TEETH)))
 (define GHOST-EDIBLE-WB (underlay/offset (make-ghost "blue") 0 7 MOUTH))
 (define SKIN-GHOST-EDIBLE (place-image/align GHOST-EDIBLE-WB 30 30 "center" "center" SKIN-BG))
 ;************************************************************************************
@@ -83,10 +87,9 @@
 (define PEN-CHERRY (pen "brown" 5 "long-dash" "butt" "round"))
 (define BRANCH (line 10 -10 PEN-CHERRY))
 (define BRANCHES (beside BRANCH (flip-horizontal BRANCH)))
-
-(define CHERRY (overlay/offset (circle 10 "solid" "firebrick") 2 2 (circle 10 "solid" "light coral")))
-(define CHERRIES (overlay/offset CHERRY 20 0 CHERRY))
-(define CHERRY-WB (overlay/offset BRANCHES 0 10 CHERRIES))
+(define CHERRY-GRAPE (overlay/offset (circle 10 "solid" "firebrick") 2 2 (circle 10 "solid" "light coral")))
+(define CHERRY-GRAPES (overlay/offset CHERRY-GRAPE 20 0 CHERRY-GRAPE))
+(define CHERRY-WB (overlay/offset BRANCHES 0 10 CHERRY-GRAPES))
 (define SKIN-CHERRY (place-image/align CHERRY-WB 30 30 "center" "center" SKIN-BG))
 
 ;************************************************************************************
@@ -96,3 +99,7 @@
 ;************************************************************************************
 ; GATE
 (define SKIN-GATE (place-image/align (rectangle 60 5 "solid" "Deep Sky Blue") 30 30 "center" "center" SKIN-BG))
+
+;************************************************************************************
+; SCORE RECTANGLE
+(define SCORE-RECTANGLE (overlay (rectangle 150 40 "solid" "black") (rectangle 155 45 "solid" "green")))

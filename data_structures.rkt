@@ -1,9 +1,12 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname data_structures) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
-;;; API
+;; LIBRARIES
 (require racket/base)
 
+;*****************************************************************
+;*****************************************************************
+;; API
 ; generic settings
 (provide SCORE)
 (provide MAX-SCORE-WO-PP)
@@ -40,12 +43,19 @@
 ; examples
 (provide INIT-APPSTATE)
 (provide EX-APPSTATE-EDIBLE)
+
 (provide INIT-MAP)
 (provide EX-MAP)
+(provide INIT-PACMAN)
+(provide INIT-GHOSTS)
+(provide INIT-SCORE)
+(provide INIT-PP-ACTIVE)
+(provide INIT-PACMAN-MOUTH)
+(provide INIT-QUIT)
 
 ;*****************************************************************
 ;*****************************************************************
-; generic settings
+;; Generic settings
 (define SCORE 0)
 (define MAX-SCORE-WO-PP 236)
 (define TICK 50)
@@ -57,6 +67,7 @@
 (define POINTS-TOT-DOT 236)
 
 ;*****************************************************************
+;; Data type
 ; Map is a Vector<String>
 ; map elements representation:
 ; - "W" wall
@@ -72,7 +83,7 @@
 ;   - "r" red
 ;   - "p" pink
 ;   - "c" cyan
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; char occupano meno spazio in memoria
+
 (define MAP-WALL #\W)
 (define MAP-EMPTY #\ )
 (define MAP-DOT #\.)
@@ -85,8 +96,8 @@
 (define MAP-GHOST-PINK #\p)
 (define MAP-GHOST-CYAN #\c)
 
-; Examples
-; test map 31x28 -- '.' 240
+;; Examples
+; test map 31x28 -> '.' 240
 (define EX-MAP (vector
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
                 "W............WW............W"
@@ -155,20 +166,23 @@
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))   ; 30
 
 ;*****************************************************************
+;; Data type
 ; Direction is an enumerator
 ; Up
 ; Down
 ; Left
 ; Right
 
+;; Constants
 (define DIRECTION-UP #\u)
 (define DIRECTION-DOWN #\d)
 (define DIRECTION-LEFT #\l)
 (define DIRECTION-RIGHT #\r)
 
 ;*****************************************************************
-; Character is a struct: (make-pacman name direction position)
-;            name : String
+;; Data type
+; Character is a struct: (make-character name direction position)
+;            name : Char
 ;        position : Posn
 ;       direction : Direction
 (define-struct character [name direction position])
@@ -181,7 +195,8 @@
 (define INIT-GHOST4 (make-character MAP-GHOST-CYAN DIRECTION-LEFT (make-posn 16 15)))
 
 ;*******************************************************************
-; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth) 
+;; Data type
+; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth)
 ; where     map : Vector<String>
 ;        pacman : Character
 ;        ghosts : List<Character>
@@ -191,7 +206,7 @@
 ;          quit : Boolean
 (define-struct appstate [map pacman ghosts score pp-active pacman-mouth quit])
 
-; Examples
+;; Examples
 (define INIT-GHOSTS (list INIT-GHOST1 INIT-GHOST2 INIT-GHOST3 INIT-GHOST4))
 (define INIT-SCORE 0)
 (define INIT-PP-ACTIVE #false)
