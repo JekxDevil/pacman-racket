@@ -305,11 +305,6 @@
                                         #false)])))
 
 ;*******************************************************************************************************
-;tests
-(define (find state pos)
-  (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
-
-;*******************************************************************************************************
 ;; Input/Output
 ; is-fullscore : Appstate -> Appstate
 ; check if score is full, if it is the quit attribute in appstate becomes true
@@ -350,6 +345,8 @@
 (check-expect (is-fullscore PRE-SCORE-APPSTATE0) POST-SCORE-APPSTATE0)
 (check-expect (is-fullscore PRE-SCORE-APPSTATE1) POST-SCORE-APPSTATE1)
 
+;; Template
+
 ;; Code - used by ---TODO IMPLEMENTATION
 (define (is-fullscore appstate)
   (local [(define score (appstate-score appstate))]
@@ -361,12 +358,14 @@
 ;; Input/Output
 ; quit : Appstate -> Appstate
 ; given an Appstate, it quits the app by changing the correspondent value in the appstate that records it
-;; header :
+; header :
 ; (define (quit appstate) AppState)
 
 ;; Examples
 
-;; Code
+;; Template
+
+;; Code - used by (...)
 (define (quit appstate)
   (make-appstate (appstate-map appstate)
                  (appstate-pacman appstate)
@@ -383,26 +382,41 @@
 ; header :
 ; (define (quit? appstate) Boolean)
 
-;; Code
+;; Examples
+
+;; Template
+
+;; Code - used by (big-bang)
 (define (quit? appstate)
   (appstate-quit appstate)); edit
 
 ;*******************************************************************************************************
-;; points handler
+;;; POINTS HANDLER
+;; Input/Output
+; add-points : Appstate Char -> Appstate
+;
+; header :
+; (define (add-points appstate char) Appstate)
 
+;; Examples
 
-(define (add-points appstate obj)
+;; Template
+
+;; Code - used by (...)
+(define (add-points appstate char)
   (make-appstate (appstate-map appstate)
-    (+ (appstate-score appstate) (cond [(equal? obj DOT) (DOT-POINTS)]
-                                        [(equal? obj CHERRY) (CHERRY-POINTS)]))
     (appstate-pacman appstate)
+    (appstate-ghosts appstate)
+    (+ (appstate-score appstate) (cond [(equal? char MAP-DOT) (DOT-POINTS)]
+                                       [(equal? char MAP-CHERRY) (CHERRY-POINTS)]))
     (appstate-pp-active appstate)
     (appstate-pacman-mouth appstate)
     (appstate-quit appstate)))
 
-(define DOTS-TOT-POINTS 236)
-;(define (points-finished appstate obj)
-;  ()
+;*******************************************************************************************************
+; tests
+; (define (find state pos)
+;   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
 
 ;*********************************************************************************
 ;*********************************************************************************
