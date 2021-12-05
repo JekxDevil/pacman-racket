@@ -15,9 +15,18 @@
 (provide SPEED-GHOSTS)
 (provide POINTS-DOT)
 (provide POINTS-CHERRY)
-(provide POINTS-TOT-DOT)
+(provide POINTS-PP)
+(provide TOTAL-POINTS-DOTS)
+(provide TOTAL-POINTS-CHERRIES)
+(provide TOTAL-POINTS-PP)
+(provide TOTAL-POINTS)
 
-; char map representation
+; map
+(provide MAP-WIDTH)
+(provide MAP-HEIGHT)
+(provide MAP-WIDTH-INDEX)
+(provide MAP-HEIGHT-INDEX)
+
 (provide MAP-WALL)
 (provide MAP-EMPTY)
 (provide MAP-DOT)
@@ -64,11 +73,23 @@
 
 (define POINTS-DOT 10)
 (define POINTS-CHERRY 100)
-(define POINTS-TOT-DOT 236)
+(define POINTS-PP 100)
+(define TOTAL-DOTS 236)
+(define TOTAL-CHERRIES 4)
+(define TOTAL-PP 4)
+(define TOTAL-POINTS-DOTS (* TOTAL-DOTS POINTS-DOT))
+(define TOTAL-POINTS-CHERRIES (* TOTAL-CHERRIES POINTS-CHERRY))
+(define TOTAL-POINTS-PP (* TOTAL-PP POINTS-PP))
+(define TOTAL-POINTS (+ TOTAL-POINTS-DOTS TOTAL-POINTS-CHERRIES TOTAL-POINTS-PP))
 
 ;*****************************************************************
 ;; Data type
 ; Map is a Vector<String>
+(define MAP-WIDTH 31)
+(define MAP-HEIGHT 28)
+(define MAP-WIDTH-INDEX 30)
+(define MAP-HEIGHT-INDEX 27)
+
 ; map elements representation:
 ; - "W" wall
 ; - " " empty cell space
@@ -100,7 +121,7 @@
 ; test map 31x28 -> '.' 240
 (define EX-MAP (vector
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W............WW............W"
+                "W.....Y......WW......Y.....W"
                 "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
                 "W@W  W.W   W.WW.W   W.W  W@W"
                 "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -128,7 +149,7 @@
                 "W......WW....WW....WW......W"
                 "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
                 "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W..........................W"
+                "W.....Y..............Y.....W"
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
 ; '.' 236
@@ -185,7 +206,7 @@
 ;            name : Char
 ;        position : Posn
 ;       direction : Direction
-(define-struct character [name direction position])
+(define-struct character [name direction position] #:transparent)
 
 ; Examples
 (define INIT-PACMAN (make-character MAP-PACMAN DIRECTION-RIGHT (make-posn 14 17)))
@@ -204,7 +225,7 @@
 ;     pp-active : Boolean
 ;  pacman-mouth : Boolean (VFX)
 ;          quit : Boolean
-(define-struct appstate [map pacman ghosts score pp-active pacman-mouth quit])
+(define-struct appstate [map pacman ghosts score pp-active pacman-mouth quit] #:transparent)
 
 ;; Examples
 (define INIT-GHOSTS (list INIT-GHOST1 INIT-GHOST2 INIT-GHOST3 INIT-GHOST4))
