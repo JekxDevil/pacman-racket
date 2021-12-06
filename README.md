@@ -98,7 +98,7 @@ button on/off in-game volume: 'M'
 ## Soundtrack
 
 Nice 8 bit song normal
-Another nice 8 bit song with incresed velocity for power pellet
+Another nice 8 bit song with increased velocity for power pellet
 
 ## Sound Effects
 
@@ -107,3 +107,13 @@ Another nice 8 bit song with incresed velocity for power pellet
 - game over
 - eaten dot
 - power pellet powerup taken
+
+
+
+### MILESTONE 2
+
+---------------------
+
+* STRUCT changing:
+  * struct pacman, ghost added with proper specific fields
+  * struct character used as inherited in pacman, ghost

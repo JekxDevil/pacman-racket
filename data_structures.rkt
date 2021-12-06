@@ -9,7 +9,6 @@
 ;; API
 ; generic settings
 (provide SCORE)
-(provide MAX-SCORE-WO-PP)
 (provide TICK)
 (provide SPEED-PACMAN)
 (provide SPEED-GHOSTS)
@@ -47,6 +46,8 @@
 
 ; struct
 (provide (struct-out character))
+(provide (struct-out pacman))
+(provide (struct-out ghost))
 (provide (struct-out appstate))
 
 ; examples
@@ -59,14 +60,12 @@
 (provide INIT-GHOSTS)
 (provide INIT-SCORE)
 (provide INIT-PP-ACTIVE)
-(provide INIT-PACMAN-MOUTH)
 (provide INIT-QUIT)
 
 ;*****************************************************************
 ;*****************************************************************
 ;; Generic settings
 (define SCORE 0)
-(define MAX-SCORE-WO-PP 236)
 (define TICK 50)
 (define SPEED-PACMAN 1)
 (define SPEED-GHOSTS 0.80)
@@ -87,8 +86,8 @@
 ; Map is a Vector<String>
 (define MAP-WIDTH 31)
 (define MAP-HEIGHT 28)
-(define MAP-WIDTH-INDEX 30)
-(define MAP-HEIGHT-INDEX 27)
+(define MAP-WIDTH-INDEX (- MAP-WIDTH 1))
+(define MAP-HEIGHT-INDEX (- MAP-HEIGHT 1))
 
 ; map elements representation:
 ; - "W" wall
@@ -153,6 +152,11 @@
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
 ; '.' 236
+(define INIT-PACMAN-POSN (make-posn 14 17))
+(define INIT-GHOST1-POSN (make-posn 16 13))
+(define INIT-GHOST2-POSN (make-posn 13 14))
+(define INIT-GHOST3-POSN (make-posn 13 15))
+(define INIT-GHOST4-POSN (make-posn 16 15)) 
 (define INIT-MAP (vector
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"     ; 0
                 "W.....Y......WW......Y.....W"
@@ -208,31 +212,53 @@
 ;       direction : Direction
 (define-struct character [name direction position] #:transparent)
 
-; Examples
-(define INIT-PACMAN (make-character MAP-PACMAN DIRECTION-RIGHT (make-posn 14 17)))
-(define INIT-GHOST1 (make-character MAP-GHOST-RED DIRECTION-DOWN (make-posn 16 13)))
-(define INIT-GHOST2 (make-character MAP-GHOST-ORANGE DIRECTION-UP (make-posn 13 14)))
-(define INIT-GHOST3 (make-character MAP-GHOST-PINK DIRECTION-RIGHT (make-posn 13 15)))
-(define INIT-GHOST4 (make-character MAP-GHOST-CYAN DIRECTION-LEFT (make-posn 16 15)))
+;; Examples
+(define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN))
+(define INIT-GHOST1-CHARACTER (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST1-POSN))
+(define INIT-GHOST2-CHARACTER (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST2-POSN))
+(define INIT-GHOST3-CHARACTER (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST3-POSN))
+(define INIT-GHOST4-CHARACTER (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST4-POSN))
+
+;*******************************************************************
+;; Data type
+; Pacman is a struct: (make-pacman moving mouth)
+; where moving : Character
+;        mouth : Boolean (VFX)
+(define-struct pacman [character mouth] #:transparent)
+
+;; Examples
+(define INIT-PACMAN (make-pacman INIT-PACMAN-CHARACTER #true))
+
+;*****************************************************************
+; Ghost is a struct: (make-ghost name moving hidden-element)
+; where   
+; where      character : Character
+;       hidden-element : Char
+(define-struct ghost [character hidden-element] #:transparent)
+
+;; Examples
+(define INIT-HIDDEN-ELEMENT #\ )
+(define INIT-GHOST1 (make-ghost INIT-GHOST1-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST2 (make-ghost INIT-GHOST2-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST3 (make-ghost INIT-GHOST3-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST4 (make-ghost INIT-GHOST4-CHARACTER INIT-HIDDEN-ELEMENT))
 
 ;*******************************************************************
 ;; Data type
 ; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth)
 ; where     map : Vector<String>
-;        pacman : Character
-;        ghosts : List<Character>
+;        pacman : Pacman
+;        ghosts : List<Ghost>
 ;         score : Natural
 ;     pp-active : Boolean
-;  pacman-mouth : Boolean (VFX)
 ;          quit : Boolean
-(define-struct appstate [map pacman ghosts score pp-active pacman-mouth quit] #:transparent)
+(define-struct appstate [map pacman ghosts score pp-active quit] #:transparent)
 
 ;; Examples
 (define INIT-GHOSTS (list INIT-GHOST1 INIT-GHOST2 INIT-GHOST3 INIT-GHOST4))
 (define INIT-SCORE 0)
 (define INIT-PP-ACTIVE #false)
-(define INIT-PACMAN-MOUTH #true)
 (define INIT-QUIT #false)
 
-(define INIT-APPSTATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-PACMAN-MOUTH INIT-QUIT))
-(define EX-APPSTATE-EDIBLE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE #true INIT-PACMAN-MOUTH INIT-QUIT))
+(define INIT-APPSTATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
+(define EX-APPSTATE-EDIBLE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE #true INIT-QUIT))
