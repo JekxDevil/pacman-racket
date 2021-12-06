@@ -114,6 +114,62 @@ Another nice 8 bit song with increased velocity for power pellet
 
 ---------------------
 
+#### GENERAL
+
+API added to work in parallel at the project
+
+Design recipe applied to functions
+
+Following common format style in files
+
+Stick to char in order to occupy less memory and have predefine rigid data type
+
+#### DATA STRUCTURES
+
 * STRUCT changing:
   * struct pacman, ghost added with proper specific fields
   * struct character used as inherited in pacman, ghost
+* Added generic settings of the game
+* Every setting has been defined as a constant and used as it in other files
+* Added examples of instances of data structures
+
+#### FIGURES
+
+- Every setting has been defined as constant
+- Code refined
+- Render section has been moved to render file
+- Score rectangle for points view has been added
+
+#### RENDER
+
+- Generic settings have been moved to data_structures.rkt
+- Added:
+  -  (conversion-char) to render given an element of the map, its image
+  - (conversion-pacman) -> pacman image
+  - (conversion-pacman-mouth) -> pacman image based on mouth state
+  - (conversion-ghosts) -> ghost image
+  - (conversion-row) -> row image
+  - (conversion-map) -> map image
+  - (render-score) -> image representation of score
+  - (render) to give image representation of the appstate
+
+#### HANDLER
+
+Added:
+
+- (key-handler) -> handler of key stroke events
+- (move-posn) -> creates new position given direction and previous position
+- (find-in-map) -> return char element of map at a given position
+- (move-pacman) -> handler pacman move logic
+- (check-edible) -> when colliding, see if pacman can or can't eat the ghost
+- (check-fullscore) -> quit the game if all points are collected
+- (quit) -> quit the game by editing the appstate
+- (quit?) -> return a boolean stating if the game ended
+
+#### MAIN
+
+Added:
+
+- libraries imports
+- big-bang construction
+- big-bang runner

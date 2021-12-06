@@ -20,7 +20,7 @@
 
 ;; Input/Output
 ; conversion-char: Appstate Char -> Image
-; 
+; return the correspondent image of a map element (char)
 ; header :
 ; (define (conversion-char appstate char) Image)
 
@@ -35,20 +35,19 @@
 (check-expect (conversion-char INIT-APPSTATE MAP-EMPTY) SKIN-BG)
 
 ;; Template
-
-;(define (conversion-char appstate char)
-;  (cond
-;    [(char=? char ...) ...]
-;    [(char=? char ...) ...]
-;    [(char=? char ...) ...]
-;    [(char=? char ...) ...]
-;    [(char=? char ...) (... appstate)]
-;    [(char=? char ...) ...]
-;    [(char=? char ...) ...]
-;    [(or (char=? char ...)
-;         (char=? char ....)
-;         (char=? char ...)
-;         (char=? char ...)) (... appstate char)]))
+; (define (conversion-char appstate char)
+;   (cond
+;     [(char=? char ...) ...]
+;     [(char=? char ...) ...]
+;     [(char=? char ...) ...]
+;     [(char=? char ...) ...]
+;     [(char=? char ...) (... appstate)]
+;     [(char=? char ...) ...]
+;     [(char=? char ...) ...]
+;     [(or (char=? char ...)
+;          (char=? char ....)
+;          (char=? char ...)
+;          (char=? char ...)) (... appstate char)]))
 
 
 ;; Code - used by (conversion-row)
@@ -69,8 +68,7 @@
 ;*********************************************************************************
 ;; Input/Output
 ; conversion-pacman: Pacman -> Image
-;the function takes an appstate and returns the image of pacman according to the direction he is facing and with his mouth open or close
-;
+; given pacman struct, returns its image according to the direction he is facing and if his mouth is open or close
 ; header :
 ; (define (conversion-pacman appstate) Image)
 
@@ -87,15 +85,14 @@
 (check-expect (conversion-pacman TEST-PAC3) (rotate 90 SKIN-PACMAN-OPEN))
 
 ;; Template
-
-;(define (conversion-pacman appstate)
-;  (local [(define direction (... (... appstate)))
-;          (define pacman-mouth (... appstate))
-;          (define pacman-skin (... pacman-mouth))]
-;    (cond [(equal? ... direction) (... .... pacman-skin)]
-;          [(equal? ... direction) (... .... pacman-skin)]
-;          [(equal? ... direction) (... .... pacman-skin)]
-;          [(equal? ... direction) (... .... pacman-skin)])))
+; (define (conversion-pacman appstate)
+;   (local [(define direction (... (... appstate)))
+;           (define pacman-mouth (... appstate))
+;           (define pacman-skin (... pacman-mouth))]
+;     (cond [(equal? ... direction) (... .... pacman-skin)]
+;           [(equal? ... direction) (... .... pacman-skin)]
+;           [(equal? ... direction) (... .... pacman-skin)]
+;           [(equal? ... direction) (... .... pacman-skin)])))
 
 ;; Code - used by (conversion-char)
 (define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values -90 90 180 0))
@@ -110,7 +107,7 @@
 ;*********************************************************************************
 ;; Input/Output
 ; conversion-pacman-mouth: Mouth -> Image
-;
+; given the mouth boolean state, return the image of pacman with the mouth open or closed 
 ; header :
 ; (define (conversion-pacman-mouth pacman-mouth) Image)
 
@@ -119,9 +116,8 @@
 (check-expect (conversion-pacman-mouth (pacman-mouth TEST-PAC1)) SKIN-PACMAN-OPEN)
 
 ;; Template
-
-;(define (conversion-pacman-mouth pacman-mouth)
-;  (if pacman-mouth ... ...))
+; (define (conversion-pacman-mouth pacman-mouth)
+;   (if pacman-mouth ... ...))
 
 ;; Code - used by (conversion-pacman)
 (define (conversion-pacman-mouth mouth)
@@ -130,7 +126,7 @@
 ;*********************************************************************************
 ;; Input/Output
 ; conversion-ghosts: Appstate Char -> Image
-;
+; given a ghost element as char and appstate, return the correspondent image
 ; header :
 ; (define (conversion-ghosts appstate char) Image)
 
@@ -142,15 +138,14 @@
 (check-expect (conversion-ghosts EX-APPSTATE-EDIBLE MAP-GHOST-RED) SKIN-GHOST-EDIBLE)
 
 ;; Template
-
-;(define (conversion-ghosts appstate char)
-;  (local [(define pp-active (... appstate))]
-;    (if pp-active
-;        ...
-;        (cond [(equal? char ...) ...]
-;              [(equal? char ...) ...]
-;              [(equal? char ...) ...]
-;              [(equal? char ...) ...]))))
+; (define (conversion-ghosts appstate char)
+;   (local [(define pp-active (... appstate))]
+;     (if pp-active
+;         ...
+;         (cond [(equal? char ...) ...]
+;               [(equal? char ...) ...]
+;               [(equal? char ...) ...]
+;               [(equal? char ...) ...]))))
 
 ;; Code - used by (conversion-char)
 (define (conversion-ghosts appstate char)
@@ -180,9 +175,9 @@
               (beside SKIN-PACMAN-OPEN SKIN-GHOST-RED SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE))
 
 ;; Template
-;(define (conversion-row appstate list-row)
-;  (cond [(... (rest list-row)) (... appstate (first list-row))]
-;        [else (... (... appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
+; (define (conversion-row appstate list-row)
+;   (cond [(... (rest list-row)) (... appstate (first list-row))]
+;         [else (... (... appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
 
 ;; Code - used by (conversion-map)
 (define (conversion-row appstate list-row)
@@ -212,10 +207,10 @@
                      (beside SKIN-CHERRY SKIN-DOT SKIN-PP SKIN-CHERRY SKIN-PP)))
 
 ;; Template
-;(define (conversion-map appstate map-list)
-;  (local [(define list-row (... (first map-list)))]
-;  (cond [(... (rest map-list)) (... appstate list-row)]
-;        [else (... (... appstate list-row) (conversion-map appstate (rest map-list)))])))
+; (define (conversion-map appstate map-list)
+;   (local [(define list-row (... (first map-list)))]
+;   (cond [(... (rest map-list)) (... appstate list-row)]
+;         [else (... (... appstate list-row) (conversion-map appstate (rest map-list)))])))
 
 
 ;; Code - used by (render)
@@ -227,7 +222,7 @@
 ;*********************************************************************************
 ;; Input/Output
 ; render-score : Score -> Image
-;
+; given the score, render the corresponding display image in its rectangle
 ; header :
 ; (define (render-score score) Image)
 
@@ -237,10 +232,13 @@
 (check-expect (render-score 100010) (overlay (text (string-append "SCORE : 100010") 18 "white") SCORE-RECTANGLE))
 
 ;; Template
+; (define (render-score score)
+;   (overlay ... SCORE-RECTANGLE)
 
 ;; Code - used by (render)
 (define (render-score score)
   (overlay (text (string-append "SCORE : " (~v score)) 18 "white") SCORE-RECTANGLE))
+
 ;*********************************************************************************
 ; render = score, gui, canvas
 
@@ -277,6 +275,8 @@
                            OFFSET-X-SCORE OFFSET-Y-SCORE (render-score 0)))
 
 ;; Template
+; (define (render appstate)
+;   (underlay/xy ...)
 
 ;; Code - used by (big-bang)
 (define (render appstate)

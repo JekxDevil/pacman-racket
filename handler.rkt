@@ -19,7 +19,7 @@
 ;;; KEY HANDLER
 ;; Input/Output
 ; key-handler : Appstate Key -> Appstate
-;
+; handler keystroke events of the game
 ; header :
 ; (define (key-handler appstate key) Appstate)
 
@@ -39,7 +39,8 @@
 ;;; MOVE POSN
 ;; Input/Output
 ; move-posn : Posn Direction -> Posn
-;
+; create a new position given direction and previous position
+; all position will be in map borders (pacman-effect)
 ; header :
 ; (define (move-posn posn direction) Posn)
 
@@ -77,24 +78,24 @@
 ;*********************************************************************************
 ;;; FIND ELEMENT CHAR IN MAP
 ;; Input/Output
-; find-in-map : Appstate Posn -> Char
-;
+; find-in-map : Map Posn -> Char
+; given the appstate and a position, return the element at that map position
 ; header :
-; (define (find-in-map appstate posn) Char)
+; (define (find-in-map Map posn) Char)
 
 ;; Examples
 
 ;; Template
 
 ;; Code - used by 
-(define (find-in-map appstate posn)
-  (string-ref (vector-ref (appstate-map appstate) (posn-y posn)) (posn-x posn)))
+(define (find-in-map map posn)
+  (string-ref (vector-ref map (posn-y posn)) (posn-x posn)))
 
 ;*********************************************************************************
 ;;; MOVE PACMAN
 ;; Input/Output
 ; move-pacman: Appstate Character -> Appstate
-;
+; handles pacman move logic
 ; header :
 ; (define (move appstate character) Character)
 
@@ -111,7 +112,7 @@
           (define mouth (pacman-mouth (appstate-pacman appstate)))
           (define posn-next (move-posn posn direction))
           (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
-          (define element-next (find-in-map appstate posn-next))]
+          (define element-next (find-in-map (appstate-map appstate) posn-next))]
     (cond [(or (char=? MAP-GATE element-next) (char=? MAP-WALL element-next)) appstate]
           [(char=? MAP-DOT element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
                                                          (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
