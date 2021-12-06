@@ -102,4 +102,4 @@
 
 ;************************************************************************************
 ; SCORE RECTANGLE
-(define SCORE-RECTANGLE (overlay (rectangle 150 40 "solid" "black") (rectangle 155 45 "solid" "green")))
+(define SCORE-RECTANGLE (overlay (rectangle 150 40 "solid" "black") (rectangle 155 45 "solid" "white")))
