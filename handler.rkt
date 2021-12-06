@@ -105,11 +105,12 @@
 ;; TODO AGGIUNGERE (map-update)
 ;; Code - used by (key-handler)
 (define (move-pacman appstate)
-  (local [(define name (character-name (appstate-pacman appstate)))
-          (define direction (character-direction (appstate-pacman appstate)))
-          (define posn (character-position (appstate-pacman appstate)))
-          (define new-pacman (make-character name direction posn))
+  (local [(define name (character-name (pacman-character (appstate-pacman appstate))))
+          (define direction (character-direction (pacman-character (appstate-pacman appstate))))
+          (define posn (character-position (pacman-character (appstate-pacman appstate))))
+          (define mouth (pacman-mouth (appstate-pacman appstate)))
           (define posn-next (move-posn posn direction))
+          (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
           (define element-next (find-in-map appstate posn-next))]
     (cond [(or (char=? MAP-GATE element-next) (char=? MAP-WALL element-next)) appstate]
           [(char=? MAP-DOT element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
@@ -121,13 +122,13 @@
           [(char=? MAP-CHERRY element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
                                                            (+ POINTS-CHERRY (appstate-score appstate)) (appstate-pp-active appstate)
                                                            (appstate-quit appstate))]
-          [(or (char=? MAP-GHOST-RED element-next) ; ghosts next
-               (char=? MAP-GHOST-PINK element-next)
-               (char=? MAP-GHOST-ORANGE element-next)
-               (char=? MAP-GHOST-CYAN element-next)) (is-edible appstate new-pacman)]
           [(char=? MAP-EMPTY element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
                                                          (appstate-score appstate) (appstate-pp-active appstate)
-                                                         (appstate-quit appstate))])))
+                                                         (appstate-quit appstate))]
+          [(or (char=? MAP-GHOST-RED element-next)
+               (char=? MAP-GHOST-PINK element-next)
+               (char=? MAP-GHOST-ORANGE element-next)
+               (char=? MAP-GHOST-CYAN element-next)) (check-edible appstate new-pacman)])))
 
 
 ;          [(equal? element-next MAP-GHOST-EDIBLE) (make-appstate (map-update state) ;; NON ESISTE
@@ -140,17 +141,29 @@
 ;*******************************************************************************************************
 ;;; CHECK GHOST EDIBLE
 ;; Input/Output
-; check-edible : Appstate -> Appstate
+; check-edible : Appstate Pacman -> Appstate
 ; check if ghosts are edible when pacman collide, if they are, pacman eats them, otherwise the game is over
 ; header :
-; (define (is-edible appstate) Appstate)
+; (define (check-edible appstate) Appstate)
 
 ;; Examples
+(define CGE-MAP (vector "Pc"))
+(define CGE-PACMAN (make-pacman (make-character MAP-PACMAN DIRECTION-RIGHT (make-posn 0 0)) #true))
+(define CGE-GHOST (make-ghost (make-character MAP-GHOST-CYAN DIRECTION-LEFT (make-posn 1 0)) MAP-EMPTY))
+(define CGE-GHOSTS (list CGE-GHOST))
+(define CGE-PACMAN-AT-GHOST (make-pacman (make-character MAP-PACMAN DIRECTION-RIGHT (make-posn 1 0)) #true))
+(define TEST-APPSTATE-GOOD (make-appstate CGE-MAP CGE-PACMAN CGE-GHOSTS INIT-SCORE #t #f))
+(define TEST-APPSTATE-GOODEND (make-appstate CGE-MAP CGE-PACMAN-AT-GHOST CGE-GHOSTS INIT-SCORE #t #f))
+(define TEST-APPSTATE-BAD (make-appstate CGE-MAP CGE-PACMAN CGE-GHOSTS INIT-SCORE #f #f))
+(define TEST-APPSTATE-BADEND (make-appstate CGE-MAP CGE-PACMAN CGE-GHOSTS INIT-SCORE #f #t))
+
+(check-expect (check-edible TEST-APPSTATE-GOOD CGE-PACMAN-AT-GHOST) TEST-APPSTATE-GOODEND)
+(check-expect (check-edible TEST-APPSTATE-BAD CGE-PACMAN-AT-GHOST) TEST-APPSTATE-BADEND)
 
 ;; Template
 
 ;; Code - used by (move-pacman)
-(define (is-edible appstate new-pacman)
+(define (check-edible appstate new-pacman)
   (if [appstate-pp-active appstate]
       [make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
                      (appstate-score appstate) (appstate-pp-active appstate)

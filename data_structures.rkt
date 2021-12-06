@@ -62,6 +62,12 @@
 (provide INIT-PP-ACTIVE)
 (provide INIT-QUIT)
 
+(provide INIT-PACMAN-POSN)
+(provide INIT-GHOST1-POSN)
+(provide INIT-GHOST2-POSN)
+(provide INIT-GHOST3-POSN)
+(provide INIT-GHOST4-POSN) 
+
 ;*****************************************************************
 ;*****************************************************************
 ;; Generic settings
