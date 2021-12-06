@@ -73,41 +73,33 @@
 ; (define (conversion-pacman appstate) Image)
 
 ;; Examples
-(define PAC-TEST1 (make-appstate
-                  (vector "WWWWWWW" "WW@W..." "YPcpro.")
-                  (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8))
-                  INIT-GHOSTS
-                  INIT-SCORE
-                  INIT-PP-ACTIVE
-                  #false
-                  INIT-QUIT))
+(define PAC-TEST1 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+                                 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8)) #false)
+                                 INIT-GHOSTS
+                                 INIT-SCORE
+                                 INIT-PP-ACTIVE
+                                 INIT-QUIT))
 
-(define PAC-TEST2 (make-appstate
-                  (vector "WWWWWWW" "WW@W..." "YPcpro.")
-                  (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8))
-                  INIT-GHOSTS
-                  INIT-SCORE
-                  INIT-PP-ACTIVE
-                  #true
-                  INIT-QUIT))
+(define PAC-TEST2 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+                                 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8)) #true)
+                                 INIT-GHOSTS
+                                 INIT-SCORE
+                                 INIT-PP-ACTIVE
+                                 INIT-QUIT))
 
-(define PAC-TEST3 (make-appstate
-                  (vector "WWWWWWW" "WW@W..." "YPcpro.")
-                  (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8))
-                  INIT-GHOSTS
-                  INIT-SCORE
-                  INIT-PP-ACTIVE
-                  #true
-                  INIT-QUIT))
+(define PAC-TEST3 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+                                 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8)) #true)
+                                 INIT-GHOSTS
+                                 INIT-SCORE
+                                 INIT-PP-ACTIVE
+                                 INIT-QUIT))
 
-(define PAC-TEST4 (make-appstate
-                  (vector "WWWWWWW" "WW@W..." "YPcpro.")
-                  (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8))
-                  INIT-GHOSTS
-                  INIT-SCORE
-                  INIT-PP-ACTIVE
-                  #true
-                  INIT-QUIT))
+(define PAC-TEST4 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+                                 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8)) #true)
+                                 INIT-GHOSTS
+                                 INIT-SCORE
+                                 INIT-PP-ACTIVE
+                                 INIT-QUIT))
 
 (check-expect (conversion-pacman INIT-APPSTATE) SKIN-PACMAN-OPEN)
 (check-expect (conversion-pacman PAC-TEST1) SKIN-PACMAN-CLOSE)
@@ -129,13 +121,13 @@
 ;; Code - used by (conversion-char)
 (define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values -90 90 180 0))
 (define (conversion-pacman appstate)
-  (local [(define direction (character-direction (appstate-pacman appstate)))
-          (define pacman-mouth (appstate-pacman-mouth appstate))
-          (define pacman-skin (conversion-pacman-mouth pacman-mouth))]
-    (cond [(equal? DIRECTION-UP direction) (rotate UPWARDS pacman-skin)]
-          [(equal? DIRECTION-DOWN direction) (rotate DOWNWARDS pacman-skin)]
-          [(equal? DIRECTION-LEFT direction) (rotate LEFTWARDS pacman-skin)]
-          [(equal? DIRECTION-RIGHT direction) (rotate RIGHTWARDS pacman-skin)])))
+  (local [(define direction (character-direction (pacman-character (appstate-pacman appstate))))
+          (define mouth (pacman-mouth (appstate-pacman appstate)))
+          (define skin (conversion-pacman-mouth pacman-mouth))]
+    (cond [(equal? DIRECTION-UP direction) (rotate UPWARDS skin)]
+          [(equal? DIRECTION-DOWN direction) (rotate DOWNWARDS skin)]
+          [(equal? DIRECTION-LEFT direction) (rotate LEFTWARDS skin)]
+          [(equal? DIRECTION-RIGHT direction) (rotate RIGHTWARDS skin)])))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -145,8 +137,8 @@
 ; (define (conversion-pacman-mouth pacman-mouth) Image)
 
 ;; Examples
-(check-expect (conversion-pacman-mouth (appstate-pacman-mouth PAC-TEST1)) SKIN-PACMAN-CLOSE)
-(check-expect (conversion-pacman-mouth (appstate-pacman-mouth PAC-TEST2)) SKIN-PACMAN-OPEN)
+(check-expect (conversion-pacman-mouth (pacman-mouth (appstate-pacman PAC-TEST1))) SKIN-PACMAN-CLOSE)
+(check-expect (conversion-pacman-mouth (pacman-mouth (appstate-pacman PAC-TEST2))) SKIN-PACMAN-OPEN)
 
 ;; Template
 
@@ -282,8 +274,9 @@
 
 ;; Examples
 (check-expect (render PAC-TEST1) (underlay/xy (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
-                                        (beside SKIN-WALL SKIN-WALL SKIN-PP SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
-                                        (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT)) 1515 7 (render-score 0)))
+                                                     (beside SKIN-WALL SKIN-WALL SKIN-PP SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
+                                                     (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT))
+                                              1515 7 (render-score 0)))
 
 ;; Template
 
