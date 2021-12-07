@@ -295,3 +295,96 @@
 ;    (appstate-pp-active appstate)
 ;    (appstate-pacman-mouth appstate)
 ;    (appstate-quit appstate)))
+
+
+;*******************************************************************************************************
+;;; FIND AND REPLACE
+;; Input/Output
+; find-n-replace : List<String> Posn Name -> List<String>
+; given a list of string representing a map, checks each row if matches position that needs updating,
+; if so proceeds to update the string
+; header :
+; (define (find-n-replace los pos name) List<String>)
+
+
+(define (find-n-replace los pos name)
+  (local (
+          (define row (string->list (vector-ref EX-MAP
+                                                (posn-y pos)))))
+    
+    (for/list ([i (in-range (length los))])
+      (if (= i (posn-y pos))
+          (local (
+                  (define list (string->list (list-ref los
+                                                       (posn-y pos)))))
+            
+            (list->string (for/list ([i (in-range (length list))])
+                            (if (= i (posn-x pos))
+                                name
+                                (list-ref list i)))))          
+          (list-ref los i)))))
+
+;*******************************************************************************************************
+;;; UPDATE MAP
+;; Input/Output
+; update-map : Map Posn Posn Name -> Map
+; given map, current and future position and name of a character,
+; updates the map according to the changes
+; header :
+; (define (update-map map pos-now pos-next name) Map)
+
+(define (update-map map pos-now pos-next name)
+  (local (
+          (define los (vector->list map))
+          (define temp (find-n-replace
+                        los
+                        pos-now
+                        (if (equal? name
+                               MAP-PACMAN)
+                            #\space
+                            #\.))))
+
+    (list->vector (find-n-replace temp
+                                  pos-next
+                                  name))))
+
+;; Tests   
+(check-expect (update-map INIT-MAP (make-posn 13 17) (make-posn 12 11) MAP-PACMAN) (vector
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                "W.....Y......WW......Y.....W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W@W  W.W   W.WW.W   W.W  W@W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W..........................W"    
+                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                "W......WW....WW....WW......W"
+                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                "     W.WWWWW WW WWWWW.W     "     
+                "     W.WW   P      WW.W     "
+                "     W.WW WWW__WWW WW.W     "
+                "WWWWWW.WW W    r W WW.WWWWWW"
+                "      .   W o    W   .      "
+                "WWWWWW.WW W p  c W WW.WWWWWW"     
+                "     W.WW WWWWWWWW WW.W     "
+                "     W.WW          WW.W     "
+                "     W.WW WWWWWWWW WW.W     "
+                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                "W............WW............W"     
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                "W@..WW.......  .......WW..@W"
+                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
+                "W......WW....WW....WW......W"
+                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                "W.....Y..............Y.....W"
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+
+
+
+
+
+
+
