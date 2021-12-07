@@ -136,7 +136,8 @@
           (define posn-next (move-posn posn direction))
           (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
           (define element-next (find-in-map (appstate-map appstate) posn-next))]
-    (cond [(or (char=? MAP-GATE element-next) (char=? MAP-WALL element-next)) appstate]
+    (cond [(or (char=? MAP-GATE element-next)
+               (char=? MAP-WALL element-next)) appstate]
           [(char=? MAP-DOT element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
                                                         new-pacman (appstate-ghosts appstate)
                                                         (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
@@ -157,15 +158,6 @@
                (char=? MAP-GHOST-PINK element-next)
                (char=? MAP-GHOST-ORANGE element-next)
                (char=? MAP-GHOST-CYAN element-next)) (check-edible appstate new-pacman)])))
-
-
-;          [(equal? element-next MAP-GHOST-EDIBLE) (make-appstate (map-update state) ;; NON ESISTE
-;                                                                 (+ (appstate-score state) 100)
-;                                                                 (appstate-pp-active? state)
-;                                                                 (appstate-pacman-mouth state)
-;                                                                 (make-character ("Pac-Man" "l" pac-next))
-;                                                                 (appstate-ghost state)
-;                                                                 #false)]
 
 ;*******************************************************************************************************
 ;;; CHECK GHOST EDIBLE #@@@@@ TODO UPDATE-MAP ONCE EATED

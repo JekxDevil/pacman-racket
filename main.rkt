@@ -6,7 +6,8 @@
 (require "data_structures.rkt")
 (require "figures.rkt")
 (require "render.rkt")
-(require "handler.rkt")
+(require "key_handler.rkt")
+(require "tick_handler.rkt")
 
 ;*********************************************************************************
 ;*********************************************************************************

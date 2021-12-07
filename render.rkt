@@ -250,16 +250,24 @@
 (define OFFSET-Y-SCORE 7)
 
 ;; Examples
-(define PAC-TEST1 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+(define PAC-TEST1 (make-appstate (vector "WWWWWWW"
+                                         "WW@W..."
+                                         "YPcpro.")
                                  TEST-PAC0 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
 
-(define PAC-TEST2 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+(define PAC-TEST2 (make-appstate (vector "WWWWWWW"
+                                         "WW@W..."
+                                         "YPcpro.")
                                  TEST-PAC1 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
 
-(define PAC-TEST3 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+(define PAC-TEST3 (make-appstate (vector "WWWWWWW"
+                                         "WW@W..."
+                                         "YPcpro.")
                                  TEST-PAC2 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
 
-(define PAC-TEST4 (make-appstate (vector "WWWWWWW" "WW@W..." "YPcpro.")
+(define PAC-TEST4 (make-appstate (vector "WWWWWWW"
+                                         "WW@W..."
+                                         "YPcpro.")
                                  TEST-PAC3 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
 
 (check-expect (render PAC-TEST1)
