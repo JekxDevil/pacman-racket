@@ -62,6 +62,11 @@
 (provide INIT-PP-ACTIVE)
 (provide INIT-QUIT)
 
+(provide INIT-GHOST-R)
+(provide INIT-GHOST-O)
+(provide INIT-GHOST-P)
+(provide INIT-GHOST-C)
+
 (provide INIT-PACMAN-POSN)
 (provide INIT-GHOST-R-POSN)
 (provide INIT-GHOST-O-POSN)
@@ -90,8 +95,8 @@
 ;*****************************************************************
 ;; Data type
 ; Map is a Vector<String>
-(define MAP-WIDTH 31)
-(define MAP-HEIGHT 28)
+(define MAP-WIDTH 28)
+(define MAP-HEIGHT 31)
 (define MAP-WIDTH-INDEX (- MAP-WIDTH 1))
 (define MAP-HEIGHT-INDEX (- MAP-HEIGHT 1))
 
@@ -123,7 +128,7 @@
 (define MAP-GHOST-CYAN #\c)
 
 ;; Examples
-; test map 31x28 -> '.' 240
+; test map 28x31 -> '.' 240
 (define EX-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
                        "W.....Y......WW......Y.....W"
                        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"

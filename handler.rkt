@@ -35,10 +35,10 @@
 
 ;; Code - used by (big-bang)
 (define (key-handler appstate key)
-  (cond [(equal? key "up") (move-pacman appstate)]
-        [(equal? key "down") (move-pacman appstate)]
-        [(equal? key "left") (move-pacman appstate)]
-        [(equal? key "right") (move-pacman appstate)]
+  (cond [(equal? key "up") (move-pacman appstate DIRECTION-UP)]
+        [(equal? key "down") (move-pacman appstate DIRECTION-DOWN)]
+        [(equal? key "left") (move-pacman appstate DIRECTION-LEFT)]
+        [(equal? key "right") (move-pacman appstate DIRECTION-RIGHT)]
         [else appstate]))
 
 ;*********************************************************************************
@@ -86,6 +86,7 @@
                                                       (posn-y posn))]
         [(char=? direction DIRECTION-RIGHT) (make-posn (if [> (+ (posn-x posn) 1) MAP-WIDTH-INDEX]  0 [+ (posn-x posn) 1])
                                                        (posn-y posn))]))
+
 ;*********************************************************************************
 ;;; FIND ELEMENT CHAR IN MAP
 ;; Input/Output
@@ -111,6 +112,10 @@
 
 ;*********************************************************************************
 ;;; MOVE PACMAN
+;; Data types
+; (update-map map pac-or-ghost pos-next)
+; (define (update-map map pac-or-ghost pos-next)
+
 ;; Input/Output
 ; move-pacman: Appstate Character -> Appstate
 ; handles pacman move logic
@@ -123,27 +128,31 @@
 
 ;; TODO AGGIUNGERE (map-update)
 ;; Code - used by (key-handler)
-(define (move-pacman appstate)
-  (local [(define name (character-name (pacman-character (appstate-pacman appstate))))
-          (define direction (character-direction (pacman-character (appstate-pacman appstate))))
-          (define posn (character-position (pacman-character (appstate-pacman appstate))))
-          (define mouth (pacman-mouth (appstate-pacman appstate)))
+(define (move-pacman appstate direction)
+  (local [(define pacman (appstate-pacman appstate))
+          (define name (character-name (pacman-character pacman)))
+          (define posn (character-position (pacman-character pacman)))
+          (define mouth (pacman-mouth pacman))
           (define posn-next (move-posn posn direction))
           (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
           (define element-next (find-in-map (appstate-map appstate) posn-next))]
     (cond [(or (char=? MAP-GATE element-next) (char=? MAP-WALL element-next)) appstate]
-          [(char=? MAP-DOT element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
-                                                         (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
+          [(char=? MAP-DOT element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                        new-pacman (appstate-ghosts appstate)
+                                                        (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
                                                          (appstate-quit appstate))]
-          [(char=? MAP-PP element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
-                                                         (+ POINTS-PP (appstate-score appstate)) #true
-                                                         (appstate-quit appstate))]
-          [(char=? MAP-CHERRY element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
+          [(char=? MAP-PP element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                       new-pacman (appstate-ghosts appstate)
+                                                       (+ POINTS-PP (appstate-score appstate)) #true
+                                                       (appstate-quit appstate))]
+          [(char=? MAP-CHERRY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                           new-pacman (appstate-ghosts appstate)
                                                            (+ POINTS-CHERRY (appstate-score appstate)) (appstate-pp-active appstate)
                                                            (appstate-quit appstate))]
-          [(char=? MAP-EMPTY element-next) (make-appstate (appstate-map appstate) new-pacman (appstate-ghosts appstate)
-                                                         (appstate-score appstate) (appstate-pp-active appstate)
-                                                         (appstate-quit appstate))]
+          [(char=? MAP-EMPTY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                          new-pacman (appstate-ghosts appstate)
+                                                          (appstate-score appstate) (appstate-pp-active appstate)
+                                                          (appstate-quit appstate))]
           [(or (char=? MAP-GHOST-RED element-next)
                (char=? MAP-GHOST-PINK element-next)
                (char=? MAP-GHOST-ORANGE element-next)
@@ -157,6 +166,7 @@
 ;                                                                 (make-character ("Pac-Man" "l" pac-next))
 ;                                                                 (appstate-ghost state)
 ;                                                                 #false)]
+
 ;*******************************************************************************************************
 ;;; CHECK GHOST EDIBLE #@@@@@ TODO UPDATE-MAP ONCE EATED
 ;; Input/Output
@@ -300,91 +310,124 @@
 ;*******************************************************************************************************
 ;;; FIND AND REPLACE
 ;; Input/Output
-; find-n-replace : List<String> Posn Name -> List<String>
+; find-n-replace : Map Posn Name -> Map
 ; given a list of string representing a map, checks each row if matches position that needs updating,
 ; if so proceeds to update the string
 ; header :
-; (define (find-n-replace los pos name) List<String>)
+; (define (find-n-replace map pos name) Map)
 
+;; Examples
 
-(define (find-n-replace los pos name)
-  (local (
-          (define row (string->list (vector-ref EX-MAP
-                                                (posn-y pos)))))
-    
-    (for/list ([i (in-range (length los))])
+;; Template
+
+;; Code - used by (...) 
+(define (find-n-replace map pos name)
+  (local [(define row (string->list (vector-ref EX-MAP (posn-y pos))))]
+    (for/list ([i (in-range (length map))])
       (if (= i (posn-y pos))
-          (local (
-                  (define list (string->list (list-ref los
-                                                       (posn-y pos)))))
-            
+          (local [(define list (string->list (list-ref map (posn-y pos))))]
             (list->string (for/list ([i (in-range (length list))])
                             (if (= i (posn-x pos))
                                 name
-                                (list-ref list i)))))          
-          (list-ref los i)))))
+                                (list-ref list i)))))
+          (list-ref map i)))))
 
 ;*******************************************************************************************************
 ;;; UPDATE MAP
 ;; Input/Output
-; update-map : Map Posn Posn Name -> Map
+; update-map : Map Pac-or-ghost Posn -> Map
 ; given map, current and future position and name of a character,
 ; updates the map according to the changes
 ; header :
-; (define (update-map map pos-now pos-next name) Map)
+; (define (update-map map pac-or-ghost pos-next) Map)
 
-(define (update-map map pos-now pos-next name)
-  (local (
-          (define los (vector->list map))
-          (define temp (find-n-replace
-                        los
-                        pos-now
-                        (if (equal? name
-                               MAP-PACMAN)
-                            #\space
-                            #\.))))
+;; Examples
+(check-expect (update-map INIT-MAP INIT-PACMAN (make-posn (+ 1 (posn-x INIT-PACMAN-POSN)) (posn-y INIT-PACMAN-POSN)))
+              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                      "W.....Y......WW......Y.....W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W@W  W.W   W.WW.W   W.W  W@W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W..........................W"    
+                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                      "W......WW....WW....WW......W"
+                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                      "     W.WWWWW WW WWWWW.W     "     
+                      "     W.WW          WW.W     "
+                      "     W.WW WWW__WWW WW.W     "
+                      "WWWWWW.WW W    r W WW.WWWWWW"
+                      "      .   W o    W   .      "
+                      "WWWWWW.WW W p  c W WW.WWWWWW"     
+                      "     W.WW WWWWWWWW WW.W     "
+                      "     W.WW     P    WW.W     "
+                      "     W.WW WWWWWWWW WW.W     "
+                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                      "W............WW............W"     
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W@..WW.......  .......WW..@W"
+                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
+                      "W......WW....WW....WW......W"
+                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                      "W.....Y..............Y.....W"
+                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
-    (list->vector (find-n-replace temp
-                                  pos-next
-                                  name))))
+(check-expect (update-map INIT-MAP INIT-GHOST-R (make-posn (posn-x INIT-GHOST-R-POSN) (+ 1 (posn-y INIT-GHOST-R-POSN))))
+              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                      "W.....Y......WW......Y.....W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W@W  W.W   W.WW.W   W.W  W@W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W..........................W"    
+                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                      "W......WW....WW....WW......W"
+                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                      "     W.WWWWW WW WWWWW.W     "     
+                      "     W.WW          WW.W     "
+                      "     W.WW WWW__WWW WW.W     "
+                      "WWWWWW.WW W      W WW.WWWWWW"
+                      "      .   W o  r W   .      "
+                      "WWWWWW.WW W p  c W WW.WWWWWW"     
+                      "     W.WW WWWWWWWW WW.W     "
+                      "     W.WW    P     WW.W     "
+                      "     W.WW WWWWWWWW WW.W     "
+                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                      "W............WW............W"     
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                      "W@..WW.......  .......WW..@W"
+                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
+                      "W......WW....WW....WW......W"
+                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                      "W.....Y..............Y.....W"
+                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
-;; Tests   
-(check-expect (update-map INIT-MAP (make-posn 13 17) (make-posn 12 11) MAP-PACMAN) (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W.....Y......WW......Y.....W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"    
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "     
-                "     W.WW   P      WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W    r W WW.WWWWWW"
-                "      .   W o    W   .      "
-                "WWWWWW.WW W p  c W WW.WWWWWW"     
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"     
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW.......  .......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.....Y..............Y.....W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+;; Template
+; (define (update-map map pac-or-ghost pos-next)
+;   (local [(define los                 ...)
+;           (define is-pac              ...)
+;           (define pos-now             ...)
+;           (define returning-item      ...)
+;           (define returning-character ...)
+;           (define map-with-prev-item (find-n-replace ...))]
+;     (list->vector (find-n-replace ...))))
 
-
-
-
-
-
-
+;; Code - used by (...)
+(define (update-map map pac-or-ghost pos-next)
+  (local [(define los (vector->list map))
+          (define is-pac (pacman? pac-or-ghost))
+          (define pos-now (if is-pac
+                              (character-position (pacman-character pac-or-ghost))
+                              (character-position (ghost-character pac-or-ghost))))
+          (define returning-item (if is-pac MAP-EMPTY (ghost-hidden-element pac-or-ghost)))
+          (define returning-character (if is-pac
+                                          (character-name (pacman-character pac-or-ghost))
+                                          (character-name (ghost-character pac-or-ghost))))
+          (define map-with-prev-item (find-n-replace los pos-now returning-item))]
+    (list->vector (find-n-replace map-with-prev-item pos-next returning-character))))

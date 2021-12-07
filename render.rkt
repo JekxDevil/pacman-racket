@@ -80,8 +80,8 @@
 (check-expect (conversion-pacman (appstate-pacman INIT-APPSTATE)) SKIN-PACMAN-OPEN)
 (check-expect (conversion-pacman TEST-PAC0) SKIN-PACMAN-CLOSE)
 (check-expect (conversion-pacman TEST-PAC1) (rotate 180 SKIN-PACMAN-OPEN))
-(check-expect (conversion-pacman TEST-PAC2) (rotate -90 SKIN-PACMAN-OPEN))
-(check-expect (conversion-pacman TEST-PAC3) (rotate 90 SKIN-PACMAN-OPEN))
+(check-expect (conversion-pacman TEST-PAC2) (rotate 90 SKIN-PACMAN-OPEN))
+(check-expect (conversion-pacman TEST-PAC3) (rotate -90 SKIN-PACMAN-OPEN))
 
 ;; Template
 ; (define (conversion-pacman appstate)
@@ -94,7 +94,7 @@
 ;           [(equal? ... direction) (... .... pacman-skin)])))
 
 ;; Code - used by (conversion-char)
-(define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values -90 90 180 0))
+(define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values 90 -90 180 0))
 (define (conversion-pacman pacman)
   (local [(define direction (character-direction (pacman-character pacman)))
           (define skin (conversion-pacman-mouth (pacman-mouth pacman)))]
