@@ -2,6 +2,7 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname render) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 ; TODO (conversion-char) requires only pacman and pp-active, no need to have full appstate (less memory usage)
+;; plug-in (pause button, music on/off, sxf on/off, quit)
 ;; LIBRARIES
 (require racket/base)
 (require 2htdp/image)
@@ -36,34 +37,32 @@
 
 ;; Template
 ; (define (conversion-char appstate char)
-;   (cond
-;     [(char=? char ...) ...]
-;     [(char=? char ...) ...]
-;     [(char=? char ...) ...]
-;     [(char=? char ...) ...]
-;     [(char=? char ...) (... appstate)]
-;     [(char=? char ...) ...]
-;     [(char=? char ...) ...]
-;     [(or (char=? char ...)
-;          (char=? char ....)
-;          (char=? char ...)
-;          (char=? char ...)) (... appstate char)]))
+;   (cond [(char=? char MAP-EMPTY)           ...]
+;         [(char=? char MAP-WALL)            ...]
+;         [(char=? char MAP-DOT)             ...]
+;         [(char=? char MAP-PP)              ...]
+;         [(char=? char MAP-PACMAN)          (... appstate ...)]
+;         [(char=? char MAP-CHERRY)          ...]
+;         [(char=? char MAP-GATE)            ...]
+;         [(or (char=? char MAP-GHOST-ORANGE)
+;              (char=? char MAP-GHOST-RED)
+;              (char=? char MAP-GHOST-PINK)
+;              (char=? char MAP-GHOST-CYAN)) (... appstate char ...)]))
 
 
 ;; Code - used by (conversion-row)
 (define (conversion-char appstate char)
-  (cond
-    [(char=? char MAP-EMPTY) SKIN-BG]
-    [(char=? char MAP-WALL) SKIN-WALL]
-    [(char=? char MAP-DOT) SKIN-DOT]
-    [(char=? char MAP-PP) SKIN-PP]
-    [(char=? char MAP-PACMAN) (conversion-pacman (appstate-pacman appstate))]
-    [(char=? char MAP-CHERRY) SKIN-CHERRY]
-    [(char=? char MAP-GATE) SKIN-GATE]
-    [(or (char=? char MAP-GHOST-ORANGE)
-         (char=? char MAP-GHOST-RED)
-         (char=? char MAP-GHOST-PINK)
-         (char=? char MAP-GHOST-CYAN)) (conversion-ghosts appstate char)]))
+  (cond [(char=? char MAP-EMPTY) SKIN-BG]
+        [(char=? char MAP-WALL) SKIN-WALL]
+        [(char=? char MAP-DOT) SKIN-DOT]
+        [(char=? char MAP-PP) SKIN-PP]
+        [(char=? char MAP-PACMAN) (conversion-pacman (appstate-pacman appstate))]
+        [(char=? char MAP-CHERRY) SKIN-CHERRY]
+        [(char=? char MAP-GATE) SKIN-GATE]
+        [(or (char=? char MAP-GHOST-ORANGE)
+             (char=? char MAP-GHOST-RED)
+             (char=? char MAP-GHOST-PINK)
+             (char=? char MAP-GHOST-CYAN)) (conversion-ghosts appstate char)]))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -239,11 +238,6 @@
 (define (render-score score)
   (overlay (text (string-append "SCORE : " (~v score)) 18 "white") SCORE-RECTANGLE))
 
-;*********************************************************************************
-; render = score, gui, canvas
-
-;; render should resemble the UI, so the map must be rendered, also the score. 
-;; plug-in (pause button, music on/off, sxf on/off, quit)
 ;*********************************************************************************
 ;; Input/Output
 ; render : Appstate -> Image

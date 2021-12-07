@@ -26,6 +26,12 @@
 ;; Examples
 
 ;; Template
+; (define (key-handler appstate key)
+;   (cond [(equal? key "up")    ...]
+;         [(equal? key "down")  ...]
+;         [(equal? key "left")  ...]
+;         [(equal? key "right") ...]
+;         [else                 ...]))
 
 ;; Code - used by (big-bang)
 (define (key-handler appstate key)
@@ -64,6 +70,11 @@
 (check-expect (move-posn EX-POSN7 DIRECTION-DOWN) EX-POSN6)
 
 ;; Template
+; (define (move-posn posn direction)
+;   (cond [(char=? direction DIRECTION-UP)    (make-posn ...)]
+;         [(char=? direction DIRECTION-DOWN)  (make-posn ...)]
+;         [(char=? direction DIRECTION-LEFT)  (make-posn ...)]
+;         [(char=? direction DIRECTION-RIGHT) (make-posn ...)]))
 
 ;; Code - used by 
 (define (move-posn posn direction)
@@ -84,8 +95,15 @@
 ; (define (find-in-map Map posn) Char)
 
 ;; Examples
+(check-expect (find-in-map INIT-MAP INIT-PACMAN-POSN) MAP-PACMAN)
+(check-expect (find-in-map INIT-MAP INIT-GHOST-R-POSN) MAP-GHOST-RED)
+(check-expect (find-in-map INIT-MAP INIT-GHOST-O-POSN) MAP-GHOST-ORANGE)
+(check-expect (find-in-map INIT-MAP INIT-GHOST-P-POSN) MAP-GHOST-PINK)
+(check-expect (find-in-map INIT-MAP INIT-GHOST-C-POSN) MAP-GHOST-CYAN)
 
 ;; Template
+; (define (find-in-map map posn)
+;   (string-ref (vector-ref ....) ...)
 
 ;; Code - used by 
 (define (find-in-map map posn)
@@ -140,7 +158,7 @@
 ;                                                                 (appstate-ghost state)
 ;                                                                 #false)]
 ;*******************************************************************************************************
-;;; CHECK GHOST EDIBLE
+;;; CHECK GHOST EDIBLE #@@@@@ TODO UPDATE-MAP ONCE EATED
 ;; Input/Output
 ; check-edible : Appstate Pacman -> Appstate
 ; check if ghosts are edible when pacman collide, if they are, pacman eats them, otherwise the game is over
@@ -162,6 +180,10 @@
 (check-expect (check-edible TEST-APPSTATE-BAD CGE-PACMAN-AT-GHOST) TEST-APPSTATE-BADEND)
 
 ;; Template
+; (define (check-edible appstate new-pacman)
+;   (if [appstate-pp-active appstate]
+;       [make-appstate ...]
+;       [quit          ...]))
 
 ;; Code - used by (move-pacman)
 (define (check-edible appstate new-pacman)
@@ -194,6 +216,10 @@
 (check-expect (check-fullscore PRE-SCORE-APPSTATE1) POST-SCORE-APPSTATE1)
 
 ;; Template
+; (define (check-fullscore appstate)
+;   (if [>= (appstate-score appstate) TOTAL-POINTS]
+;       [quit ...]
+;       ... appstate ...)))
 
 ;; Code - used by ---TODO IMPLEMENTATION
 (define (check-fullscore appstate)
@@ -216,6 +242,8 @@
 (check-expect (quit INIT-APPSTATE) (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE  #true))
 
 ;; Template
+; (define (quit appstate)
+;   (make-appstate ...)
 
 ;; Code - used by (...)
 (define (quit appstate)
@@ -238,6 +266,8 @@
 (check-expect (quit? END-STATE) #true)
 
 ;; Template
+; (define (quit? appstate)
+;   ... appstate ...)
 
 ;; Code - used by (big-bang)
 (define (quit? appstate)
@@ -265,21 +295,3 @@
 ;    (appstate-pp-active appstate)
 ;    (appstate-pacman-mouth appstate)
 ;    (appstate-quit appstate)))
-
-;*******************************************************************************************************
-; tests
-; (define (find state pos)
-;   (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
-
-;*********************************************************************************
-;*********************************************************************************
-;*********************************************************************************
-;FIND ELEMENT AT POSITION
-;(define (find-in-map state pos)
-;  (vector-ref (vector-ref (appstate-map state) (posn-y pos)) (posn-x pos)))
-
-
-; Map Pac-posn -> Map
-
-;(define (find appstate pos)
- ; (list-ref (list-ref (appstate-map appstate) (posn-y pos)) (posn-x pos)))

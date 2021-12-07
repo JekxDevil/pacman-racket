@@ -63,10 +63,10 @@
 (provide INIT-QUIT)
 
 (provide INIT-PACMAN-POSN)
-(provide INIT-GHOST1-POSN)
-(provide INIT-GHOST2-POSN)
-(provide INIT-GHOST3-POSN)
-(provide INIT-GHOST4-POSN) 
+(provide INIT-GHOST-R-POSN)
+(provide INIT-GHOST-O-POSN)
+(provide INIT-GHOST-P-POSN)
+(provide INIT-GHOST-C-POSN) 
 
 ;*****************************************************************
 ;*****************************************************************
@@ -124,77 +124,75 @@
 
 ;; Examples
 ; test map 31x28 -> '.' 240
-(define EX-MAP (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                "W.....Y......WW......Y.....W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W      W WW.WWWWWW"
-                "      .   W      W   .      "
-                "WWWWWW.WW W      W WW.WWWWWW"
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW          WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW.......  .......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.....Y..............Y.....W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+(define EX-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                       "W.....Y......WW......Y.....W"
+                       "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                       "W@W  W.W   W.WW.W   W.W  W@W"
+                       "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                       "W..........................W"
+                       "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                       "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                       "W......WW....WW....WW......W"
+                       "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                       "     W.WWWWW WW WWWWW.W     "
+                       "     W.WW          WW.W     "
+                       "     W.WW WWW__WWW WW.W     "
+                       "WWWWWW.WW W      W WW.WWWWWW"
+                       "      .   W      W   .      "
+                       "WWWWWW.WW W      W WW.WWWWWW"
+                       "     W.WW WWWWWWWW WW.W     "
+                       "     W.WW          WW.W     "
+                       "     W.WW WWWWWWWW WW.W     "
+                       "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                       "W............WW............W"
+                       "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                       "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                       "W@..WW.......  .......WW..@W"
+                       "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                       "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                       "W......WW....WW....WW......W"
+                       "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                       "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                       "W.....Y..............Y.....W"
+                       "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
 ; '.' 236
-(define INIT-PACMAN-POSN (make-posn 14 17))
-(define INIT-GHOST1-POSN (make-posn 16 13))
-(define INIT-GHOST2-POSN (make-posn 13 14))
-(define INIT-GHOST3-POSN (make-posn 13 15))
-(define INIT-GHOST4-POSN (make-posn 16 15)) 
-(define INIT-MAP (vector
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"     ; 0
-                "W.....Y......WW......Y.....W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@W  W.W   W.WW.W   W.W  W@W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W..........................W"     ; 5
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                "W......WW....WW....WW......W"
-                "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                "     W.WWWWW WW WWWWW.W     "     ; 10
-                "     W.WW          WW.W     "
-                "     W.WW WWW__WWW WW.W     "
-                "WWWWWW.WW W    r W WW.WWWWWW"
-                "      .   W o    W   .      "
-                "WWWWWW.WW W p  c W WW.WWWWWW"     ; 15
-                "     W.WW WWWWWWWW WW.W     "
-                "     W.WW    P     WW.W     "
-                "     W.WW WWWWWWWW WW.W     "
-                "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                "W............WW............W"     ; 20
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                "W@..WW.......  .......WW..@W"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     ; 25
-                "W......WW....WW....WW......W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                "W.....Y..............Y.....W"
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))   ; 30
+(define INIT-PACMAN-POSN (make-posn 13 17))
+(define INIT-GHOST-R-POSN (make-posn 15 13))
+(define INIT-GHOST-O-POSN (make-posn 12 14))
+(define INIT-GHOST-P-POSN (make-posn 12 15))
+(define INIT-GHOST-C-POSN (make-posn 15 15)) 
+(define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
+                         "W.....Y......WW......Y.....W"
+                         "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                         "W@W  W.W   W.WW.W   W.W  W@W"
+                         "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                         "W..........................W";--- 5
+                         "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                         "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+                         "W......WW....WW....WW......W"
+                         "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+                         "     W.WWWWW WW WWWWW.W     ";--- 10
+                         "     W.WW          WW.W     "
+                         "     W.WW WWW__WWW WW.W     "
+                         "WWWWWW.WW W    r W WW.WWWWWW"
+                         "      .   W o    W   .      "
+                         "WWWWWW.WW W p  c W WW.WWWWWW";--- 15
+                         "     W.WW WWWWWWWW WW.W     "
+                         "     W.WW    P     WW.W     "
+                         "     W.WW WWWWWWWW WW.W     "
+                         "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+                         "W............WW............W";--- 20
+                         "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                         "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+                         "W@..WW.......  .......WW..@W"
+                         "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+                         "WWW.WW.WW.WWWWWWWW.WW.WW.WWW";--- 25
+                         "W......WW....WW....WW......W"
+                         "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                         "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+                         "W.....Y..............Y.....W"
+                         "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"));- 30
 
 ;*****************************************************************
 ;; Data type
@@ -220,10 +218,10 @@
 
 ;; Examples
 (define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN))
-(define INIT-GHOST1-CHARACTER (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST1-POSN))
-(define INIT-GHOST2-CHARACTER (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST2-POSN))
-(define INIT-GHOST3-CHARACTER (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST3-POSN))
-(define INIT-GHOST4-CHARACTER (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST4-POSN))
+(define INIT-GHOST-R-CHARACTER (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST-R-POSN))
+(define INIT-GHOST-O-CHARACTER (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST-O-POSN))
+(define INIT-GHOST-P-CHARACTER (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST-P-POSN))
+(define INIT-GHOST-C-CHARACTER (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST-C-POSN))
 
 ;*******************************************************************
 ;; Data type
@@ -244,10 +242,10 @@
 
 ;; Examples
 (define INIT-HIDDEN-ELEMENT #\ )
-(define INIT-GHOST1 (make-ghost INIT-GHOST1-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST2 (make-ghost INIT-GHOST2-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST3 (make-ghost INIT-GHOST3-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST4 (make-ghost INIT-GHOST4-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-R (make-ghost INIT-GHOST-R-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-O (make-ghost INIT-GHOST-O-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-P (make-ghost INIT-GHOST-P-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-C (make-ghost INIT-GHOST-C-CHARACTER INIT-HIDDEN-ELEMENT))
 
 ;*******************************************************************
 ;; Data type
@@ -261,7 +259,7 @@
 (define-struct appstate [map pacman ghosts score pp-active quit] #:transparent)
 
 ;; Examples
-(define INIT-GHOSTS (list INIT-GHOST1 INIT-GHOST2 INIT-GHOST3 INIT-GHOST4))
+(define INIT-GHOSTS (list INIT-GHOST-R INIT-GHOST-O INIT-GHOST-P INIT-GHOST-C))
 (define INIT-SCORE 0)
 (define INIT-PP-ACTIVE #false)
 (define INIT-QUIT #false)
