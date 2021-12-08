@@ -77,7 +77,7 @@
 ;*****************************************************************
 ;; Generic settings
 (define SCORE 0)
-(define TICK 50)
+(define TICK 15)
 (define SPEED-PACMAN 1)
 (define SPEED-GHOSTS 0.80)
 
