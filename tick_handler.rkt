@@ -18,7 +18,8 @@
 ;(provide find-in-map)
 ;(provide check-edible)
 ;(provide check-fullscore)
-;(provide 
+;(provide find-n-replace)
+;(provide update-map)
 
 ;*********************************************************************************
 ;*********************************************************************************

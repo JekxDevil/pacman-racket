@@ -16,6 +16,7 @@
     [to-draw render]
     [on-key key-handler]
     [on-tick tick_handler TICK]
+    [on-tick tick_hanlder 10]
     [stop-when quit?]))
 
 (run INIT-APPSTATE)
