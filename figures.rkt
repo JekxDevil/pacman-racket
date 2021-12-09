@@ -19,7 +19,7 @@
 (provide SKIN-GHOST-EDIBLE)
 ; objects
 (provide SKIN-DOT)
-(provide SKIN-PP)
+(provide SKIN-POWERPELLET)
 (provide SKIN-CHERRY)
 ; map
 (provide SKIN-BG)
@@ -79,8 +79,8 @@
 
 ;************************************************************************************
 ; POWERPELLETS
-(define PP-WB (circle 10 "solid" "Khaki"))
-(define SKIN-PP (place-image/align PP-WB 30 30 "center" "center" SKIN-BG))
+(define POWERPELLET-WB (circle 10 "solid" "Khaki"))
+(define SKIN-POWERPELLET (place-image/align POWERPELLET-WB 30 30 "center" "center" SKIN-BG))
 
 ;************************************************************************************
 ; CHERRY

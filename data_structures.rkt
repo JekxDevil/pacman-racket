@@ -10,14 +10,15 @@
 ; generic settings
 (provide SCORE)
 (provide TICK)
-(provide SPEED-PACMAN)
-(provide SPEED-GHOSTS)
+;(provide TICK-PACMAN)
+;(provide TICK-GHOSTS)
+(provide LIMIT-PP-ACTIVE)
 (provide POINTS-DOT)
 (provide POINTS-CHERRY)
-(provide POINTS-PP)
+(provide POINTS-POWERPELLET)
 (provide TOTAL-POINTS-DOTS)
 (provide TOTAL-POINTS-CHERRIES)
-(provide TOTAL-POINTS-PP)
+(provide TOTAL-POINTS-POWERPELLET)
 (provide TOTAL-POINTS)
 
 ; map
@@ -29,7 +30,7 @@
 (provide MAP-WALL)
 (provide MAP-EMPTY)
 (provide MAP-DOT)
-(provide MAP-PP)
+(provide MAP-POWERPELLET)
 (provide MAP-CHERRY)
 (provide MAP-GATE)
 (provide MAP-PACMAN)
@@ -48,6 +49,7 @@
 (provide (struct-out character))
 (provide (struct-out pacman))
 (provide (struct-out ghost))
+(provide (struct-out powerpellet-effect)) ;; non ha senso mantenere una lista di pp perche' non li muoviamo
 (provide (struct-out appstate))
 
 ; examples
@@ -59,38 +61,39 @@
 (provide INIT-PACMAN)
 (provide INIT-GHOSTS)
 (provide INIT-SCORE)
-(provide INIT-PP-ACTIVE)
+(provide INIT-POWERPELLET-EFFECT)
 (provide INIT-QUIT)
 
-(provide INIT-GHOST-R)
-(provide INIT-GHOST-O)
-(provide INIT-GHOST-P)
-(provide INIT-GHOST-C)
+(provide INIT-GHOST-RED)
+(provide INIT-GHOST-ORANGE)
+(provide INIT-GHOST-PINK)
+(provide INIT-GHOST-CYAN)
 
 (provide INIT-PACMAN-POSN)
-(provide INIT-GHOST-R-POSN)
-(provide INIT-GHOST-O-POSN)
-(provide INIT-GHOST-P-POSN)
-(provide INIT-GHOST-C-POSN) 
+(provide INIT-GHOST-RED-POSN)
+(provide INIT-GHOST-ORANGE-POSN)
+(provide INIT-GHOST-PINK-POSN)
+(provide INIT-GHOST-CYAN-POSN) 
 
 ;*****************************************************************
 ;*****************************************************************
 ;; Generic settings
 (define SCORE 0)
-(define TICK 15)
-(define SPEED-PACMAN 1)
-(define SPEED-GHOSTS 0.80)
+(define TICK 5/10)
+;(define TICK-PACMAN 3/10)
+;(define TICK-GHOSTS 5/10)
+(define LIMIT-POWERPELLET-ACTIVE 5)
 
 (define POINTS-DOT 10)
 (define POINTS-CHERRY 100)
-(define POINTS-PP 100)
+(define POINTS-POWERPELLET 100)
 (define TOTAL-DOTS 236)
 (define TOTAL-CHERRIES 4)
-(define TOTAL-PP 4)
+(define TOTAL-POWERPELLET 4)
 (define TOTAL-POINTS-DOTS (* TOTAL-DOTS POINTS-DOT))
 (define TOTAL-POINTS-CHERRIES (* TOTAL-CHERRIES POINTS-CHERRY))
-(define TOTAL-POINTS-PP (* TOTAL-PP POINTS-PP))
-(define TOTAL-POINTS (+ TOTAL-POINTS-DOTS TOTAL-POINTS-CHERRIES TOTAL-POINTS-PP))
+(define TOTAL-POINTS-POWERPELLET (* TOTAL-POWERPELLET POINTS-POWERPELLET))
+(define TOTAL-POINTS (+ TOTAL-POINTS-DOTS TOTAL-POINTS-CHERRIES TOTAL-POINTS-POWERPELLET)) ; 3160
 
 ;*****************************************************************
 ;; Data type
@@ -100,7 +103,7 @@
 (define MAP-WIDTH-INDEX (- MAP-WIDTH 1))
 (define MAP-HEIGHT-INDEX (- MAP-HEIGHT 1))
 
-; map elements representation:
+; map items representation:
 ; - "W" wall
 ; - " " empty cell space
 ; - "." dot point
@@ -118,7 +121,7 @@
 (define MAP-WALL #\W)
 (define MAP-EMPTY #\ )
 (define MAP-DOT #\.)
-(define MAP-PP #\@)
+(define MAP-POWERPELLET #\@)
 (define MAP-CHERRY #\Y)
 (define MAP-GATE #\_)
 (define MAP-PACMAN #\P)
@@ -163,10 +166,10 @@
 
 ; '.' 236
 (define INIT-PACMAN-POSN (make-posn 13 17))
-(define INIT-GHOST-R-POSN (make-posn 15 13))
-(define INIT-GHOST-O-POSN (make-posn 12 14))
-(define INIT-GHOST-P-POSN (make-posn 12 15))
-(define INIT-GHOST-C-POSN (make-posn 15 15)) 
+(define INIT-GHOST-RED-POSN (make-posn 15 13))
+(define INIT-GHOST-ORANGE-POSN (make-posn 12 14))
+(define INIT-GHOST-PINK-POSN (make-posn 12 15))
+(define INIT-GHOST-CYAN-POSN (make-posn 15 15)) 
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -201,7 +204,7 @@
 
 ;*****************************************************************
 ;; Data type
-; Direction is an enumerator
+; Direction is an Enumerator
 ; Up
 ; Down
 ; Left
@@ -219,14 +222,15 @@
 ;            name : Char
 ;        position : Posn
 ;       direction : Direction
-(define-struct character [name direction position] #:transparent)
+(define-struct character [name direction position overlayed-item] #:transparent)
 
 ;; Examples
-(define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN))
-(define INIT-GHOST-R-CHARACTER (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST-R-POSN))
-(define INIT-GHOST-O-CHARACTER (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST-O-POSN))
-(define INIT-GHOST-P-CHARACTER (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST-P-POSN))
-(define INIT-GHOST-C-CHARACTER (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST-C-POSN))
+(define INIT-OVERLAYED-ITEM #\ )
+(define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN INIT-OVERLAYED-ITEM))
+(define INIT-GHOST-RED (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST-RED-POSN INIT-OVERLAYED-ITEM))
+(define INIT-GHOST-ORANGE (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST-ORANGE-POSN INIT-OVERLAYED-ITEM))
+(define INIT-GHOST-PINK (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST-PINK-POSN INIT-OVERLAYED-ITEM))
+(define INIT-GHOST-CYAN (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST-CYAN-POSN INIT-OVERLAYED-ITEM))
 
 ;*******************************************************************
 ;; Data type
@@ -246,28 +250,37 @@
 (define-struct ghost [character hidden-element] #:transparent)
 
 ;; Examples
-(define INIT-HIDDEN-ELEMENT #\ )
-(define INIT-GHOST-R (make-ghost INIT-GHOST-R-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-O (make-ghost INIT-GHOST-O-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-P (make-ghost INIT-GHOST-P-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-C (make-ghost INIT-GHOST-C-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-RED (make-ghost INIT-GHOST-RED-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-ORANGE (make-ghost INIT-GHOST-ORANGE-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-PINK (make-ghost INIT-GHOST-PINK-CHARACTER INIT-HIDDEN-ELEMENT))
+(define INIT-GHOST-CYAN (make-ghost INIT-GHOST-CYAN-CHARACTER INIT-HIDDEN-ELEMENT))
 
 ;*******************************************************************
 ;; Data type
-; Appstate is a struct: (make-labyrinth map score pp-active? pacman-mouth)
-; where     map : Vector<String>
-;        pacman : Pacman
-;        ghosts : List<Ghost>
-;         score : Natural
-;     pp-active : Boolean
-;          quit : Boolean
-(define-struct appstate [map pacman ghosts score pp-active quit] #:transparent)
+; powerpellet-effect is a struct: (make-powerpellet-effect active active-ticks)
+; where       active : Boolean
+;       active-ticks : Natural
+(define-struct powerpellet-effect [active ticks] #:transparent)
 
 ;; Examples
-(define INIT-GHOSTS (list INIT-GHOST-R INIT-GHOST-O INIT-GHOST-P INIT-GHOST-C))
+(define INIT-POWERPELLET-EFFECT (make-powerpellet-effect #false 0))
+(define EX-POWERPELLET-EFFECT-EDIBLE (make-powerpellet-effect #true 0))
+
+;*******************************************************************
+;; Data type
+; Appstate is a struct: (make-appstate map score pp-active? pacman-mouth)
+; where                map : Vector<String>
+;                   pacman : Pacman
+;                   ghosts : List<Ghost>
+;                    score : Natural
+;       powerpellet-effect : Powerpellet-effect
+;                     quit : Boolean
+(define-struct appstate [map pacman ghosts score powerpellet-effect quit] #:transparent)
+
+;; Examples
+(define INIT-GHOSTS (list INIT-GHOST-RED INIT-GHOST-ORANGE INIT-GHOST-PINK INIT-GHOST-CYAN))
 (define INIT-SCORE 0)
-(define INIT-PP-ACTIVE #false)
 (define INIT-QUIT #false)
 
-(define INIT-APPSTATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
-(define EX-APPSTATE-EDIBLE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE #true INIT-QUIT))
+(define INIT-APPSTATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
+(define EX-APPSTATE-EDIBLE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE EX-POWERPELLET-EFFECT-EDIBLE INIT-QUIT))

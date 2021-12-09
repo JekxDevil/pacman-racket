@@ -31,38 +31,40 @@
 (check-expect (conversion-char INIT-APPSTATE MAP-WALL) SKIN-WALL)
 (check-expect (conversion-char INIT-APPSTATE MAP-PACMAN) SKIN-PACMAN-OPEN)
 (check-expect (conversion-char INIT-APPSTATE MAP-GHOST-RED) SKIN-GHOST-RED)
-(check-expect (conversion-char INIT-APPSTATE MAP-PP) SKIN-PP)
+(check-expect (conversion-char INIT-APPSTATE MAP-POWERPELLET) SKIN-POWERPELLET)
 (check-expect (conversion-char INIT-APPSTATE MAP-GATE) SKIN-GATE)
 (check-expect (conversion-char INIT-APPSTATE MAP-EMPTY) SKIN-BG)
 
 ;; Template
 ; (define (conversion-char appstate char)
-;   (cond [(char=? char MAP-EMPTY)           ...]
-;         [(char=? char MAP-WALL)            ...]
-;         [(char=? char MAP-DOT)             ...]
-;         [(char=? char MAP-PP)              ...]
-;         [(char=? char MAP-PACMAN)          (... appstate ...)]
-;         [(char=? char MAP-CHERRY)          ...]
-;         [(char=? char MAP-GATE)            ...]
-;         [(or (char=? char MAP-GHOST-ORANGE)
-;              (char=? char MAP-GHOST-RED)
-;              (char=? char MAP-GHOST-PINK)
-;              (char=? char MAP-GHOST-CYAN)) (... appstate char ...)]))
+;   (cond
+;     [(char=? char MAP-EMPTY)           ...]
+;     [(char=? char MAP-WALL)            ...]
+;     [(char=? char MAP-DOT)             ...]
+;     [(char=? char MAP-PP)              ...]
+;     [(char=? char MAP-PACMAN)          (... appstate ...)]
+;     [(char=? char MAP-CHERRY)          ...]
+;     [(char=? char MAP-GATE)            ...]
+;       [(or (char=? char MAP-GHOST-ORANGE)
+;            (char=? char MAP-GHOST-RED)
+;            (char=? char MAP-GHOST-PINK)
+;            (char=? char MAP-GHOST-CYAN)) (... appstate char ...)]))
 
 
 ;; Code - used by (conversion-row)
 (define (conversion-char appstate char)
-  (cond [(char=? char MAP-EMPTY) SKIN-BG]
-        [(char=? char MAP-WALL) SKIN-WALL]
-        [(char=? char MAP-DOT) SKIN-DOT]
-        [(char=? char MAP-PP) SKIN-PP]
-        [(char=? char MAP-PACMAN) (conversion-pacman (appstate-pacman appstate))]
-        [(char=? char MAP-CHERRY) SKIN-CHERRY]
-        [(char=? char MAP-GATE) SKIN-GATE]
-        [(or (char=? char MAP-GHOST-ORANGE)
-             (char=? char MAP-GHOST-RED)
-             (char=? char MAP-GHOST-PINK)
-             (char=? char MAP-GHOST-CYAN)) (conversion-ghosts appstate char)]))
+  (cond
+    [(char=? char MAP-EMPTY) SKIN-BG]
+    [(char=? char MAP-WALL) SKIN-WALL]
+    [(char=? char MAP-DOT) SKIN-DOT]
+    [(char=? char MAP-POWERPELLET) SKIN-POWERPELLET]
+    [(char=? char MAP-PACMAN) (conversion-pacman (appstate-pacman appstate))]
+    [(char=? char MAP-CHERRY) SKIN-CHERRY]
+    [(char=? char MAP-GATE) SKIN-GATE]
+    [(or (char=? char MAP-GHOST-ORANGE)
+         (char=? char MAP-GHOST-RED)
+         (char=? char MAP-GHOST-PINK)
+         (char=? char MAP-GHOST-CYAN)) (conversion-ghosts appstate char)]))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -88,20 +90,22 @@
 ;   (local [(define direction (... (... appstate)))
 ;           (define pacman-mouth (... appstate))
 ;           (define pacman-skin (... pacman-mouth))]
-;     (cond [(equal? ... direction) (... .... pacman-skin)]
-;           [(equal? ... direction) (... .... pacman-skin)]
-;           [(equal? ... direction) (... .... pacman-skin)]
-;           [(equal? ... direction) (... .... pacman-skin)])))
+;     (cond
+;       [(equal? ... direction) (... .... pacman-skin)]
+;       [(equal? ... direction) (... .... pacman-skin)]
+;       [(equal? ... direction) (... .... pacman-skin)]
+;       [(equal? ... direction) (... .... pacman-skin)])))
 
 ;; Code - used by (conversion-char)
 (define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values 90 -90 180 0))
 (define (conversion-pacman pacman)
   (local [(define direction (character-direction (pacman-character pacman)))
           (define skin (conversion-pacman-mouth (pacman-mouth pacman)))]
-    (cond [(equal? DIRECTION-UP direction) (rotate UPWARDS skin)]
-          [(equal? DIRECTION-DOWN direction) (rotate DOWNWARDS skin)]
-          [(equal? DIRECTION-LEFT direction) (rotate LEFTWARDS skin)]
-          [(equal? DIRECTION-RIGHT direction) (rotate RIGHTWARDS skin)])))
+    (cond
+      [(equal? DIRECTION-UP direction) (rotate UPWARDS skin)]
+      [(equal? DIRECTION-DOWN direction) (rotate DOWNWARDS skin)]
+      [(equal? DIRECTION-LEFT direction) (rotate LEFTWARDS skin)]
+      [(equal? DIRECTION-RIGHT direction) (rotate RIGHTWARDS skin)])))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -141,20 +145,22 @@
 ;   (local [(define pp-active (... appstate))]
 ;     (if pp-active
 ;         ...
-;         (cond [(equal? char ...) ...]
-;               [(equal? char ...) ...]
-;               [(equal? char ...) ...]
-;               [(equal? char ...) ...]))))
+;         (cond
+;           [(equal? char ...) ...]
+;           [(equal? char ...) ...]
+;           [(equal? char ...) ...]
+;           [(equal? char ...) ...]))))
 
 ;; Code - used by (conversion-char)
 (define (conversion-ghosts appstate char)
-  (local [(define pp-active (appstate-pp-active appstate))]
-    (if pp-active
+  (local [(define edible (powerpellet-effect-active (appstate-powerpellet-effect appstate)))]
+    (if edible
         SKIN-GHOST-EDIBLE
-        (cond [(equal? char MAP-GHOST-ORANGE) SKIN-GHOST-ORANGE]
-              [(equal? char MAP-GHOST-RED) SKIN-GHOST-RED]
-              [(equal? char MAP-GHOST-PINK) SKIN-GHOST-PINK]
-              [(equal? char MAP-GHOST-CYAN) SKIN-GHOST-CYAN]))))
+        (cond
+          [(equal? char MAP-GHOST-ORANGE) SKIN-GHOST-ORANGE]
+          [(equal? char MAP-GHOST-RED) SKIN-GHOST-RED]
+          [(equal? char MAP-GHOST-PINK) SKIN-GHOST-PINK]
+          [(equal? char MAP-GHOST-CYAN) SKIN-GHOST-CYAN]))))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -168,7 +174,7 @@
               (beside SKIN-DOT SKIN-WALL SKIN-WALL SKIN-CHERRY SKIN-WALL))
 
 (check-expect (conversion-row INIT-APPSTATE (string->list "@..@."))
-              (beside SKIN-PP SKIN-DOT SKIN-DOT SKIN-PP SKIN-DOT))
+              (beside SKIN-POWERPELLET SKIN-DOT SKIN-DOT SKIN-POWERPELLET SKIN-DOT))
 
 (check-expect (conversion-row INIT-APPSTATE (string->list "Prcpo"))
               (beside SKIN-PACMAN-OPEN SKIN-GHOST-RED SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE))
@@ -180,8 +186,9 @@
 
 ;; Code - used by (conversion-map)
 (define (conversion-row appstate list-row)
-  (cond [(empty? (rest list-row)) (conversion-char appstate (first list-row))]
-        [else (beside (conversion-char appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
+  (cond
+    [(empty? (rest list-row)) (conversion-char appstate (first list-row))]
+    [else (beside (conversion-char appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -193,30 +200,32 @@
 ;; Examples
 (check-expect (conversion-map INIT-APPSTATE (list ".WWYW" "..@YW"))
               (above (beside SKIN-DOT SKIN-WALL SKIN-WALL SKIN-CHERRY SKIN-WALL)
-                     (beside SKIN-DOT SKIN-DOT SKIN-PP SKIN-CHERRY SKIN-WALL)))
+                     (beside SKIN-DOT SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-WALL)))
 
 (check-expect (conversion-map INIT-APPSTATE (list "WWWWW" "Pproc" "Y.@Y@"))
               (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
                      (beside SKIN-PACMAN-OPEN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-GHOST-CYAN)
-                     (beside SKIN-CHERRY SKIN-DOT SKIN-PP SKIN-CHERRY SKIN-PP)))
+                     (beside SKIN-CHERRY SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-POWERPELLET)))
 
 (check-expect (conversion-map EX-APPSTATE-EDIBLE (list "WWWWW" "Pproc" "Y.@Y@"))
               (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
                      (beside SKIN-PACMAN-OPEN SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE)
-                     (beside SKIN-CHERRY SKIN-DOT SKIN-PP SKIN-CHERRY SKIN-PP)))
+                     (beside SKIN-CHERRY SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-POWERPELLET)))
 
 ;; Template
 ; (define (conversion-map appstate map-list)
 ;   (local [(define list-row (... (first map-list)))]
-;   (cond [(... (rest map-list)) (... appstate list-row)]
-;         [else (... (... appstate list-row) (conversion-map appstate (rest map-list)))])))
+;   (cond
+;     [(... (rest map-list)) (... appstate list-row)]
+;     [else (... (... appstate list-row) (conversion-map appstate (rest map-list)))])))
 
 
 ;; Code - used by (render)
 (define (conversion-map appstate map-list)
   (local [(define list-row (string->list (first map-list)))]
-  (cond [(empty? (rest map-list)) (conversion-row appstate list-row)]
-        [else (above (conversion-row appstate list-row) (conversion-map appstate (rest map-list)))])))
+  (cond
+    [(empty? (rest map-list)) (conversion-row appstate list-row)]
+    [else (above (conversion-row appstate list-row) (conversion-map appstate (rest map-list)))])))
 
 ;*********************************************************************************
 ;; Input/Output
@@ -253,26 +262,26 @@
 (define PAC-TEST1 (make-appstate (vector "WWWWWWW"
                                          "WW@W..."
                                          "YPcpro.")
-                                 TEST-PAC0 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
+                                 TEST-PAC0 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 
 (define PAC-TEST2 (make-appstate (vector "WWWWWWW"
                                          "WW@W..."
                                          "YPcpro.")
-                                 TEST-PAC1 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
+                                 TEST-PAC1 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 
 (define PAC-TEST3 (make-appstate (vector "WWWWWWW"
                                          "WW@W..."
                                          "YPcpro.")
-                                 TEST-PAC2 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
+                                 TEST-PAC2 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 
 (define PAC-TEST4 (make-appstate (vector "WWWWWWW"
                                          "WW@W..."
                                          "YPcpro.")
-                                 TEST-PAC3 INIT-GHOSTS INIT-SCORE INIT-PP-ACTIVE INIT-QUIT))
+                                 TEST-PAC3 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 
 (check-expect (render PAC-TEST1)
               (underlay/xy (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
-                                  (beside SKIN-WALL SKIN-WALL SKIN-PP SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
+                                  (beside SKIN-WALL SKIN-WALL SKIN-POWERPELLET SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
                                   (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT))
                            OFFSET-X-SCORE OFFSET-Y-SCORE (render-score 0)))
 

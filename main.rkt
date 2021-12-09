@@ -14,9 +14,8 @@
 (define (run appstate)
   (big-bang appstate
     [to-draw render]
+    [on-tick tick-handler TICK]
     [on-key key-handler]
-    [on-tick tick_handler TICK]
-    [on-tick tick_hanlder 10]
     [stop-when quit?]))
 
 (run INIT-APPSTATE)
