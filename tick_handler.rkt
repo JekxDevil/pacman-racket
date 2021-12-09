@@ -41,69 +41,127 @@
     [; appstate fields abbreviations
      (define map (appstate-map appstate))
      (define pacman (appstate-pacman appstate))
+     (define pacman-posn (character-position (pacman-character pacman)))
+     (define pacman-overlayed-item (charactrer-overlayed-item (pacman-character pacman)))
      (define ghosts (appstate-ghosts appstate))
      (define score (appstate-score appstate))
      (define pp-effect (appstate-powerpellet-effect appstate))
+     (define active (powerpellet-effect-active pp-effect))
      (define quit (appstate-quit appstate))
      ; pre-calculated fields updates
-     (define new-pacman (move-pacman pacman))
-     (define new-pacman-item-below (character-item-below (pacman-character new-pacman)))
-     (define new-map-pacman (update-map ))
+     ; - move pacman struct and update map consequently -
+     (define moved-pacman (move-pacman map active pacman))
+     (define moved-pacman-posn (character-position (pacman-character moved-pacman)))
+     (define new-map-pacman (update-map map pacman-posn moved-pacman-posn pacman-overlayed-item MAP-PACMAN))
+     ;;;; insert pp-effect activation
+     ; - move ghosts struct and update map consequently -
      (define new-ghosts (move-ghots ))
      (define new-map (update-map ))
+     (define moved-pacman-item-below (character-item-below (pacman-character new-pacman)))
      (define new-score (update-score score new-pacman-item-below))
+     ;;;; insert pacman without score (?)
      (define new-pp-effect (update-pp-effect pp-effect))
      (define new-pp-active (powerpellet-effect-active new-pp-effect))
-     (define new-quit (game-over new-ghosts new-pp-active new-score))]
+     (define new-quit (game-over new-ghosts new-pp-active new-score))
+     ; - free pacman from it's overlayed item -
+     (define new-pacman (clear-item moved-pacman))]
     (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
 
 ;*********************************************************************************
-;;; MOVE PACMAN EDIT
+;;; MOVE PACMAN
 ;; Data types
-; (update-map map pac-or-ghost pos-next)
-; (define (update-map map pac-or-ghost pos-next)
 
 ;; Input/Output
-; move-pacman: Appstate Character -> Appstate
+; move-pacman: Map Active Pacman -> Pacman
 ; handles pacman move logic
+; logic | stops pacman from moving in a wall or a gate, otherwise move and save the item before for score purposes
 ; header :
-; (define (move appstate character) Character)
+; (define (move-pacman appstate character) Pacman)
 
 ;; Examples
+(define EX-MP-PACMAN0 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-RIGHT
+                        (make-posn (+ 1 (posn-x INIT-PACMAN-POSN)) (posn-y INIT-PACMAN-POSN))
+                        MAP-EMPTY)
+                       #false))
+(define EX-MP-PACMAN1 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-RIGHT
+                        (make-posn (+ 1 (posn-x INIT-GHOST-RED-POSN)) (posn-y INIT-GHOST-RED-POSN))
+                        MAP-EMPTY)
+                       #false))
+(define EX-MP-PACMAN2 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        (make-posn (+ 1 (posn-x INIT-GHOST-RED-POSN)) (posn-y INIT-GHOST-RED-POSN))
+                        MAP-EMPTY)
+                       #false))
+(define EX-MP-PACMAN3 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-RIGHT
+                        INIT-GHOST-RED-POSN
+                        MAP-GHOST-RED)
+                       #true))
+(check-expect (move-pacman INIT-MAP #false INIT-PACMAN) EX-MP-PACMAN0)
+(check-expect (move-pacman INIT-MAP #false EX-MP-PACMAN1) EX-MP-PACMAN1)
+(check-expect (move-pacman INIT-MAP #false EX-MP-PACMAN3) EX-MP-PACMAN3)
 
 ;; Template
+; (define (move-pacman map pp-active pacman)
+;   (local [(define character    ...)
+;           (define direction    ...)
+;           (define posn         ...)
+;           (define mouth        ...)
+;           (define posn-next    ...)
+;           (define element-next ...)
+;           (define mouth-next   ...)]
+;     [cond [(or (char=? element-next MAP-GATE) 
+;                (char=? element-next MAP-WALL))       ...]
+;           [(or (char=? element-next MAP-DOT)
+;                (char=? element-next MAP-CHERRY)
+;                (char=? element-next MAP-POWERPELLET)
+;                (char=? element-next MAP-EMPTY)
+;                (char=? element-next MAP-GHOST-RED)
+;                (char=? element-next MAP-GHOST-PINK)
+;                (char=? element-next MAP-GHOST-ORANGE)
+;                (char=? element-next MAP-GHOST-CYAN)) ...]
+;           [else (error ...)]]))
 
-;; Code - used by (key-handler)
-(define (move-pacman appstate direction)
-  (local [(define pacman (appstate-pacman appstate))
-          (define name (character-name (pacman-character pacman)))
-          (define posn (character-position (pacman-character pacman)))
+;; Code - used by (tick-handler)
+(define (move-pacman map pp-active pacman)
+  (local [; param abbreviations
+          (define character (pacman-character pacman))
+          (define direction (character-direction character))
+          (define posn (character-position character))
           (define mouth (pacman-mouth pacman))
+          ; pre-calculated values
           (define posn-next (move-posn posn direction))
-          (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
-          (define element-next (find-in-map (appstate-map appstate) posn-next))]
-    (cond [(or (char=? MAP-GATE element-next)
-               (char=? MAP-WALL element-next)) appstate]
-          [(char=? MAP-DOT element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
-                                                        new-pacman (appstate-ghosts appstate)
-                                                        (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
-                                                         (appstate-quit appstate))]
-          [(char=? MAP-PP element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
-                                                       new-pacman (appstate-ghosts appstate)
-                                                       (+ POINTS-PP (appstate-score appstate)) #true
-                                                       (appstate-quit appstate))]
-          [(char=? MAP-CHERRY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
-                                                           new-pacman (appstate-ghosts appstate)
-                                                           (+ POINTS-CHERRY (appstate-score appstate)) (appstate-pp-active appstate)
-                                                           (appstate-quit appstate))]
-          [(char=? MAP-EMPTY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
-                                                          new-pacman (appstate-ghosts appstate)
-                                                          (appstate-score appstate) (appstate-pp-active appstate)
-                                                          (appstate-quit appstate))]
-          [(or (char=? MAP-GHOST-RED element-next)
-               (char=? MAP-GHOST-PINK element-next)
-               (char=? MAP-GHOST-ORANGE element-next)
-               (char=? MAP-GHOST-CYAN element-next)) (check-edible appstate new-pacman)])))
+          (define element-next (find-in-map map posn-next))
+          (define mouth-next (not mouth))]
+    ; body
+    [cond [(or (char=? element-next MAP-GATE) 
+               (char=? element-next MAP-WALL)) pacman]
+          [(or (char=? element-next MAP-DOT)
+               (char=? element-next MAP-CHERRY)
+               (char=? element-next MAP-POWERPELLET)
+               (char=? element-next MAP-EMPTY)
+               ; ghosts cases follow the same pattern 'cause collision detection isn't detected here but in (game-over)
+               (char=? element-next MAP-GHOST-RED)
+               (char=? element-next MAP-GHOST-PINK)
+               (char=? element-next MAP-GHOST-ORANGE)
+               (char=? element-next MAP-GHOST-CYAN)) (make-pacman
+                                                      (make-character
+                                                       MAP-PACMAN
+                                                       direction
+                                                       posn-next
+                                                       element-next)
+                                                      mouth-next)]
+          [else (error "move-pacman : invalid pacman movement")]]))
 
 ;*********************************************************************************
 ;;; UPDATE POWERPELLET EFFECT
@@ -182,7 +240,7 @@
 ;; Template
 
 ;; Code - used by (...) 
-(define (move-ghost map pp-active pacman ghost)
+(define (move-ghost map pp-active ghost)
   (local
     [; param field abbreviations
      (define name (character-name (character-ghost ghost)))
@@ -214,6 +272,7 @@
 ;*********************************************************************************
 ;*********************************************************************************
 ;*********************************************************************************
+;;; COLLECT POSSIBLE CHOICES
 ;; Input/Output
 ; collect-possible-choices : Name List<Pair> -> List<Ghost>
 ; group choices available, discarding non-ghost values which are invalid choices
@@ -229,6 +288,7 @@
     (map (λ (choice) (if [ghost? choice] choice '())) list-choices))
 
 ;*********************************************************************************
+;;; COLLECT VALID CHOICES
 ;; Data type
 ; Choice is a Trio (Direction Posn Char)
 ; Maybe<Ghost> can be either:
@@ -240,7 +300,7 @@
 ; given pacman or a valid map cell as its aim, return a ghost if the cell pointed by the choice
 ; is eligible, otherwise return false
 ; header :
-; (define (collect-valid-choices name choice looking-pacman) Maybe<Ghost>)
+; (define (collect-valid-choices name choice looking-for-pacman) Maybe<Ghost>)
 
 ;; Examples
 
@@ -249,9 +309,9 @@
 
 
 ;; Code - used by (move-ghost)
-(define (collect-valid-choices name choice looking-pacman)
+(define (collect-valid-choices name choice looking-for-pacman)
   (cond
-    [(and (not looking-pacman)
+    [(and (not looking-for-pacman)
           (not (char=? MAP-WALL (third choice)))
           (not (char=? MAP-GHOST-RED (third choice)))
           (not (char=? MAP-GHOST-ORANGE (third choice)))
@@ -259,7 +319,7 @@
           (not (char=? MAP-GHOST-CYAN (third choice)))) (make-ghost
                                                          (make-character name (first choice) (second choice))
                                                          (third choice))]
-    [(and looking-pacman
+    [(and looking-for-pacman
           (char=? MAP-PACMAN (third choice))) (make-ghost
                                                (make-character name (first choice) (second choice))
                                                MAP-PACMAN)]
@@ -368,103 +428,104 @@
 
 ;*******************************************************************************************************
 ;;; UPDATE MAP
+;; Data types
+; Map
+
 ;; Input/Output
-; update-map : Map Pac-or-ghost Posn -> Map
+; update-map : Map Posn Posn Char Char -> Map
 ; given map, current and future position and name of a character,
-; updates the map according to the changes
+; updates the map according to a given character
 ; header :
-; (define (update-map map pac-or-ghost pos-next) Map)
+; (define (update-map map posn-previous posn-next return-item return-character) Map)
 
 ;; Examples
-(check-expect (update-map INIT-MAP INIT-PACMAN (make-posn (+ 1 (posn-x INIT-PACMAN-POSN)) (posn-y INIT-PACMAN-POSN)))
-              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                      "W.....Y......WW......Y.....W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W@W  W.W   W.WW.W   W.W  W@W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W..........................W"    
-                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                      "W......WW....WW....WW......W"
-                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                      "     W.WWWWW WW WWWWW.W     "     
-                      "     W.WW          WW.W     "
-                      "     W.WW WWW__WWW WW.W     "
-                      "WWWWWW.WW W    r W WW.WWWWWW"
-                      "      .   W o    W   .      "
-                      "WWWWWW.WW W p  c W WW.WWWWWW"     
-                      "     W.WW WWWWWWWW WW.W     "
-                      "     W.WW     P    WW.W     "
-                      "     W.WW WWWWWWWW WW.W     "
-                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                      "W............WW............W"     
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W@..WW.......  .......WW..@W"
-                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
-                      "W......WW....WW....WW......W"
-                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                      "W.....Y..............Y.....W"
-                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
-
-(check-expect (update-map INIT-MAP INIT-GHOST-R (make-posn (posn-x INIT-GHOST-R-POSN) (+ 1 (posn-y INIT-GHOST-R-POSN))))
-              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-                      "W.....Y......WW......Y.....W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W@W  W.W   W.WW.W   W.W  W@W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W..........................W"    
-                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
-                      "W......WW....WW....WW......W"
-                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
-                      "     W.WWWWW WW WWWWW.W     "     
-                      "     W.WW          WW.W     "
-                      "     W.WW WWW__WWW WW.W     "
-                      "WWWWWW.WW W      W WW.WWWWWW"
-                      "      .   W o  r W   .      "
-                      "WWWWWW.WW W p  c W WW.WWWWWW"     
-                      "     W.WW WWWWWWWW WW.W     "
-                      "     W.WW    P     WW.W     "
-                      "     W.WW WWWWWWWW WW.W     "
-                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
-                      "W............WW............W"     
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
-                      "W@..WW.......  .......WW..@W"
-                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
-                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
-                      "W......WW....WW....WW......W"
-                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
-                      "W.....Y..............Y.....W"
-                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+;(check-expect (update-map INIT-MAP INIT-PACMAN (make-posn (+ 1 (posn-x INIT-PACMAN-POSN)) (posn-y INIT-PACMAN-POSN)))
+;              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+;                      "W.....Y......WW......Y.....W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W@W  W.W   W.WW.W   W.W  W@W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W..........................W"    
+;                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+;                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+;                      "W......WW....WW....WW......W"
+;                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+;                      "     W.WWWWW WW WWWWW.W     "     
+;                      "     W.WW          WW.W     "
+;                      "     W.WW WWW__WWW WW.W     "
+;                      "WWWWWW.WW W    r W WW.WWWWWW"
+;                      "      .   W o    W   .      "
+;                      "WWWWWW.WW W p  c W WW.WWWWWW"     
+;                      "     W.WW WWWWWWWW WW.W     "
+;                      "     W.WW     P    WW.W     "
+;                      "     W.WW WWWWWWWW WW.W     "
+;                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+;                      "W............WW............W"     
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W@..WW.......  .......WW..@W"
+;                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+;                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
+;                      "W......WW....WW....WW......W"
+;                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+;                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+;                      "W.....Y..............Y.....W"
+;                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
+;
+;(check-expect (update-map INIT-MAP INIT-GHOST-R (make-posn (posn-x INIT-GHOST-R-POSN) (+ 1 (posn-y INIT-GHOST-R-POSN))))
+;              (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+;                      "W.....Y......WW......Y.....W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W@W  W.W   W.WW.W   W.W  W@W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W..........................W"    
+;                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+;                      "W.WWWW.WW.WWWWWWWW.WW.WWWW.W"
+;                      "W......WW....WW....WW......W"
+;                      "WWWWWW.WWWWW WW WWWWW.WWWWWW"
+;                      "     W.WWWWW WW WWWWW.W     "     
+;                      "     W.WW          WW.W     "
+;                      "     W.WW WWW__WWW WW.W     "
+;                      "WWWWWW.WW W      W WW.WWWWWW"
+;                      "      .   W o  r W   .      "
+;                      "WWWWWW.WW W p  c W WW.WWWWWW"     
+;                      "     W.WW WWWWWWWW WW.W     "
+;                      "     W.WW    P     WW.W     "
+;                      "     W.WW WWWWWWWW WW.W     "
+;                      "WWWWWW.WW WWWWWWWW WW.WWWWWW"
+;                      "W............WW............W"     
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
+;                      "W@..WW.......  .......WW..@W"
+;                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"
+;                      "WWW.WW.WW.WWWWWWWW.WW.WW.WWW"     
+;                      "W......WW....WW....WW......W"
+;                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+;                      "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
+;                      "W.....Y..............Y.....W"
+;                      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"))
 
 ;; Template
-; (define (update-map map pac-or-ghost pos-next)
+; (define (update-map map posn-previous pos-next return-item return-character)
 ;   (local [(define los                 ...)
-;           (define is-pac              ...)
-;           (define pos-now             ...)
-;           (define returning-item      ...)
-;           (define returning-character ...)
 ;           (define map-with-prev-item (find-n-replace ...))]
 ;     (list->vector (find-n-replace ...))))
 
 ;; Code - used by (...)
-(define (update-map map pac-or-ghost pos-next)
-  (local [(define los (vector->list map))
-          (define is-pac (pacman? pac-or-ghost))
-          (define pos-now (if is-pac
-                              (character-position (pacman-character pac-or-ghost))
-                              (character-position (ghost-character pac-or-ghost))))
-          (define returning-item (if is-pac MAP-EMPTY (ghost-hidden-element pac-or-ghost)))
-          (define returning-character (if is-pac
-                                          (character-name (pacman-character pac-or-ghost))
-                                          (character-name (ghost-character pac-or-ghost))))
-          (define map-with-prev-item (find-n-replace los pos-now returning-item))]
-    (list->vector (find-n-replace map-with-prev-item pos-next returning-character))))
+(define (update-map map posn-previous posn-next return-item return-character)
+  (local [; pre-calculated params abbreviations
+          (define los (vector->list map))
+          ; map with previous item given back
+          (define map-with-prev-item (find-n-replace
+                                      los
+                                      pos-prevoius
+                                      return-item))]
+    ; body
+    (list->vector
+     (find-n-replace
+      map-with-prev-item
+      pos-next
+      return-character))))
 
 ;*******************************************************************************************************
 ;;; UPDATE SCORE
@@ -500,6 +561,64 @@
     [(char=? item MAP-CHERRY) (+ score POINTS-CHERRY)]
     [(char=? item MAP-POWERPELLET) (+ score POINTS-POWERPELLET)]
     [else score]))
+
+;*******************************************************************************************************
+;;; POST UPDATE SCORE
+;; Data types
+; Pacman
+
+;; Input/Output
+; post-update-score : Pacman -> Pacman
+; clear the item pacman has overlayed
+; header :
+; (define (clear-item pacman) Pacman)
+
+;; Examples
+(define EX-PUS-PACMAN0 (make-pacman
+                        (make-character
+                         MAP-PACMAN
+                         DIRECTION-DOWN
+                         INIT-PACMAN-POSN
+                         MAP-CHERRY)
+                        #true))
+(define EX-PUS-PACMAN1 (make-pacman
+                        (make-character
+                         MAP-PACMAN
+                         DIRECTION-DOWN
+                         INIT-PACMAN-POSN
+                         MAP-EMPTY)
+                        #true))
+
+(check-expect (clear-item INIT-PACMAN) INIT-PACMAN)
+(check-expect (clear-item EX-PUS-PACMAN) EX-PUS-PACMAN1)
+
+;; Template
+;(define (clear-item pacman)
+;  (local
+;     (define character ...)
+;     (define name      ...)
+;     (define direction ...)
+;     (define position  ...)
+;     (define mouth     ...)]
+;    [make-pacman ...]))
+
+;; Code - used by (tick-handler)
+(define (clear-item pacman)
+  (local
+    [; param abbreviations
+     (define character (pacman-character pacman))
+     (define name (character-name character))
+     (define direction (character-direction character))
+     (define position (character-position character))
+     (define mouth (pacman-mouth pacman))]
+    ; body
+    [make-pacman
+     (make-character
+      name
+      direction
+      position
+      MAP-EMPTY)
+     mouth]))
 
 ;*******************************************************************************************************
 ;;; GAME OVER
@@ -547,7 +666,7 @@
    (is-fullscore score)
    (and
     (not active)
-    (collision ghosts))))
+    (collision ghosts))));; collision needs update
 
 ;*********************************************************************************
 ;;; IS FULL SCORE
