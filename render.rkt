@@ -31,6 +31,9 @@
 (check-expect (conversion-char INIT-APPSTATE MAP-WALL) SKIN-WALL)
 (check-expect (conversion-char INIT-APPSTATE MAP-PACMAN) SKIN-PACMAN-OPEN)
 (check-expect (conversion-char INIT-APPSTATE MAP-GHOST-RED) SKIN-GHOST-RED)
+(check-expect (conversion-char INIT-APPSTATE MAP-GHOST-ORANGE) SKIN-GHOST-ORANGE)
+(check-expect (conversion-char INIT-APPSTATE MAP-GHOST-PINK) SKIN-GHOST-PINK)
+(check-expect (conversion-char INIT-APPSTATE MAP-GHOST-CYAN) SKIN-GHOST-CYAN)
 (check-expect (conversion-char INIT-APPSTATE MAP-POWERPELLET) SKIN-POWERPELLET)
 (check-expect (conversion-char INIT-APPSTATE MAP-GATE) SKIN-GATE)
 (check-expect (conversion-char INIT-APPSTATE MAP-EMPTY) SKIN-BG)
@@ -74,10 +77,10 @@
 ; (define (conversion-pacman appstate) Image)
 
 ;; Examples
-(define TEST-PAC0 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8)) #false))
-(define TEST-PAC1 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8)) #true))
-(define TEST-PAC2 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8)) #true))
-(define TEST-PAC3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8)) #true))
+(define TEST-PAC0 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-OVERLAYED-ITEM) #false))
+(define TEST-PAC1 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
+(define TEST-PAC2 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
+(define TEST-PAC3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
 
 (check-expect (conversion-pacman (appstate-pacman INIT-APPSTATE)) SKIN-PACMAN-OPEN)
 (check-expect (conversion-pacman TEST-PAC0) SKIN-PACMAN-CLOSE)

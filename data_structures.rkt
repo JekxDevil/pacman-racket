@@ -12,7 +12,7 @@
 (provide TICK)
 ;(provide TICK-PACMAN)
 ;(provide TICK-GHOSTS)
-(provide LIMIT-PP-ACTIVE)
+(provide LIMIT-POWERPELLET-ACTIVE)
 (provide POINTS-DOT)
 (provide POINTS-CHERRY)
 (provide POINTS-POWERPELLET)
@@ -48,7 +48,6 @@
 ; struct
 (provide (struct-out character))
 (provide (struct-out pacman))
-(provide (struct-out ghost))
 (provide (struct-out powerpellet-effect)) ;; non ha senso mantenere una lista di pp perche' non li muoviamo
 (provide (struct-out appstate))
 
@@ -73,7 +72,9 @@
 (provide INIT-GHOST-RED-POSN)
 (provide INIT-GHOST-ORANGE-POSN)
 (provide INIT-GHOST-PINK-POSN)
-(provide INIT-GHOST-CYAN-POSN) 
+(provide INIT-GHOST-CYAN-POSN)
+
+(provide INIT-OVERLAYED-ITEM)
 
 ;*****************************************************************
 ;*****************************************************************
@@ -222,7 +223,7 @@
 ;            name : Char
 ;        position : Posn
 ;       direction : Direction
-(define-struct character [name direction position overlayed-item] #:transparent)
+(define-struct character [name direction position item-below] #:transparent)
 
 ;; Examples
 (define INIT-OVERLAYED-ITEM #\ )
@@ -242,19 +243,6 @@
 ;; Examples
 (define INIT-PACMAN (make-pacman INIT-PACMAN-CHARACTER #true))
 
-;*****************************************************************
-; Ghost is a struct: (make-ghost name moving hidden-element)
-; where   
-; where      character : Character
-;       hidden-element : Char
-(define-struct ghost [character hidden-element] #:transparent)
-
-;; Examples
-(define INIT-GHOST-RED (make-ghost INIT-GHOST-RED-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-ORANGE (make-ghost INIT-GHOST-ORANGE-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-PINK (make-ghost INIT-GHOST-PINK-CHARACTER INIT-HIDDEN-ELEMENT))
-(define INIT-GHOST-CYAN (make-ghost INIT-GHOST-CYAN-CHARACTER INIT-HIDDEN-ELEMENT))
-
 ;*******************************************************************
 ;; Data type
 ; powerpellet-effect is a struct: (make-powerpellet-effect active active-ticks)
@@ -271,7 +259,7 @@
 ; Appstate is a struct: (make-appstate map score pp-active? pacman-mouth)
 ; where                map : Vector<String>
 ;                   pacman : Pacman
-;                   ghosts : List<Ghost>
+;                   ghosts : List<Character>
 ;                    score : Natural
 ;       powerpellet-effect : Powerpellet-effect
 ;                     quit : Boolean

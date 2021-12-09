@@ -9,8 +9,47 @@
 (require "key_handler.rkt")
 (require "tick_handler.rkt")
 
-;*********************************************************************************
-;*********************************************************************************
+;*******************************************************************************************************
+;*******************************************************************************************************
+;;; HAS QUIT ?
+;; Data types
+; Quit is a Boolean from struct Appstate (appstate-quit)
+
+;; Input/Output
+; quit? : Appstate -> Quit
+; takes an appstate and returns a bool indicating whether the app has quit or not
+; header :
+; (define (quit? appstate) Quit)
+
+;; Examples
+(check-expect (quit? INIT-APPSTATE) #false)
+(check-expect (quit? END-STATE) #true)
+
+;; Template
+; (define (quit? appstate)
+;   ... appstate ...)
+
+;; Code - used by (big-bang)
+(define (quit? appstate)
+  (appstate-quit appstate))
+
+;*******************************************************************************************************
+;;; BIG BANG
+;; Input/Output
+; run : Appstate
+; runs the Pacman game
+; header :
+; (define (run appstate))
+
+;; Template
+; (define (run appstate)
+;   (big-bang appstate
+;     [to-draw   ...]
+;     [on-tick   ...]
+;     [on-key    ...]
+;     [stop-when ...]))
+
+;; Code 
 (define (run appstate)
   (big-bang appstate
     [to-draw render]

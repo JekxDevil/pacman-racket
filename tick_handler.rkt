@@ -12,12 +12,12 @@
 ;*********************************************************************************
 ;; API
 (provide tick-handler)
-(provide move-posn)
-(provide find-in-map)
-(provide find-n-replace)
-(provide update-map)
-(provide check-fullscore)
-(provide quit)
+;(provide move-posn)
+;(provide find-in-map)
+;(provide find-n-replace)
+;(provide update-map)
+;(provide check-fullscore)
+;(provide quit)
 (provide quit?)
 
 ;*********************************************************************************
@@ -38,61 +38,119 @@
 ;; Code - used by (big-bang)
 (define (tick-handler appstate)
   (local
-    [(define pp-effect (appstate-powerpellet-effect appstate))
-     (define pp-active (powerpellet-effect-active pp-effect))]
-    (cond
-      [pp-active (edible-handler appstate)]
-      [else (update-appstate appstate)])))
-
-;*********************************************************************************
-;; Input/Output
-; edible-handler : Appstate -> Appstate
-; handle ticks when powerpellet is active, also manage its consequences in-game
-; header :
-; (define (edible-handler appstate) Appstate)
-
-;; Examples
-
-;; Template
-
-;; Code - used by (tick-handler)
-(define (edible-handler appstate)
-  (local
     [; appstate fields abbreviations
      (define map (appstate-map appstate))
      (define pacman (appstate-pacman appstate))
      (define ghosts (appstate-ghosts appstate))
      (define score (appstate-score appstate))
-     (define powerpellet-effect (appstate-powerpellet-effect appstate))
-     (define ticks (powerpellet-effect-ticks powerpellet-effect))
-     ; updated fields
-     (define new-ghosts (move-ghosts ghosts))
+     (define pp-effect (appstate-powerpellet-effect appstate))
+     (define quit (appstate-quit appstate))
+     ; pre-calculated fields updates
      (define new-pacman (move-pacman pacman))
-     (define )]
-    (cond
-      [(>= ticks LIMIT-POWERPELLET-EFFECT) (make-appstate
-                                            (appstate-map appstate)    ; update-map
-                                            (appstate-pacman appstate)
-                                            (appstate-ghosts appstate) ; update-ghosts
-                                            (appstate-score appstate)
-                                            INIT-POWERPELLET-EFFECT
-                                            (appstate-quit appstate))]
-    [else (make-appstate
-           (appstate-map appstate)    ; update-map
-           (appstate-pacman appstate)
-           (move-ghosts ghosts) ; update ghosts
-           (appstate-score appstate)
-           (make-powerpellet-effect #true (+ TICK ticks))
-           (appstate-quit appstate))])))
+     (define new-pacman-item-below (character-item-below (pacman-character new-pacman)))
+     (define new-map-pacman (update-map ))
+     (define new-ghosts (move-ghots ))
+     (define new-map (update-map ))
+     (define new-score (update-score score new-pacman-item-below))
+     (define new-pp-effect (update-pp-effect pp-effect))
+     (define new-pp-active (powerpellet-effect-active new-pp-effect))
+     (define new-quit (game-over new-ghosts new-pp-active new-score))]
+    (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
 
 ;*********************************************************************************
-; first update ghosts
-;     direction versus pacman if near, just don't collision detection yet
-; pass new ghosts to map to update position and if collision end game
-(define (update-appstate appstate)
-  )
+;;; MOVE PACMAN EDIT
+;; Data types
+; (update-map map pac-or-ghost pos-next)
+; (define (update-map map pac-or-ghost pos-next)
+
+;; Input/Output
+; move-pacman: Appstate Character -> Appstate
+; handles pacman move logic
+; header :
+; (define (move appstate character) Character)
+
+;; Examples
+
+;; Template
+
+;; Code - used by (key-handler)
+(define (move-pacman appstate direction)
+  (local [(define pacman (appstate-pacman appstate))
+          (define name (character-name (pacman-character pacman)))
+          (define posn (character-position (pacman-character pacman)))
+          (define mouth (pacman-mouth pacman))
+          (define posn-next (move-posn posn direction))
+          (define new-pacman (make-pacman (make-character name direction posn-next) mouth))
+          (define element-next (find-in-map (appstate-map appstate) posn-next))]
+    (cond [(or (char=? MAP-GATE element-next)
+               (char=? MAP-WALL element-next)) appstate]
+          [(char=? MAP-DOT element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                        new-pacman (appstate-ghosts appstate)
+                                                        (+ POINTS-DOT (appstate-score appstate)) (appstate-pp-active appstate)
+                                                         (appstate-quit appstate))]
+          [(char=? MAP-PP element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                       new-pacman (appstate-ghosts appstate)
+                                                       (+ POINTS-PP (appstate-score appstate)) #true
+                                                       (appstate-quit appstate))]
+          [(char=? MAP-CHERRY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                           new-pacman (appstate-ghosts appstate)
+                                                           (+ POINTS-CHERRY (appstate-score appstate)) (appstate-pp-active appstate)
+                                                           (appstate-quit appstate))]
+          [(char=? MAP-EMPTY element-next) (make-appstate (update-map (appstate-map appstate) pacman posn-next)
+                                                          new-pacman (appstate-ghosts appstate)
+                                                          (appstate-score appstate) (appstate-pp-active appstate)
+                                                          (appstate-quit appstate))]
+          [(or (char=? MAP-GHOST-RED element-next)
+               (char=? MAP-GHOST-PINK element-next)
+               (char=? MAP-GHOST-ORANGE element-next)
+               (char=? MAP-GHOST-CYAN element-next)) (check-edible appstate new-pacman)])))
 
 ;*********************************************************************************
+;;; UPDATE POWERPELLET EFFECT
+;; Input/Output
+; update-pp-effect : Powerpellet-effect -> Powerpellet-effect
+; update powerpellet effect managing ticks and state when powerpellet is active
+; header :
+; (define (update-pp-effect pp) Powerpellet-effect)
+
+;; Examples
+(define EX-UPPE-PP0 (make-powerpellet-effect #true 1))
+(define EX-UPPE-PP1 (make-powerpellet-effect #true LIMIT-POWERPELLET-ACTIVE))
+(define EX-UPPE-PP2 (make-powerpellet-effect #true (- LIMIT-POWERPELLET-ACTIVE 1)))
+(define EX-UPPE-PP3 (make-powerpellet-effect #true (+ LIMIT-POWERPELLET-ACTIVE 1)))
+
+(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT) INIT-POWERPELLET-EFFECT)
+(check-expect (update-pp-effect EX-UPPE-PP0) (make-powerpellet-effect #true 2))
+(check-expect (update-pp-effect EX-UPPE-PP1) INIT-POWERPELLET-EFFECT)
+(check-expect (update-pp-effect EX-UPPE-PP2) EX-UPPE-PP1)
+(check-expect (update-pp-effect EX-UPPE-PP3) INIT-POWERPELLET-EFFECT)
+
+;; Template
+; (define (update-pp-effect pp)
+;   (local
+;     [(define active ...)
+;      (defien ticks  ...)]
+;   [cond
+;     [active [cond
+;               [(>= ticks LIMIT-POWERPELLET-EFFECT) ...]
+;               [else                                ...]]]
+;     [else ... pp ...]]))
+
+;; Code - used by (tick-handler)
+(define (update-pp-effect pp)
+  (local
+    [; powerpellet fields abbreviations
+     (define active (powerpellet-effect-active pp))
+     (defien ticks (powerpellet-effect-ticks pp))]
+    ; function body
+  [cond
+    [active [cond
+              [(>= ticks LIMIT-POWERPELLET-EFFECT) INIT-POWERPELLET-EFFECT]
+              [else (make-powerpellet-effect #true (+ TICK ticks))]]]
+    [else pp]]))
+
+;*********************************************************************************
+;;; MOVE GHOSTS
 ;; Input/Output
 ; move-ghosts : List<Ghost> -> List<Ghost>
 ; update the whole ghosts list at each tick
@@ -110,6 +168,7 @@
     [(cons (update-ghost (first ghosts)) (update-ghosts (rest ghosts)))]))
 
 ;*********************************************************************************
+;;; MOVE GHOST
 ;; Input/Output
 ; move-ghost : Ghost -> Ghost
 ; move ghost position and direction
@@ -207,42 +266,6 @@
     [else #f]))
 
 ;*********************************************************************************
-;; Input/Output
-; collision : -> Boolean
-; check if the game ends because of a collision between pacman and an invulnerable ghost
-; logic | check hidden element in all ghosts if they match with MAP-PACMAN)
-; assumption | pacman is only one
-; header :
-; (define (collision ghosts) Boolean)
-
-;; Examples
-(define EX-C-POSN (make-posn 0 0))
-(define EX-C-GHOST0 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP EX-C-POSN) MAP-PACMAN))
-(define EX-C-GHOST1 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 1 1)) MAP-EMPTY))
-(define EX-C-GHOST2 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 2 2)) MAP-DOT))
-(define EX-C-GHOST3 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 3 3)) MAP-CHERRY))
-(define EX-C-GHOSTS-TRUE (list EX-C-GHOST0 EX-C-GHOST1 EX-C-GHOST2 EX-C-GHOST3))
-(define EX-C-GHOSTS-FALSE (list EX-C-GHOST1 EX-C-GHOST2 EX-C-GHOST3))
-
-(check-expect (collision EX-C-GHOSTS-TRUE) #true)
-(check-expect (collision EX-C-GHOSTS-FALSE) #false)
-
-;; Template
-
-;; Code - used by (quit)
-(define (collision ghosts)
-  (local
-    [(define collisions (map
-                         (λ (g) (if [char=? MAP-PACMAN (ghost-hidden-element g)] #true #false))
-                         ghosts))]
-  (foldl
-   (λ (item result) (or item result))
-   #false
-   collisions)
-
-;*********************************************************************************
-
-
 ;;; MOVE POSN
 ;; Input/Output
 ; move-posn : Posn Direction -> Posn
@@ -277,7 +300,7 @@
 ;         [(char=? direction DIRECTION-LEFT)  (make-posn ...)]
 ;         [(char=? direction DIRECTION-RIGHT) (make-posn ...)]))
 
-;; Code - used by 
+;; Code - used by (...)
 (define (move-posn posn direction)
   (cond [(char=? direction DIRECTION-UP) (make-posn (posn-x posn)
                                                     (if [< (- (posn-y posn) 1) 0] MAP-HEIGHT-INDEX [- (posn-y posn) 1]))]
@@ -290,11 +313,14 @@
 
 ;*********************************************************************************
 ;;; FIND ELEMENT CHAR IN MAP
+;; Data types
+; Map is a Vector<String> from struct Appstate (appstate-map)
+
 ;; Input/Output
 ; find-in-map : Map Posn -> Char
 ; given the appstate and a position, return the element at that map position
 ; header :
-; (define (find-in-map Map posn) Char)
+; (define (find-in-map map posn) Char)
 
 ;; Examples
 (check-expect (find-in-map INIT-MAP INIT-PACMAN-POSN) MAP-PACMAN)
@@ -307,43 +333,9 @@
 ; (define (find-in-map map posn)
 ;   (string-ref (vector-ref ....) ...)
 
-;; Code - used by 
+;; Code - used by (...)
 (define (find-in-map map posn)
   (string-ref (vector-ref map (posn-y posn)) (posn-x posn)))
-
-;;; CHECK FULL SCORE
-;; Input/Output
-; check-fullscore : Appstate -> Appstate
-; check if score is full, if it is the quit attribute in appstate becomes true
-; header:
-; (define (is-fullscore appstate) Appstate)
-
-;; Examples
-(define PRE-SCORE-APPSTATE0 (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS TOTAL-POINTS
-                                           INIT-PP-ACTIVE #false))
-(define POST-SCORE-APPSTATE0 (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS TOTAL-POINTS
-                                            INIT-PP-ACTIVE #true))
-(define PRE-SCORE-APPSTATE1 (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS (- TOTAL-POINTS 1)
-                                           INIT-PP-ACTIVE #false))
-(define POST-SCORE-APPSTATE1 (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS (- TOTAL-POINTS 1)
-                                            INIT-PP-ACTIVE #false))
-
-(check-expect (check-fullscore INIT-APPSTATE) INIT-APPSTATE)
-(check-expect (check-fullscore PRE-SCORE-APPSTATE0) POST-SCORE-APPSTATE0)
-(check-expect (check-fullscore PRE-SCORE-APPSTATE1) POST-SCORE-APPSTATE1)
-
-;; Template
-; (define (check-fullscore appstate)
-;   (if [>= (appstate-score appstate) TOTAL-POINTS]
-;       [quit ...]
-;       ... appstate ...)))
-
-;; Code - used by ---TODO IMPLEMENTATION
-(define (check-fullscore appstate)
-  (local [(define score (appstate-score appstate))]
-  (if [>= score TOTAL-POINTS]
-      [quit appstate]
-      appstate)))
 
 ;*******************************************************************************************************
 ;;; FIND AND REPLACE
@@ -355,6 +347,10 @@
 ; (define (find-n-replace map pos name) Map)
 
 ;; Examples
+(define EX-FNR-PRE-MAP (vector ".." ".."))
+(define EX-FNR-POST-MAP (vector ".." ".P"))
+(defien EX-FNR-POSN (make-posn 1 1))
+(check-expect (find-n-replace EX-FNR-PRE-MAP EX-FNR-POSN MAP-PACMAN) EX-FNR-POST-MAP)
 
 ;; Template
 
@@ -471,19 +467,159 @@
     (list->vector (find-n-replace map-with-prev-item pos-next returning-character))))
 
 ;*******************************************************************************************************
-;;; GAME OVER
+;;; UPDATE SCORE
+;; Data types
+; Score is a Natural from struct Appstate (appstate-score)
+; Item is a Char from struct Character (character-overlayed-item)
+
 ;; Input/Output
-; game-over : Appstate -> Appstate
-; check all possible causes of game over and if there are any, quit the game
+; update-score : Score Item -> Score
+; given an item, check if it is a valuable one, and if it is so, add it to the score
+; Assumptions | this function can be used only by pacman
 ; header :
-; (define (game-over appstate) Appstate)
+; (define (add-points Score Item) Score)
 
 ;; Examples
+(check-expect (update-score MAP-EMTPY 0) 0)
+(check-expect (update-score MAP-DOT 0) POINTS-DOT)
+(check-expect (update-score MAP-CHERRY 0) POINTS-CHERRY)
+(check-expect (update-score MAP-POWERPELLET 0) POINTS-POWERPELLET)
 
 ;; Template
+; (define (add-points score item)
+;   (cond
+;     [(char=? item MAP-DOT)         ... score ...]
+;     [(char=? item MAP-CHERRY)      ... score ...]
+;     [(char=? item MAP-POWERPELLET) ... score ...]
+;     [else                          ... score ...]))
 
-;; Code - used by (update-appstate)
-    
+;; Code - used by (tick-handler)
+(define (add-points score item)
+  (cond
+    [(char=? item MAP-DOT) (+ score POINTS-DOT)]
+    [(char=? item MAP-CHERRY) (+ score POINTS-CHERRY)]
+    [(char=? item MAP-POWERPELLET) (+ score POINTS-POWERPELLET)]
+    [else score]))
+
+;*******************************************************************************************************
+;;; GAME OVER
+;; Data types
+; Ghosts is a List<Character>
+; Active is a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
+; Score is a Natural
+; Quit is a Boolean
+
+
+;; Input/Output
+; game-over : Ghosts Active Score -> Quit
+; check all possible causes of game over and if there are any, quit the game :
+; - collision with unvulnerable ghost
+; - collection of all points
+; header :
+; (define (game-over ghosts active score) Quit)
+
+;; Examples
+(define EX-GO-GHOST0 (make-character MAP-GHOST-RED DIRECTION-DOWN (make-posn 0 0) MAP-PACMAN))
+(define EX-GO-GHOST1 (make-character MAP-GHOST-ORANGE DIRECTION-LEFT (make-posn 1 1) MAP-EMPTY))
+(define EX-GO-GHOST2 (make-character MAP-GHOST-PINK DIRECTION-RIGHT (make-posn 2 22) MAP-DOT))
+(define EX-GO-GHOSTS-WITH-COLLISION (list EX-GO-GHOST0 EX-GO-GHOST1 EX-GO-GHOST2))
+(define EX-GO-GHOSTS-WITHOUT-COLLISION (list EX-GO-GHOST1 EX-GO-GHOST2))
+
+(check-expect (game-over EX-GO-GHOSTS-WITH-COLLISION #false 0) #true)
+(check-expect (game-over EX-GO-GHOSTS-WITH-COLLISION #true 0) #false)
+(check-expect (game-over EX-GO-GHOST-WITHOUT-COLLISION #false 0) #false)
+(check-expect (game-over EX-GO-GHOST-WITHOUT-COLLISION #true 0) #false)
+(check-expect (game-over EX-GO-GHOST-WITHOUT-COLLISION #false LIMIT-SCORE) #true)
+(check-expect (game-over EX-GO-GHOST-WITHOUT-COLLISION #false (- LIMIT-SCORE 1)) #false)
+(check-expect (game-over EX-GO-GHOST-WITH-COLLISION #true LIMIT-SCORE) #true)
+
+;; Template
+; (define (game-over ghosts active score)
+;   (or
+;    (is-fullscore ...)
+;    (and
+;     (not active)
+;     (collision ...))))
+
+;; Code - used by (tick-handler)
+(define (game-over ghosts active score)
+  (or
+   (is-fullscore score)
+   (and
+    (not active)
+    (collision ghosts))))
+
+;*********************************************************************************
+;;; IS FULL SCORE
+;; Data types
+; Score is a Natural from struct Appstate (appstate-score)
+; Quit is a Boolean form struct Appstate (appstate-quit)
+
+;; Input/Output
+; is-fullscore : Score -> Quit
+; check if score is full, if it is return true otherwise false
+; header:
+; (define (is-fullscore score) Boolean)
+
+;; Examples
+(check-expect (check-fullscore 0) #false)
+(check-expect (check-fullscore TOTAL-POINTS) #true)
+(check-expect (check-fullscore (- TOTAL-POINTS 1)) #false)
+
+;; Template
+; (define (is-fullscore score)
+;   (>= score TOTAL-POINTS))
+
+;; Code - used by (game-over)
+(define (is-fullscore score)
+  (>= score TOTAL-POINTS))
+
+;*********************************************************************************
+;;; COLLISION
+;; Data types
+; Ghosts is a List<Character>
+; Quit is a Boolean from struct Appstate (appstate-quit)
+
+;; Input/Output
+; collision : Ghosts -> Quit
+; check if the game ends because of a collision between pacman and an invulnerable ghost
+; logic | check hidden element in all ghosts if they match with MAP-PACMAN
+; assumption | pacman is only one, powerpellet effect is off
+; header :
+; (define (collision ghosts) Quit)
+
+;; Examples
+(define EX-C-POSN (make-posn 0 0))
+(define EX-C-GHOST0 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP EX-C-POSN) MAP-PACMAN))
+(define EX-C-GHOST1 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 1 1)) MAP-EMPTY))
+(define EX-C-GHOST2 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 2 2)) MAP-DOT))
+(define EX-C-GHOST3 (make-ghost (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 3 3)) MAP-CHERRY))
+(define EX-C-GHOSTS-TRUE (list EX-C-GHOST0 EX-C-GHOST1 EX-C-GHOST2 EX-C-GHOST3))
+(define EX-C-GHOSTS-FALSE (list EX-C-GHOST1 EX-C-GHOST2 EX-C-GHOST3))
+
+(check-expect (collision EX-C-GHOSTS-TRUE) #true)
+(check-expect (collision EX-C-GHOSTS-FALSE) #false)
+
+;; Template
+;(define (collision ghosts)
+;  (local
+;    [(define possible-collisions ...)]
+;  [foldl
+;   (λ (item result) (or item result))
+;   #false
+;   possible-collisions]))
+
+;; Code - used by (quit)
+(define (collision ghosts)
+  (local
+    [(define possible-collisions (map
+                                  (λ (g) (char=? MAP-PACMAN (character-overalyed-item g)))
+                                  ghosts))]
+  [foldl
+   (λ (item result) (or item result))
+   #false
+   possible-collisions]))
+
 ;*******************************************************************************************************
 ;;; QUITTER
 ;; Input/Output
@@ -509,47 +645,3 @@
                  (appstate-score appstate)
                  (appstate-pp-active appstate)
                  #true))
-
-;*******************************************************************************************************
-;;; HAS QUIT ?
-;; Input/Output
-; quit? : Appstate -> Boolean
-; takes an appstate and returns a bool indicating whether the app has quit or not
-; header :
-; (define (quit? appstate) Boolean)
-
-;; Examples
-(check-expect (quit? INIT-APPSTATE) #false)
-(check-expect (quit? END-STATE) #true)
-
-;; Template
-; (define (quit? appstate)
-;   ... appstate ...)
-
-;; Code - used by (big-bang)
-(define (quit? appstate)
-  (appstate-quit appstate)); edit
-
-;*******************************************************************************************************
-;*******************************************************************************************************
-;;;; POINTS HANDLER
-;;; Input/Output
-;; add-points : Appstate Char -> Appstate
-;;
-;; header :
-;; (define (add-points appstate char) Appstate)
-;
-;;; Examples
-;
-;;; Template
-;
-;;; Code - used by (...)
-;(define (add-points appstate char)
-;  (make-appstate (appstate-map appstate)
-;    (appstate-pacman appstate)
-;    (appstate-ghosts appstate)
-;    (+ (appstate-score appstate) (cond [(equal? char MAP-DOT) (DOT-POINTS)]
-;                                       [(equal? char MAP-CHERRY) (CHERRY-POINTS)]))
-;    (appstate-pp-active appstate)
-;    (appstate-pacman-mouth appstate)
-;    (appstate-quit appstate)))
