@@ -12,12 +12,6 @@
 ;*********************************************************************************
 ;; API
 (provide tick-handler)
-;(provide move-posn)
-;(provide find-in-map)
-;(provide find-n-replace)
-;(provide update-map)
-;(provide check-fullscore)
-;(provide quit)
 
 ;*********************************************************************************
 ;*********************************************************************************
@@ -31,6 +25,7 @@
 ; (define (tick-handler appstate) Appstate)
 
 ;; Examples
+
 
 ;; Template
 
