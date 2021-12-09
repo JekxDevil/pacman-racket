@@ -22,6 +22,7 @@
 ; (define (quit? appstate) Quit)
 
 ;; Examples
+(define END-STATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
 (check-expect (quit? INIT-APPSTATE) #false)
 (check-expect (quit? END-STATE) #true)
 

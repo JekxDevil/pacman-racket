@@ -52,19 +52,21 @@
      (define moved-pacman-posn (character-position (pacman-character moved-pacman)))
      (define new-map-pacman (update-map map pacman-posn moved-pacman-posn pacman-overlayed-item MAP-PACMAN))
      ; - pp-effect handler -
-     (define new-pp-effect (update-pp-effect pp-effect))
+     (define moved-pacman-item (character-item-below (pacman-character moved-pacman)))
+     (define new-pp-effect (update-pp-effect pp-effect moved-pacman-item))
      (define new-pp-active (powerpellet-effect-active new-pp-effect))
      ; - game over first check -
      (define quit0 (pre-game-over pacman new-pp-active))
      ; - move ghosts struct and update map consequently -
      (define new-ghosts (move-ghosts new-map-pacman new-pp-active ghosts))
-     (define new-map (map
-                      (λ (g-previous g-next) (update-map
-                              new-map-pacman
-                              (character-position g-previous)
-                              (character-position g-next)
-                              (character-item-below g-previous)
-                              (character-name g-next)))
+     (define new-map (foldl
+                      (λ (g-previous g-next tmp-map) (update-map
+                                                      tmp-map
+                                                      (character-position g-previous)
+                                                      (character-position g-next)
+                                                      (character-item-below g-previous)
+                                                      (character-name g-next)))
+                      new-map-pacman
                       ghosts
                       new-ghosts))
      ; - score update -
@@ -175,17 +177,17 @@
 
 ;*********************************************************************************
 ;;; UPDATE POWERPELLET EFFECT
+;; Data types
+; Item is a Char from struct Character (character-item-below)
 ;; Input/Output
-; update-pp-effect : Powerpellet-effect -> Powerpellet-effect
+; update-pp-effect : Powerpellet-effect Item -> Powerpellet-effect
 ; update powerpellet effect managing ticks and state when powerpellet is active
-; Collateral | if pacman gets more than one powerpellet, the effect is not increased
+; Assumptions | only pacman can ivoke this function 
+; Collateral  | if pacman gets more than one powerpellet, the effect is not increased
 ; header :
 ; (define (update-pp-effect pp) Powerpellet-effect)
 
 ;; Examples
-(define EX-UPPE-PACMAN (make-pacman
-                        (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 0 0) MAP-POWERPELLET)
-                        #true))
 (define EX-UPPE-PP0 (make-powerpellet-effect #true 0))
 (define EX-UPPE-PP1 (make-powerpellet-effect #true 0.5))
 (define EX-UPPE-PP2 (make-powerpellet-effect #true LIMIT-POWERPELLET-ACTIVE))
@@ -193,18 +195,18 @@
 (define EX-UPPE-PP4 (make-powerpellet-effect #true (+ LIMIT-POWERPELLET-ACTIVE TICK)))
 
 ; case 1.1 : reset pp effect because it finished
-(check-expect (update-pp-effect EX-UPPE-PP2 INIT-PACMAN) INIT-POWERPELLET-EFFECT)
-(check-expect (update-pp-effect EX-UPPE-PP4 INIT-PACMAN) INIT-POWERPELLET-EFFECT)
+(check-expect (update-pp-effect EX-UPPE-PP2 MAP-EMPTY) INIT-POWERPELLET-EFFECT)
+(check-expect (update-pp-effect EX-UPPE-PP4 MAP-EMPTY) INIT-POWERPELLET-EFFECT)
 ; case 1.2 : increase ticks to pp-effect
-(check-expect (update-pp-effect EX-UPPE-PP0 INIT-PACMAN) EX-UPPE-PP1)
-(check-expect (update-pp-effect EX-UPPE-PP3 INIT-PACMAN) EX-UPPE-PP2)
+(check-expect (update-pp-effect EX-UPPE-PP0 MAP-EMPTY) EX-UPPE-PP1)
+(check-expect (update-pp-effect EX-UPPE-PP3 MAP-EMPTY) EX-UPPE-PP2)
 ; case 2.1 : activate pp effect
-(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT EX-UPPE-PACMAN) EX-UPPE-PP0) 
+(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT MAP-POWERPELLET) EX-UPPE-PP0) 
 ; case 2.2 : return pp
-(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT INIT-PACMAN) INIT-POWERPELLET-EFFECT)
+(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT MAP-EMPTY) INIT-POWERPELLET-EFFECT)
 
 ;; Template
-; (define (update-pp-effect pp)
+; (define (update-pp-effect pp item)
 ;   (local
 ;     [(define active ...)
 ;      (defien ticks  ...)]
@@ -217,12 +219,11 @@
 ;           [else                          ...]]]]))
 
 ;; Code - used by (tick-handler)
-(define (update-pp-effect pp pacman)
+(define (update-pp-effect pp item)
   (local
     [; param fields abbreviations
      (define active (powerpellet-effect-active pp))
-     (define ticks (powerpellet-effect-ticks pp))
-     (define item (character-item-below (pacman-character pacman)))]
+     (define ticks (powerpellet-effect-ticks pp))]
     ; function body
     [cond
       [active (cond
@@ -552,7 +553,7 @@
 ; (define (update-map map posn-previous posn-next return-item return-character) Map)
 
 ;; Examples
-; KIS
+; KEEP IT SIMPLE
 
 ;; Template
 ; (define (update-map map posn-previous pos-next return-item return-character)
@@ -562,19 +563,17 @@
 
 ;; Code - used by (...)
 (define (update-map map posn-previous posn-next return-item return-character)
-  (local [; pre-calculated params abbreviations
-          (define los (vector->list map))
-          ; map with previous item given back
-          (define map-with-prev-item (find-n-replace
-                                      los
-                                      posn-previous
-                                      return-item))]
+  (local
+    [; map with previous item given back
+     (define map-with-prev-item (find-n-replace
+                                 map
+                                 posn-previous
+                                 return-item))]
     ; body
-    (list->vector
-     (find-n-replace
-      map-with-prev-item
-      posn-next
-      return-character))))
+    (find-n-replace
+     map-with-prev-item
+     posn-next
+     return-character)))
 
 ;*******************************************************************************************************
 ;;; UPDATE SCORE
