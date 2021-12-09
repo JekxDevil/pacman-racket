@@ -59,7 +59,15 @@
      (define quit0 (pre-game-over pacman new-pp-active))
      ; - move ghosts struct and update map consequently -
      (define new-ghosts (move-ghosts new-map-pacman new-pp-active ghosts))
-     (define new-map (update-map ))
+     (define new-map (map
+                      (λ (g-previous g-next) (update-map
+                              new-map-pacman
+                              (character-position g-previous)
+                              (character-position g-next)
+                              (character-item-below g-previous)
+                              (character-name g-next)))
+                      ghosts
+                      new-ghosts))
      ; - score update -
      (define moved-pacman-item-below (character-item-below (pacman-character new-pacman)))
      (define new-score (update-score score moved-pacman-item-below))
