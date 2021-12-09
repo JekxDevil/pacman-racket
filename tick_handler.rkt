@@ -900,28 +900,29 @@
    #false
    possible-collisions]))
 
-;*******************************************************************************************************
-;;; QUITTER
-;; Input/Output
-; quit : Appstate -> Appstate
-; given an Appstate, it quits the app by changing the correspondent value in the appstate that records it
-; header :
-; (define (quit appstate) AppState)
-
-;; Examples
-(define END-STATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
-(check-expect (quit END-STATE) END-STATE)
-(check-expect (quit INIT-APPSTATE) (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT  #true))
-
-;; Template
-; (define (quit appstate)
-;   (make-appstate ...)
-
-;; Code - used by (...)
-(define (quit appstate)
-  (make-appstate (appstate-map appstate)
-                 (appstate-pacman appstate)
-                 (appstate-ghosts appstate)
-                 (appstate-score appstate)
-                 (appstate-powerpellet-effect appstate)
-                 #true))
+;;*******************************************************************************************************
+;;;;;;;;;;;;;;;;; NO NEED ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; QUITTER
+;;; Input/Output
+;; quit : Appstate -> Appstate
+;; given an Appstate, it quits the app by changing the correspondent value in the appstate that records it
+;; header :
+;; (define (quit appstate) AppState)
+;
+;;; Examples
+;(define END-STATE (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
+;(check-expect (quit END-STATE) END-STATE)
+;(check-expect (quit INIT-APPSTATE) (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT  #true))
+;
+;;; Template
+;; (define (quit appstate)
+;;   (make-appstate ...)
+;
+;;; Code - used by (...)
+;(define (quit appstate)
+;  (make-appstate (appstate-map appstate)
+;                 (appstate-pacman appstate)
+;                 (appstate-ghosts appstate)
+;                 (appstate-score appstate)
+;                 (appstate-powerpellet-effect appstate)
+;                 #true))
