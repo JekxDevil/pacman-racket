@@ -422,10 +422,10 @@
 ;*********************************************************************************
 ;;; COLLECT POSSIBLE CHOICES
 ;; Input/Output
-; collect-possible-choices : Name List<Pair> -> List<Ghost>
+; collect-possible-choices : List<Character> -> List<Character>
 ; group choices available, discarding non-ghost values which are invalid choices
 ; header :
-; (define (collect-possible-choices list-choices) List<Ghost>)
+; (define (collect-possible-choices list-choices) List<Character>)
 
 ;; Examples
 (define EX-CPC-CHOICE0 (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 1 0) MAP-EMPTY))
