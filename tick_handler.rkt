@@ -550,14 +550,17 @@
 ;; Template
 ;(define (collect-valid-choice ghost looking-for-pacman)
 ;  (local
-;    [(define item ...)]
+;    [(define item ...)
+;     (define down ...)]
 ;    [cond
 ;      [(and (not looking-for-pacman)
 ;            (not (char=? item MAP-WALL))
 ;            (not (char=? item MAP-GHOST-RED))
 ;            (not (char=? item MAP-GHOST-ORANGE))
 ;            (not (char=? item MAP-GHOST-PINK))
-;            (not (char=? item MAP-GHOST-CYAN))) ...]
+;            (not (char=? item MAP-GHOST-CYAN))
+;            (not (and down
+;                      (char=? item MAP-GATE)))) ...]
 ;      [(and looking-for-pacman
 ;            (char=? item MAP-PACMAN))           ...]
 ;      [else                                     ...]]))
