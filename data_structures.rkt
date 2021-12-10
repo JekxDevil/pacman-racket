@@ -74,7 +74,7 @@
 (provide INIT-GHOST-PINK-POSN)
 (provide INIT-GHOST-CYAN-POSN)
 
-(provide INIT-OVERLAYED-ITEM)
+(provide INIT-ITEM-BELOW)
 
 ;*****************************************************************
 ;*****************************************************************
@@ -170,7 +170,7 @@
 (define INIT-GHOST-RED-POSN (make-posn 15 13))
 (define INIT-GHOST-ORANGE-POSN (make-posn 12 14))
 (define INIT-GHOST-PINK-POSN (make-posn 12 15))
-(define INIT-GHOST-CYAN-POSN (make-posn 15 15)) 
+(define INIT-GHOST-CYAN-POSN (make-posn 15 15))
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -226,12 +226,12 @@
 (define-struct character [name direction position item-below] #:transparent)
 
 ;; Examples
-(define INIT-OVERLAYED-ITEM #\ )
-(define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN INIT-OVERLAYED-ITEM))
-(define INIT-GHOST-RED (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST-RED-POSN INIT-OVERLAYED-ITEM))
-(define INIT-GHOST-ORANGE (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST-ORANGE-POSN INIT-OVERLAYED-ITEM))
-(define INIT-GHOST-PINK (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST-PINK-POSN INIT-OVERLAYED-ITEM))
-(define INIT-GHOST-CYAN (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST-CYAN-POSN INIT-OVERLAYED-ITEM))
+(define INIT-ITEM-BELOW #\ )
+(define INIT-PACMAN-CHARACTER (make-character MAP-PACMAN DIRECTION-RIGHT INIT-PACMAN-POSN INIT-ITEM-BELOW))
+(define INIT-GHOST-RED (make-character MAP-GHOST-RED DIRECTION-DOWN INIT-GHOST-RED-POSN INIT-ITEM-BELOW))
+(define INIT-GHOST-ORANGE (make-character MAP-GHOST-ORANGE DIRECTION-UP INIT-GHOST-ORANGE-POSN INIT-ITEM-BELOW))
+(define INIT-GHOST-PINK (make-character MAP-GHOST-PINK DIRECTION-RIGHT INIT-GHOST-PINK-POSN INIT-ITEM-BELOW))
+(define INIT-GHOST-CYAN (make-character MAP-GHOST-CYAN DIRECTION-LEFT INIT-GHOST-CYAN-POSN INIT-ITEM-BELOW))
 
 ;*******************************************************************
 ;; Data type

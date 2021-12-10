@@ -5,8 +5,6 @@
 (require racket/base)
 (require 2htdp/image)
 (require "data_structures.rkt")
-(require "figures.rkt")
-(require "render.rkt")
 
 ;*********************************************************************************
 ;*********************************************************************************
@@ -36,7 +34,7 @@
      (define map (appstate-map appstate))
      (define pacman (appstate-pacman appstate))
      (define pacman-posn (character-position (pacman-character pacman)))
-     (define pacman-overlayed-item (character-item-below (pacman-character pacman)))
+     (define pacman-item-below (character-item-below (pacman-character pacman)))
      (define ghosts (appstate-ghosts appstate))
      (define score (appstate-score appstate))
      (define pp-effect (appstate-powerpellet-effect appstate))
@@ -45,7 +43,7 @@
      ; - move pacman struct and update map consequently -
      (define moved-pacman (move-pacman map pacman))
      (define moved-pacman-posn (character-position (pacman-character moved-pacman)))
-     (define new-map-pacman (update-map map pacman-posn moved-pacman-posn pacman-overlayed-item MAP-PACMAN))
+     (define new-map-pacman (update-map map pacman-posn moved-pacman-posn pacman-item-below MAP-PACMAN))
      ; - pp-effect handler -
      (define moved-pacman-item (character-item-below (pacman-character moved-pacman)))
      (define new-pp-effect (update-pp-effect pp-effect moved-pacman-item))
@@ -242,19 +240,31 @@
 ; (define (move-ghosts ghosts) Ghosts)
 
 ;; Examples
-;;;;;;;;;;;;;;;; really difficult ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define EX-MG-MAP0 (vector "WWWW" "Wr.W" "WWWWW" "Wp@W" "WWWW" "WcYW" "WWWW"))
+(define EX-MG-GHOST0 (make-character MAP-GHOST-RED DIRECTION-RIGHT (make-posn 1 1) MAP-EMPTY))
+(define EX-MG-GHOST1 (make-character MAP-GHOST-RED DIRECTION-RIGHT (make-posn 2 1) MAP-DOT))
+(define EX-MG-GHOST2 (make-character MAP-GHOST-RED DIRECTION-UP (make-posn 1 0) MAP-PACMAN))
+(define EX-MG-GHOST3 (make-character MAP-GHOST-PINK DIRECTION-RIGHT (make-posn 1 3) MAP-EMPTY))
+(define EX-MG-GHOST4 (make-character MAP-GHOST-PINK DIRECTION-RIGHT (make-posn 2 3) MAP-POWERPELLET))
+(define EX-MG-GHOST5 (make-character MAP-GHOST-CYAN DIRECTION-RIGHT (make-posn 1 5) MAP-EMPTY))
+(define EX-MG-GHOST6 (make-character MAP-GHOST-CYAN DIRECTION-RIGHT (make-posn 2 5) MAP-CHERRY))
+(define EX-MG-GHOSTS-IN (list EX-MG-GHOST0 EX-MG-GHOST3 EX-MG-GHOST5))
+(define EX-MG-GHOSTS-OUT (list EX-MG-GHOST1 EX-MG-GHOST4 EX-MG-GHOST6))
+
+(check-expect (move-ghosts EX-MG-MAP0 #false EX-MG-GHOSTS-IN) EX-MG-GHOSTS-OUT)
+
 
 ;; Template
 ; (define (move-ghosts map active ghosts)
 ;   (cond
 ;     [(empty? (rest ghosts)) (update-ghost ...)]
-;     [(cons (update-ghost ...) (update-ghosts ...))]))
+;     [else (cons (update-ghost ...) (update-ghosts ...))]))
 
 ;; Code - used by (tick-handler) 
 (define (move-ghosts map active ghosts)
   (cond
-    [(empty? (rest ghosts)) (move-ghost map active (first ghosts))]
-    [(cons (move-ghost map active (first ghosts)) (move-ghosts map active (rest ghosts)))]))
+    [(empty? ghosts) '()]
+    [else (cons (move-ghost map active (first ghosts)) (move-ghosts map active (rest ghosts)))]))
 
 ;*********************************************************************************
 ;;; MOVE GHOST
@@ -272,45 +282,78 @@
 ; (define (move-ghost map active ghost) Ghost)
 
 ;; Examples
-;;;;;;;;;;;;;;; really difficult ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define EX-MG-MAP1 (vector "WPWW" "Wr.W" "WWWW"))
+
+; PP effect disabled: if there is pacman, kill it
+(check-expect (move-ghost EX-MG-MAP0 #false EX-MG-GHOST0) EX-MG-GHOST1)
+(check-expect (move-ghost EX-MG-MAP1 #false EX-MG-GHOST0) EX-MG-GHOST2)
+; PP effect enable: must avoid pacman
+(check-expect (move-ghost EX-MG-MAP0 #true EX-MG-GHOST0) EX-MG-GHOST1)
+(check-expect (move-ghost EX-MG-MAP1 #true EX-MG-GHOST0) EX-MG-GHOST1)
 
 ;; Template
+; (define (move-ghost mymap active ghost)
+;   (local
+;     [(define name ...)
+;      (define posn ...)
+;      (define posn-up (move-posn ...))
+;      (define posn-right (move-posn ...))
+;      (define posn-down (move-posn ...))
+;      (define posn-left (move-posn ...))
+;      (define element-up (find-in-map ...))
+;      (define element-right (find-in-map ...))
+;      (define element-down (find-in-map ...))
+;      (define element-left (find-in-map ...))
+;      (define ghost-choices ...)
+;      (define choices-with-pacman ... (collect-valid-choices ...) ...)
+;      (define possible-choices-with-pacman (collect-possible-choices ...))
+;      (define choices-without-pacman ... (collect-valid-choices ...) ...)
+;      (define possible-choices-without-pacman (collect-possible-choices ...))
+;      (define random-choice-without-pacman ...)]
+;     [cond
+;       [active ...]
+;       [else (cond
+;               [(not (empty? possible-choices-with-pacman)) ...]
+;               [else                                        ...])]]))
 
 ;; Code - used by (move-ghosts) 
-(define (move-ghost map active ghost)
+(define (move-ghost mymap active ghost)
   (local
     [; param field abbreviations
      (define name (character-name ghost))
+     (define posn (character-position ghost))
      ; pre-calculated elements for func
      (define posn-up (move-posn posn DIRECTION-UP))
      (define posn-right (move-posn posn DIRECTION-RIGHT))
      (define posn-down (move-posn posn DIRECTION-DOWN))
      (define posn-left (move-posn posn DIRECTION-LEFT))
-     (define element-up (find-in-map map posn-up))
-     (define element-right (find-in-map map posn-right))
-     (define element-down (find-in-map map posn-down))
-     (define element-left (find-in-map map posn-left))
+     (define element-up (find-in-map mymap posn-up))
+     (define element-right (find-in-map mymap posn-right))
+     (define element-down (find-in-map mymap posn-down))
+     (define element-left (find-in-map mymap posn-left))
      ; organized calculated values
      (define ghost-choices (list
-                      (make-character name DIRECTION-UP posn-up element-up)
-                      (make-character name DIRECTION-RIGHT posn-right element-right)
-                      (make-character name DIRECTION-DOWN posn-down element-down)
-                      (make-character name DIRECTION-LEFT posn-left element-left)))
-     (define choices-with-pacman (map (λ (choice) (collect-valid-choices choice #true)) ghost-choices))
+                            (make-character name DIRECTION-UP posn-up element-up)
+                            (make-character name DIRECTION-RIGHT posn-right element-right)
+                            (make-character name DIRECTION-DOWN posn-down element-down)
+                            (make-character name DIRECTION-LEFT posn-left element-left)))
+     (define choices-with-pacman (map (λ (choice) (collect-valid-choice choice #true)) ghost-choices))
      (define possible-choices-with-pacman (collect-possible-choices choices-with-pacman))
-     (define choices-without-pacman (map (λ (choice) (collect-valid-choices choice #false)) ghost-choices))
+     (define choices-without-pacman (map (λ (choice) (collect-valid-choice choice #false)) ghost-choices))
      (define possible-choices-without-pacman (collect-possible-choices choices-without-pacman))
-     (define random-choice-without-pacman (list-ref possible-choices-without-pacman (random (length possible-choices-without-pacman))))]
-    ; body
+     (define random-choice-without-pacman (list-ref
+                                           possible-choices-without-pacman
+                                           (random (length possible-choices-without-pacman))))]
+    ; function body
     [cond
       ; if powerpellet effect is active, avoid pacman and choose where he is not
       ; which is always possible because map hasn't got dead ends
       [active random-choice-without-pacman]
-      [else [cond
+      [else (cond
               ; pacman reserved (assumption pacman is only one)
               [(not (empty? possible-choices-with-pacman)) (first possible-choices-with-pacman)]
               ; random choice excluded walls, pacman and other ghosts
-              [else random-choice-without-pacman]]]]))
+              [else random-choice-without-pacman])]]))
 
 ;*********************************************************************************
 ;;; COLLECT POSSIBLE CHOICES
@@ -340,7 +383,7 @@
     (filter character? list-choices))
 
 ;*********************************************************************************
-;;; COLLECT VALID CHOICES
+;;; COLLECT VALID CHOICE
 ;; Data type
 ; Ghost
 ; Maybe<Ghost> can be either:
@@ -348,7 +391,7 @@
 ; - #false
 
 ;; Input/Output
-; collect-valid-choices : Ghost Boolean -> Maybe<Ghost>
+; collect-valid-choice : Ghost Boolean -> Maybe<Ghost>
 ; given pacman or a valid map cell as its aim, return a ghost if the cell pointed by the choice
 ; is eligible, otherwise return false
 ; Collaterals | pacman position can be chosen only if requested through 'looking-for-pacman'
@@ -364,23 +407,23 @@
 (define EX-CVC-GHOST5 (make-character MAP-GHOST-RED DIRECTION-DOWN (make-posn 0 0) MAP-PACMAN))
 
 ; just move ghost - no pacman allowed
-(check-expect (collect-valid-choices EX-CVC-GHOST0 #false) EX-CVC-GHOST0)
-(check-expect (collect-valid-choices EX-CVC-GHOST1 #false) EX-CVC-GHOST1)
-(check-expect (collect-valid-choices EX-CVC-GHOST2 #false) EX-CVC-GHOST2)
-(check-expect (collect-valid-choices EX-CVC-GHOST3 #false) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST4 #false) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST5 #false) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST0 #false) EX-CVC-GHOST0)
+(check-expect (collect-valid-choice EX-CVC-GHOST1 #false) EX-CVC-GHOST1)
+(check-expect (collect-valid-choice EX-CVC-GHOST2 #false) EX-CVC-GHOST2)
+(check-expect (collect-valid-choice EX-CVC-GHOST3 #false) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST4 #false) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST5 #false) #false)
 
 ; looking for pacman
-(check-expect (collect-valid-choices EX-CVC-GHOST0 #true) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST1 #true) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST2 #true) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST3 #true) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST4 #true) #false)
-(check-expect (collect-valid-choices EX-CVC-GHOST5 #true) EX-CVC-GHOST5)
+(check-expect (collect-valid-choice EX-CVC-GHOST0 #true) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST1 #true) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST2 #true) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST3 #true) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST4 #true) #false)
+(check-expect (collect-valid-choice EX-CVC-GHOST5 #true) EX-CVC-GHOST5)
 
 ;; Template
-;(define (collect-valid-choices ghost looking-for-pacman)
+;(define (collect-valid-choice ghost looking-for-pacman)
 ;  (local
 ;    [(define item ...)]
 ;    [cond
@@ -395,7 +438,7 @@
 ;      [else                                     ...]]))
 
 ;; Code - used by (move-ghost)
-(define (collect-valid-choices ghost looking-for-pacman)
+(define (collect-valid-choice ghost looking-for-pacman)
   (local
     [; param abbreviations
      (define item (character-item-below ghost))]
@@ -548,7 +591,11 @@
 ; (define (update-map map posn-previous posn-next return-item return-character) Map)
 
 ;; Examples
-; KEEP IT SIMPLE
+(define EX-UM-MAP0 (vector "P.." "..."))
+(define EX-UM-MAP1 (vector "..." "P.."))
+(define EX-UM-MAP2 (vector "..." ".P."))
+(check-expect (update-map EX-UM-MAP0 (make-posn 0 0) (make-posn 0 1) MAP-DOT MAP-PACMAN) EX-UM-MAP1)
+(check-expect (update-map EX-UM-MAP1 (make-posn 0 1) (make-posn 1 1) MAP-DOT MAP-PACMAN) EX-UM-MAP2)
 
 ;; Template
 ; (define (update-map map posn-previous pos-next return-item return-character)
@@ -799,13 +846,13 @@
 (check-expect (collision-pacman EX-CP-PACMAN0) #true)
 
 ;; Template
-;(define (collision-pacman pacman)
-;  (local
-;    [(define item ...)]
-;    [or (char=? item MAP-GHOST-RED)
-;        (char=? item MAP-GHOST-ORANGE)
-;        (char=? item MAP-GHOST-PINK)
-;        (char=? item MAP-GHOST-CYAN)]))
+; (define (collision-pacman pacman)
+;   (local
+;     [(define item ...)]
+;     [or (char=? item MAP-GHOST-RED)
+;         (char=? item MAP-GHOST-ORANGE)
+;         (char=? item MAP-GHOST-PINK)
+;         (char=? item MAP-GHOST-CYAN)]))
 
 ;; Code - used by (pre-game-over)
 (define (collision-pacman pacman)
@@ -843,13 +890,13 @@
 (check-expect (collision-ghosts EX-C-GHOSTS-FALSE) #false)
 
 ;; Template
-;(define (collision-ghosts ghosts)
-;  (local
-;    [(define possible-collisions ...)]
-;  [foldl
-;   (λ (item result) (or item result))
-;   #false
-;   possible-collisions]))
+; (define (collision-ghosts ghosts)
+;   (local
+;     [(define possible-collisions ...)]
+;   [foldl
+;    (λ (item result) (or item result))
+;    #false
+;    possible-collisions]))
 
 ;; Code - used by (quit)
 (define (collision-ghosts ghosts)

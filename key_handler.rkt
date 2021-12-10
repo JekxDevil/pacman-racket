@@ -5,9 +5,6 @@
 (require racket/base)
 (require 2htdp/image)
 (require "data_structures.rkt")
-(require "figures.rkt")
-(require "render.rkt")
-(require "tick_handler.rkt")
 
 ;*********************************************************************************
 ;*********************************************************************************
@@ -24,6 +21,41 @@
 ; (define (key-handler appstate key) Appstate)
 
 ;; Examples
+(define EX-CPD-APPSTATE0 (make-appstate
+                         INIT-MAP
+                         (make-pacman
+                          (make-character MAP-PACMAN DIRECTION-UP INIT-PACMAN-POSN INIT-ITEM-BELOW)
+                          #true)
+                         INIT-GHOSTS
+                         INIT-SCORE
+                         INIT-POWERPELLET-EFFECT
+                         INIT-QUIT))
+
+(define EX-CPD-APPSTATE1 (make-appstate
+                         INIT-MAP
+                         (make-pacman
+                          (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN INIT-ITEM-BELOW)
+                          #true)
+                         INIT-GHOSTS
+                         INIT-SCORE
+                         INIT-POWERPELLET-EFFECT
+                         INIT-QUIT))
+
+(define EX-CPD-APPSTATE2 (make-appstate
+                         INIT-MAP
+                         (make-pacman
+                          (make-character MAP-PACMAN DIRECTION-LEFT INIT-PACMAN-POSN INIT-ITEM-BELOW)
+                          #true)
+                         INIT-GHOSTS
+                         INIT-SCORE
+                         INIT-POWERPELLET-EFFECT
+                         INIT-QUIT))
+
+(check-expect (key-handler INIT-APPSTATE "up") EX-CPD-APPSTATE0)
+(check-expect (key-handler INIT-APPSTATE "right") INIT-APPSTATE)
+(check-expect (key-handler INIT-APPSTATE "down") EX-CPD-APPSTATE1)
+(check-expect (key-handler INIT-APPSTATE "left") EX-CPD-APPSTATE2)
+(check-expect (key-handler INIT-APPSTATE "shift") INIT-APPSTATE)
 
 ;; Template
 ; (define (key-handler appstate key)
@@ -54,8 +86,24 @@
 ; (define (move appstate direction) Appstate)
 
 ;; Examples
+(check-expect (change-pacman-direction INIT-APPSTATE DIRECTION-LEFT) EX-CPD-APPSTATE2)
 
 ;; Template
+; (define (change-pacman-direction appstate direction)
+;   (local
+;     [(define map ...)
+;      (define pacman ...)
+;      (define ghosts ...)
+;      (define score ...)
+;      (define pp ...)
+;      (define quit ...)
+;      (define character ...)
+;      (define name ...)
+;      (define posn ...)
+;      (define item ...)
+;      (define mouth ...)
+;      (define new-pacman ...)]
+;     [make-appstate map new-pacman ghosts score pp quit]))
 
 ;; Code - used by (key-handler)
 (define (change-pacman-direction appstate direction)
@@ -71,8 +119,8 @@
      (define character (pacman-character pacman))
      (define name (character-name character))
      (define posn (character-position character))
-     (define item (character-item-below))
-     (define mouth (pacman-mouth))
+     (define item (character-item-below character))
+     (define mouth (pacman-mouth pacman))
      ; pre-calculated value
      (define new-pacman (make-pacman
                          (make-character name direction posn item)
