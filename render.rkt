@@ -309,6 +309,20 @@
 ;the functions takes an appstate and return an image with the text "game over" and the score overlayed on the map
 ;header: (define game-over appstate) Image)
 
+
+;template
+;(define (game-over state)
+;  (local (
+;          (define rendered-appstate (... state))
+;          (define render-width (... rendered-appstate))
+;          (define render-length (... (... rendered-appstate)))
+;          (define score  (... (... state)))
+;          (define mask (... render-width render-length ... ...)))
+;    (overlay/align/offset ... ...
+;                        (... ... score)
+;                        ... ... (overlay ... ... mask rendered-appstate))))
+
+
 (define (game-over state)
   (local (
           (define rendered-appstate (render state))
