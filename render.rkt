@@ -260,6 +260,7 @@
 ;; Constants
 (define OFFSET-X-SCORE 1515)
 (define OFFSET-Y-SCORE 7)
+(define RATIO 0.6)
 
 ;; Examples
 (define PAC-TEST1 (make-appstate (vector "WWWWWWW"
@@ -283,10 +284,10 @@
                                  TEST-PAC3 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 
 (check-expect (render PAC-TEST1)
-              (underlay/xy (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
-                                  (beside SKIN-WALL SKIN-WALL SKIN-POWERPELLET SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
-                                  (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT))
-                           OFFSET-X-SCORE OFFSET-Y-SCORE (render-score 0)))
+              (scale RATIO (underlay/xy (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
+                                               (beside SKIN-WALL SKIN-WALL SKIN-POWERPELLET SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
+                                               (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT))
+                                        OFFSET-X-SCORE OFFSET-Y-SCORE (render-score 0))))
 
 ;; Template
 ; (define (render appstate)
@@ -296,4 +297,4 @@
 (define (render appstate)
   (local [(define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
           (define score-image (render-score (appstate-score appstate)))]
-    (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image)))
+    (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image))))

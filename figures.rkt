@@ -33,6 +33,7 @@
 ;; CONTANTS
 ; postfix "WB" stands for "Without Border"
 
+
 ; BACKGROUND
 (define SKIN-BG (square 60  "solid" "black"))
 
