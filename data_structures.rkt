@@ -79,8 +79,6 @@
 ;; Generic settings
 (define SCORE 0)
 (define TICK 25/100)
-;(define TICK-PACMAN 3/10)
-;(define TICK-GHOSTS 5/10)
 (define LIMIT-POWERPELLET-ACTIVE 10)
 
 (define POINTS-DOT 10)
@@ -168,7 +166,7 @@
 (define INIT-GHOST-RED-POSN (make-posn 14 13))
 (define INIT-GHOST-ORANGE-POSN (make-posn 13 13))
 (define INIT-GHOST-PINK-POSN (make-posn 13 14))
-(define INIT-GHOST-CYAN-POSN (make-posn 14 14));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
+(define INIT-GHOST-CYAN-POSN (make-posn 14 14))
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"

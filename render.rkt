@@ -82,7 +82,7 @@
 (define TEST-PAC2 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8) INIT-ITEM-BELOW) #true))
 (define TEST-PAC3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8) INIT-ITEM-BELOW) #true))
 
-(check-expect (conversion-pacman (appstate-pacman INIT-APPSTATE)) SKIN-PACMAN-OPEN)
+(check-expect (conversion-pacman INIT-PACMAN) SKIN-PACMAN-OPEN)
 (check-expect (conversion-pacman TEST-PAC0) SKIN-PACMAN-CLOSE)
 (check-expect (conversion-pacman TEST-PAC1) (rotate 180 SKIN-PACMAN-OPEN))
 (check-expect (conversion-pacman TEST-PAC2) (rotate 90 SKIN-PACMAN-OPEN))
@@ -173,14 +173,10 @@
 ; (define (conversion-row appstate list-row) Image)
 
 ;; Example
-(check-expect (conversion-row INIT-APPSTATE (string->list ".WWYW"))
-              (beside SKIN-DOT SKIN-WALL SKIN-WALL SKIN-CHERRY SKIN-WALL))
-
-(check-expect (conversion-row INIT-APPSTATE (string->list "@..@."))
-              (beside SKIN-POWERPELLET SKIN-DOT SKIN-DOT SKIN-POWERPELLET SKIN-DOT))
-
-(check-expect (conversion-row INIT-APPSTATE (string->list "Prcpo"))
-              (beside SKIN-PACMAN-OPEN SKIN-GHOST-RED SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE))
+(check-expect (conversion-row INIT-APPSTATE (string->list ".W@YPrcpo"))
+              (beside SKIN-DOT SKIN-WALL SKIN-POWERPELLET SKIN-CHERRY
+                      SKIN-PACMAN-OPEN SKIN-GHOST-RED SKIN-GHOST-CYAN
+                      SKIN-GHOST-PINK SKIN-GHOST-ORANGE))
 
 ;; Template
 ; (define (conversion-row appstate list-row)
@@ -201,18 +197,9 @@
 ; (define (conversion-map appstate map-list) Image)
 
 ;; Examples
-(check-expect (conversion-map INIT-APPSTATE (list ".WWYW" "..@YW"))
-              (above (beside SKIN-DOT SKIN-WALL SKIN-WALL SKIN-CHERRY SKIN-WALL)
-                     (beside SKIN-DOT SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-WALL)))
-
 (check-expect (conversion-map INIT-APPSTATE (list "WWWWW" "Pproc" "Y.@Y@"))
               (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
                      (beside SKIN-PACMAN-OPEN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-GHOST-CYAN)
-                     (beside SKIN-CHERRY SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-POWERPELLET)))
-
-(check-expect (conversion-map EX-APPSTATE-EDIBLE (list "WWWWW" "Pproc" "Y.@Y@"))
-              (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
-                     (beside SKIN-PACMAN-OPEN SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE SKIN-GHOST-EDIBLE)
                      (beside SKIN-CHERRY SKIN-DOT SKIN-POWERPELLET SKIN-CHERRY SKIN-POWERPELLET)))
 
 ;; Template
@@ -239,7 +226,6 @@
 
 ;; Examples
 (check-expect (render-score 4) (overlay (text (string-append "SCORE : 4") 18 "white") SCORE-RECTANGLE))
-(check-expect (render-score 3) (overlay (text (string-append "SCORE : 3") 18 "white") SCORE-RECTANGLE))
 (check-expect (render-score 100010) (overlay (text (string-append "SCORE : 100010") 18 "white") SCORE-RECTANGLE))
 
 ;; Template
@@ -249,9 +235,6 @@
 ;; Code - used by (render)
 (define (render-score score)
   (overlay (text (string-append "SCORE : " (~v score)) 18 "white") SCORE-RECTANGLE))
-
-
-
 
 ;*********************************************************************************
 ;; Input/Output
@@ -266,52 +249,67 @@
 (define RATIO 0.6)
 
 ;; Examples
-(define PAC-TEST1 (make-appstate (vector "WWWWWWW"
-                                         "WW@W..."
-                                         "YPcpro.")
-                                 TEST-PAC0 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
+(define EX-R-MAP (vector ".W@YPrcpo"))
+(define EX-R-SCORE (render-score 0))
+(define EX-R-APPSTATE-GOOD (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
+(define EX-R-APPSTATE-GOOD-IMG (scale RATIO
+                                      (underlay/xy (beside SKIN-DOT SKIN-WALL SKIN-POWERPELLET
+                                                           SKIN-CHERRY SKIN-PACMAN-OPEN SKIN-GHOST-RED
+                                                           SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE)
+                                                   OFFSET-X-SCORE OFFSET-Y-SCORE EX-R-SCORE)))
 
-(define PAC-TEST2 (make-appstate (vector "WWWWWWW"
-                                         "WW@W..."
-                                         "YPcpro.")
-                                 TEST-PAC1 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
+(define EX-R-APPSTATE-BAD (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
+(define EX-R-SCORE-IMG-BAD (overlay (text "SCORE : 0" 36 "white")
+                                    (rectangle 300 80 "solid" "black")
+                                    (rectangle 310 90 "solid" "white")))
+(define EX-R-APPSTATE-BAD-IMG (underlay/offset
+                               (overlay
+                                (overlay (text "GAME OVER" 100 "white")
+                                         (text "GAME OVER" 105 "steel blue"))
+                                (rectangle (image-width EX-R-APPSTATE-GOOD-IMG)
+                                           (image-width (rotate 90 EX-R-APPSTATE-GOOD-IMG))
+                                           "solid"
+                                           (color 0 0 0 127))
+                                EX-R-APPSTATE-GOOD-IMG)
+                               0
+                               100
+                               (scale 2 EX-R-SCORE)))
 
-(define PAC-TEST3 (make-appstate (vector "WWWWWWW"
-                                         "WW@W..."
-                                         "YPcpro.")
-                                 TEST-PAC2 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
-
-(define PAC-TEST4 (make-appstate (vector "WWWWWWW"
-                                         "WW@W..."
-                                         "YPcpro.")
-                                 TEST-PAC3 INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
-
-(check-expect (render PAC-TEST1)
-              (scale RATIO (underlay/xy (above (beside SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL SKIN-WALL)
-                                               (beside SKIN-WALL SKIN-WALL SKIN-POWERPELLET SKIN-WALL SKIN-DOT SKIN-DOT SKIN-DOT)
-                                               (beside  SKIN-CHERRY SKIN-PACMAN-CLOSE SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-RED SKIN-GHOST-ORANGE SKIN-DOT))
-                                        OFFSET-X-SCORE OFFSET-Y-SCORE (render-score 0))))
+(check-expect (render EX-R-APPSTATE-GOOD) EX-R-APPSTATE-GOOD-IMG)
+(check-expect (render EX-R-APPSTATE-BAD) EX-R-APPSTATE-BAD-IMG)
 
 ;; Template
 ; (define (render appstate)
-;   (underlay/xy ...)
+;   (local
+;     [(define map-image (conversion-map ...))
+;      (define score-image (render-score ...))
+;      (define appstate-img ...)]
+;   (cond
+;     [(appstate-quit appstate) (render-game-over ...)]
+;     [else                     ...])))
 
 ;; Code - used by (big-bang)
 (define (render appstate)
-  (local [(define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
-          (define score-image (render-score (appstate-score appstate)))]
-    (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image))))
+  (local
+    [; pre-calculated values
+     (define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
+     (define score-image (render-score (appstate-score appstate)))
+     (define appstate-img (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image)))]
+    ; body - game or game ended
+  (cond
+    [(appstate-quit appstate) (render-game-over appstate-img score-image)]
+    [else appstate-img])))
 
 ;*********************************************************************************
-;;; GAME OVER RENDER
+;;; RENDER GAME OVER
 ;; Data types
 ; Appstate
 ; Image
 
 ;; Input/Output
-; game-over: Appstate --> Image
+; render-game-over: Image Image -> Image
 ; take an appstate and return an image with the text "game over" and the score overlayed on the map
-; header: (define game-over appstate) Image)
+; header: (define render-game-over appstate) Image)
 
 ;; Constants
 (define RATIO-SCORE 2)
@@ -319,40 +317,24 @@
 (define COLOR-MASK (color 0 0 0 127))
 
 ;; Examples
-(define EX-GOR-APPSTATE-IMG (underlay/offset
-                             (overlay (overlay (text "GAME OVER" SIZE-GAMEOVER "white")
-                                               (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue"))
-                                      (rectangle (* MAP-WIDTH UNIT RATIO)
-                                                 (* MAP-HEIGHT UNIT RATIO)
-                                                 "solid"
-                                                 COLOR-MASK)
-                                      (render INIT-APPSTATE))
-                             0
-                             SIZE-GAMEOVER
-                             (scale RATIO-SCORE (render-score 0)))) 
-
-(check-expect (render-game-over INIT-APPSTATE) EX-GOR-APPSTATE-IMG)
+(check-expect (render-game-over EX-R-APPSTATE-GOOD-IMG EX-R-SCORE) EX-R-APPSTATE-BAD-IMG)
 
 ;; Template
-;(define (render-game-over appstate)
+;(define (render-game-over appstate-img score-img)
 ;  (local 
-;    [(define appstate-img                  (render ...))
-;     (define width                         ...)
-;     (define height                        ...)
-;     (define score-img                     (render-score ...))
-;     (define mask                          ...)
-;     (define gameover-img                  ...)
-;     (define masked-gameover-without-score ...)]
-;    [underlay/offset                       ...)]))
+;     [(define width                         ...)
+;      (define height                        ...)
+;      (define mask                          ...)
+;      (define gameover-img                  ...)
+;      (define masked-gameover-without-score ...)]
+;     [underlay/offset                       ...)]))
 
 
-(define (render-game-over appstate)
+(define (render-game-over appstate-img score-img)
   (local 
     [; pre-calculated values
-     (define appstate-img (render appstate))
      (define width (image-width appstate-img))
      (define height (image-width (rotate 90 appstate-img)))
-     (define score-img  (render-score (appstate-score appstate)))
      ; mask elements composition
      (define mask (rectangle width height "solid" COLOR-MASK))
      (define gameover-img (overlay (text "GAME OVER" SIZE-GAMEOVER "white") (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue")))
