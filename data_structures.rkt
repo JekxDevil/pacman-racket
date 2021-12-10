@@ -10,8 +10,6 @@
 ; generic settings
 (provide SCORE)
 (provide TICK)
-;(provide TICK-PACMAN)
-;(provide TICK-GHOSTS)
 (provide LIMIT-POWERPELLET-ACTIVE)
 (provide POINTS-DOT)
 (provide POINTS-CHERRY)
@@ -48,7 +46,7 @@
 ; struct
 (provide (struct-out character))
 (provide (struct-out pacman))
-(provide (struct-out powerpellet-effect)) ;; non ha senso mantenere una lista di pp perche' non li muoviamo
+(provide (struct-out powerpellet-effect))
 (provide (struct-out appstate))
 
 ; examples
@@ -167,10 +165,10 @@
 
 ; '.' 236
 (define INIT-PACMAN-POSN (make-posn 13 17))
-(define INIT-GHOST-RED-POSN (make-posn 15 13))
-(define INIT-GHOST-ORANGE-POSN (make-posn 12 13))
-(define INIT-GHOST-PINK-POSN (make-posn 12 15))
-(define INIT-GHOST-CYAN-POSN (make-posn 15 15));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
+(define INIT-GHOST-RED-POSN (make-posn 14 13))
+(define INIT-GHOST-ORANGE-POSN (make-posn 13 13))
+(define INIT-GHOST-PINK-POSN (make-posn 13 15))
+(define INIT-GHOST-CYAN-POSN (make-posn 14 15));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"

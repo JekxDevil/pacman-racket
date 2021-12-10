@@ -303,33 +303,63 @@
     (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image))))
 
 ;*********************************************************************************
-;GAME OVER RENDER
+;;; GAME OVER RENDER
+;; Data types
+; Appstate
+; Image
 
-;game-over: appstate --> Image
-;the functions takes an appstate and return an image with the text "game over" and the score overlayed on the map
-;header: (define game-over appstate) Image)
+;; Input/Output
+; game-over: Appstate --> Image
+; take an appstate and return an image with the text "game over" and the score overlayed on the map
+; header: (define game-over appstate) Image)
+
+;; Constants
+(define RATIO-SCORE 2)
+(define SIZE-GAMEOVER 100)
+(define COLOR-MASK (color 0 0 0 127))
+
+;; Examples
+(define EX-GOR-APPSTATE-IMG (underlay/offset
+                             (overlay (overlay (text "GAME OVER" SIZE-GAMEOVER "white")
+                                               (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue"))
+                                      (rectangle (* MAP-WIDTH UNIT RATIO)
+                                                 (* MAP-HEIGHT UNIT RATIO)
+                                                 "solid"
+                                                 COLOR-MASK)
+                                      (render INIT-APPSTATE))
+                             0
+                             SIZE-GAMEOVER
+                             (scale RATIO-SCORE (render-score 0)))) 
+
+(check-expect (render-game-over INIT-APPSTATE) EX-GOR-APPSTATE-IMG)
+
+;; Template
+;(define (render-game-over appstate)
+;  (local 
+;    [(define appstate-img                  (render ...))
+;     (define width                         ...)
+;     (define height                        ...)
+;     (define score-img                     (render-score ...))
+;     (define mask                          ...)
+;     (define gameover-img                  ...)
+;     (define masked-gameover-without-score ...)]
+;    [underlay/offset                       ...)]))
 
 
-;template
-;(define (game-over state)
-;  (local (
-;          (define rendered-appstate (... state))
-;          (define render-width (... rendered-appstate))
-;          (define render-length (... (... rendered-appstate)))
-;          (define score  (... (... state)))
-;          (define mask (... render-width render-length ... ...)))
-;    (overlay/align/offset ... ...
-;                        (... ... score)
-;                        ... ... (overlay ... ... mask rendered-appstate))))
-
-
-(define (game-over state)
-  (local (
-          (define rendered-appstate (render state))
-          (define render-width (image-width rendered-appstate))
-          (define render-length (image-width (rotate 90 rendered-appstate)))
-          (define score  (render-score (appstate-score state)))
-          (define mask (rectangle render-width render-length "solid" (color 0 0 0 127))))
-    (overlay/align/offset "middle" "middle"
-                        (scale  2  score)
-                        0 -100 (overlay (text "GAME OVER" 100 "white") (text "GAME OVER" 105 "steel blue") mask rendered-appstate))))
+(define (render-game-over appstate)
+  (local 
+    [; pre-calculated values
+     (define appstate-img (render appstate))
+     (define width (image-width appstate-img))
+     (define height (image-width (rotate 90 appstate-img)))
+     (define score-img  (render-score (appstate-score appstate)))
+     ; mask elements composition
+     (define mask (rectangle width height "solid" COLOR-MASK))
+     (define gameover-img (overlay (text "GAME OVER" SIZE-GAMEOVER "white") (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue")))
+     (define masked-gameover-without-score (overlay gameover-img mask appstate-img))]
+    ; function body - assemble
+    [underlay/offset
+     masked-gameover-without-score
+     0
+     SIZE-GAMEOVER
+     (scale RATIO-SCORE score-img)]))

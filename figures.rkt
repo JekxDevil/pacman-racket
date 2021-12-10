@@ -4,11 +4,12 @@
 ;; LIBRARIES
 (require racket/base)
 (require 2htdp/image)
-(require "data_structures.rkt")
 
 ;************************************************************************************
 ;************************************************************************************
 ;; API
+(provide UNIT)
+
 ; characters
 (provide SKIN-PACMAN-OPEN)
 (provide SKIN-PACMAN-CLOSE)
@@ -31,11 +32,11 @@
 ;************************************************************************************
 ;************************************************************************************
 ;; CONTANTS
+(define UNIT 60)
 ; postfix "WB" stands for "Without Border"
 
-
 ; BACKGROUND
-(define SKIN-BG (square 60  "solid" "black"))
+(define SKIN-BG (square UNIT "solid" "black"))
 
 ; PACMAN
 (define PACMAN-OPEN-WB (rotate 30 (wedge 30 300 "solid" "gold")))
@@ -95,11 +96,11 @@
 
 ;************************************************************************************
 ; WALL
-(define SKIN-WALL (rectangle 60 60 "solid" "blue"))
+(define SKIN-WALL (square UNIT "solid" "blue"))
 
 ;************************************************************************************
 ; GATE
-(define SKIN-GATE (place-image/align (rectangle 60 5 "solid" "Deep Sky Blue") 30 30 "center" "center" SKIN-BG))
+(define SKIN-GATE (place-image/align (rectangle UNIT 5 "solid" "Deep Sky Blue") 30 30 "center" "center" SKIN-BG))
 
 ;************************************************************************************
 ; SCORE RECTANGLE
