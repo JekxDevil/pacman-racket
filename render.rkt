@@ -250,6 +250,9 @@
 (define (render-score score)
   (overlay (text (string-append "SCORE : " (~v score)) 18 "white") SCORE-RECTANGLE))
 
+
+
+
 ;*********************************************************************************
 ;; Input/Output
 ; render : Appstate -> Image
@@ -298,3 +301,21 @@
   (local [(define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
           (define score-image (render-score (appstate-score appstate)))]
     (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image))))
+
+;*********************************************************************************
+;GAME OVER RENDER
+
+;game-over: appstate --> Image
+;the functions takes an appstate and return an image with the text "game over" and the score overlayed on the map
+;header: (define game-over appstate) Image)
+
+(define (game-over state)
+  (local (
+          (define rendered-appstate (render state))
+          (define render-width (image-width rendered-appstate))
+          (define render-length (image-width (rotate 90 rendered-appstate)))
+          (define score  (render-score (appstate-score state)))
+          (define mask (rectangle render-width render-length "solid" (color 0 0 0 127))))
+    (overlay/align/offset "middle" "middle"
+                        (scale  2  score)
+                        0 -100 (overlay (text "GAME OVER" 100 "white") (text "GAME OVER" 105 "steel blue") mask rendered-appstate))))
