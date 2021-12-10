@@ -1,8 +1,0 @@
-\contentsline {section}{\numberline {1}Analysis}{3}%
-\contentsline {section}{\numberline {2}Sofware design}{3}%
-\contentsline {subsection}{\numberline {2.1}Tools}{3}%
-\contentsline {subsection}{\numberline {2.2}UI}{3}%
-\contentsline {section}{\numberline {3}Software Development}{3}%
-\contentsline {subsection}{\numberline {3.1}Tools}{3}%
-\contentsline {subsection}{\numberline {3.2}Libraries}{3}%
-\contentsline {section}{\numberline {4}Usage}{3}%
