@@ -167,8 +167,8 @@
 (define INIT-PACMAN-POSN (make-posn 13 17))
 (define INIT-GHOST-RED-POSN (make-posn 14 13))
 (define INIT-GHOST-ORANGE-POSN (make-posn 13 13))
-(define INIT-GHOST-PINK-POSN (make-posn 13 15))
-(define INIT-GHOST-CYAN-POSN (make-posn 14 15));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
+(define INIT-GHOST-PINK-POSN (make-posn 13 14))
+(define INIT-GHOST-CYAN-POSN (make-posn 14 14));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -182,9 +182,9 @@
                          "     W.WWWWW WW WWWWW.W     ";--- 10
                          "     W.WW          WW.W     "
                          "     W.WW WWW__WWW WW.W     "
-                         "WWWWWW.WW WW or WW WW.WWWWWW";--- 13
-                         "      .   WW    WW   .      "
-                         "WWWWWW.WW WW pc WW WW.WWWWWW";--- 15
+                         "WWWWWW.WW WWWorWWW WW.WWWWWW";--- 13
+                         "      .   WWWpcWWW   .      "
+                         "WWWWWW.WW WWWWWWWW WW.WWWWWW";--- 15
                          "     W.WW WWWWWWWW WW.W     "
                          "     W.WW    P     WW.W     "
                          "     W.WW WWWWWWWW WW.W     "

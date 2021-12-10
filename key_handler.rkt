@@ -14,6 +14,10 @@
 ;*********************************************************************************
 ;*********************************************************************************
 ;;; KEY HANDLER
+;; Data types
+; Appstate
+; Key is a KeyEvent
+
 ;; Input/Output
 ; key-handler : Appstate Key -> Appstate
 ; handler keystroke events of the game
