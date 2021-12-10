@@ -82,6 +82,7 @@
      (define new-quit (or quit0 quit1))
      ; - free pacman from it's overlayed item -
      (define new-pacman (clear-item moved-pacman))]
+    ; body
     (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
 
 ;*********************************************************************************
@@ -324,11 +325,34 @@
 ;     [(empty? (rest ghosts)) (update-ghost ...)]
 ;     [else (cons (update-ghost ...) (update-ghosts ...))]))
 
+;(local
+;    [; params abbreviations
+;     (define ghost (first ghosts))
+;     (define name (character-name ghost))
+;     (define posn-previous (character-position ghost))
+;     (define return-item (character-item-below ghost))
+;     ; precalculated abbreviations
+;     (define ghost-post (move-ghost map active ghost))
+;     (define posn-next (character-position ghost-post))
+;     (define map-post (update-map map posn-previous posn-next return-item name))]
+
 ;; Code - used by (tick-handler) 
 (define (move-ghosts map active ghosts)
-  (cond
-    [(empty? ghosts) '()]
-    [else (cons (move-ghost map active (first ghosts)) (move-ghosts map active (rest ghosts)))]))
+    (cond
+      [(empty? ghosts) '()]
+      [else
+       (local
+         [; params abbreviations
+          (define ghost (first ghosts))
+          (define name (character-name ghost))
+          (define posn-previous (character-position ghost))
+          (define return-item (character-item-below ghost))
+          ; precalculated abbreviations
+          (define ghost-post (move-ghost map active ghost))
+          (define posn-next (character-position ghost-post))
+          (define map-post (update-map map posn-previous posn-next return-item name))]
+         ; function body
+         [cons ghost-post (move-ghosts map-post active (rest ghosts))])]))
 
 ;*********************************************************************************
 ;;; MOVE GHOST
