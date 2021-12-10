@@ -14,6 +14,7 @@
 ;*********************************************************************************
 ;; API
 (provide render)
+(provide render-game-over)
 
 ;*********************************************************************************
 ;*********************************************************************************
@@ -258,6 +259,41 @@
                                                            SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE)
                                                    OFFSET-X-SCORE OFFSET-Y-SCORE EX-R-SCORE)))
 
+(check-expect (render EX-R-APPSTATE-GOOD) EX-R-APPSTATE-GOOD-IMG)
+
+;; Template
+; (define (render appstate)
+;   (local
+;     [(define map-image (conversion-map ...))
+;      (define score-image (render-score ...))
+;     [scale ... appstate ...]))
+
+;; Code - used by (big-bang)
+(define (render appstate)
+  (local
+    [; pre-calculated values
+     (define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
+     (define score-image (render-score (appstate-score appstate)))]
+    ; body
+     [scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image)]))
+
+;*********************************************************************************
+;;; RENDER GAME OVER
+;; Data types
+; Appstate
+; Image
+
+;; Input/Output
+; render-game-over: Appstate -> Image
+; take an appstate and return an image with the text "game over" and the score overlayed on the map
+; header: (define render-game-over appstate) Image)
+
+;; Constants
+(define RATIO-SCORE 2)
+(define SIZE-GAMEOVER 100)
+(define COLOR-MASK (color 0 0 0 127))
+
+;; Examples
 (define EX-R-APPSTATE-BAD (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
 (define EX-R-SCORE-IMG-BAD (overlay (text "SCORE : 0" 36 "white")
                                     (rectangle 300 80 "solid" "black")
@@ -275,66 +311,28 @@
                                100
                                (scale 2 EX-R-SCORE)))
 
-(check-expect (render EX-R-APPSTATE-GOOD) EX-R-APPSTATE-GOOD-IMG)
-(check-expect (render EX-R-APPSTATE-BAD) EX-R-APPSTATE-BAD-IMG)
-
-;; Template
-; (define (render appstate)
-;   (local
-;     [(define map-image (conversion-map ...))
-;      (define score-image (render-score ...))
-;      (define appstate-img ...)]
-;   (cond
-;     [(appstate-quit appstate) (render-game-over ...)]
-;     [else                     ...])))
-
-;; Code - used by (big-bang)
-(define (render appstate)
-  (local
-    [; pre-calculated values
-     (define map-image (conversion-map appstate (vector->list (appstate-map appstate))))
-     (define score-image (render-score (appstate-score appstate)))
-     (define appstate-img (scale RATIO (underlay/xy map-image OFFSET-X-SCORE OFFSET-Y-SCORE score-image)))]
-    ; body - game or game ended
-  (cond
-    [(appstate-quit appstate) (render-game-over appstate-img score-image)]
-    [else appstate-img])))
-
-;*********************************************************************************
-;;; RENDER GAME OVER
-;; Data types
-; Appstate
-; Image
-
-;; Input/Output
-; render-game-over: Image Image -> Image
-; take an appstate and return an image with the text "game over" and the score overlayed on the map
-; header: (define render-game-over appstate) Image)
-
-;; Constants
-(define RATIO-SCORE 2)
-(define SIZE-GAMEOVER 100)
-(define COLOR-MASK (color 0 0 0 127))
-
-;; Examples
-(check-expect (render-game-over EX-R-APPSTATE-GOOD-IMG EX-R-SCORE) EX-R-APPSTATE-BAD-IMG)
+(check-expect (render-game-over EX-R-APPSTATE-BAD) EX-R-APPSTATE-BAD-IMG)
 
 ;; Template
 ;(define (render-game-over appstate-img score-img)
 ;  (local 
-;     [(define width                         ...)
+;     [(define appstate-img                  ...)
+;      (define width                         ...)
 ;      (define height                        ...)
+;      (define score-img                     ...)
 ;      (define mask                          ...)
 ;      (define gameover-img                  ...)
 ;      (define masked-gameover-without-score ...)]
 ;     [underlay/offset                       ...)]))
 
 
-(define (render-game-over appstate-img score-img)
+(define (render-game-over appstate)
   (local 
     [; pre-calculated values
+     (define appstate-img (render appstate))
      (define width (image-width appstate-img))
      (define height (image-width (rotate 90 appstate-img)))
+     (define score-img (render-score (appstate-score appstate)))
      ; mask elements composition
      (define mask (rectangle width height "solid" COLOR-MASK))
      (define gameover-img (overlay (text "GAME OVER" SIZE-GAMEOVER "white") (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue")))
