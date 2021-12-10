@@ -26,6 +26,19 @@
 
 
 ;; Template
+; (define (tick-handler appstate)
+;   (local
+;     [(define moved-pacman (move-pacman ...))
+;      (define new-map-pacman (update-map ...))
+;      (define new-pp-effect (update-pp-effect ...))
+;      (define quit0 (pre-game-over ...))
+;      (define new-ghosts (move-ghosts ...))
+;      (define new-map ... (update-map...) ...)
+;      (define new-score (update-score ...))
+;      (define quit1 (game-over ...))
+;      (define new-quit (or ...))
+;      (define new-pacman (clear-item ...))]
+;     (make-appstate ...)))
 
 ;; Code - used by (big-bang)
 (define (tick-handler appstate)
@@ -63,8 +76,7 @@
                       ghosts
                       new-ghosts))
      ; - score update -
-     (define moved-pacman-item-below (character-item-below (pacman-character new-pacman)))
-     (define new-score (update-score score moved-pacman-item-below))
+     (define new-score (update-score score moved-pacman-item))
      ; - game over second check -
      (define quit1 (game-over new-ghosts new-pp-active new-score))
      (define new-quit (or quit0 quit1))
@@ -91,6 +103,7 @@
                         (make-posn (+ 1 (posn-x INIT-PACMAN-POSN)) (posn-y INIT-PACMAN-POSN))
                         MAP-EMPTY)
                        #false))
+
 (define EX-MP-PACMAN1 (make-pacman
                        (make-character
                         MAP-PACMAN
@@ -98,6 +111,7 @@
                         (make-posn (+ 1 (posn-x INIT-GHOST-RED-POSN)) (posn-y INIT-GHOST-RED-POSN))
                         MAP-EMPTY)
                        #false))
+
 (define EX-MP-PACMAN2 (make-pacman
                        (make-character
                         MAP-PACMAN
@@ -105,6 +119,7 @@
                         (make-posn (+ 1 (posn-x INIT-GHOST-RED-POSN)) (posn-y INIT-GHOST-RED-POSN))
                         MAP-EMPTY)
                        #false))
+
 (define EX-MP-PACMAN3 (make-pacman
                        (make-character
                         MAP-PACMAN
@@ -113,9 +128,58 @@
                         MAP-GHOST-RED)
                        #true))
 
+(define EX-MP-PACMAN4 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        (make-posn (+ 1 (posn-x INIT-GHOST-ORANGE-POSN)) (posn-y INIT-GHOST-ORANGE-POSN))
+                        MAP-EMPTY)
+                       #false))
+(define EX-MP-PACMAN5 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        INIT-GHOST-ORANGE-POSN
+                        MAP-GHOST-ORANGE)
+                       #true))
+
+(define EX-MP-PACMAN6 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        (make-posn (+ 1 (posn-x INIT-GHOST-PINK-POSN)) (posn-y INIT-GHOST-PINK-POSN))
+                        MAP-EMPTY)
+                       #false))
+(define EX-MP-PACMAN7 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        INIT-GHOST-PINK-POSN
+                        MAP-GHOST-PINK)
+                       #true))
+
+(define EX-MP-PACMAN8 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        (make-posn (+ 1 (posn-x INIT-GHOST-CYAN-POSN)) (posn-y INIT-GHOST-CYAN-POSN))
+                        MAP-EMPTY)
+                       #false))
+
+(define EX-MP-PACMAN9 (make-pacman
+                       (make-character
+                        MAP-PACMAN
+                        DIRECTION-LEFT
+                        INIT-GHOST-CYAN-POSN
+                        MAP-GHOST-CYAN)
+                       #true))
+
 (check-expect (move-pacman INIT-MAP INIT-PACMAN) EX-MP-PACMAN0)   ; normal movement
 (check-expect (move-pacman INIT-MAP EX-MP-PACMAN1) EX-MP-PACMAN1) ; wall
-(check-expect (move-pacman INIT-MAP EX-MP-PACMAN2) EX-MP-PACMAN3) ; vs ghost
+(check-expect (move-pacman INIT-MAP EX-MP-PACMAN2) EX-MP-PACMAN3) ; vs ghost red
+(check-expect (move-pacman INIT-MAP EX-MP-PACMAN4) EX-MP-PACMAN5) ; vs ghost orange
+(check-expect (move-pacman INIT-MAP EX-MP-PACMAN6) EX-MP-PACMAN7) ; vs ghost pink
+(check-expect (move-pacman INIT-MAP EX-MP-PACMAN8) EX-MP-PACMAN9) ; vs ghost cyan
 
 ;; Template
 ; (define (move-pacman map pp-active pacman)
@@ -182,7 +246,7 @@
 
 ;; Examples
 (define EX-UPPE-PP0 (make-powerpellet-effect #true 0))
-(define EX-UPPE-PP1 (make-powerpellet-effect #true 0.5))
+(define EX-UPPE-PP1 (make-powerpellet-effect #true (+ 0 TICK)))
 (define EX-UPPE-PP2 (make-powerpellet-effect #true LIMIT-POWERPELLET-ACTIVE))
 (define EX-UPPE-PP3 (make-powerpellet-effect #true (- LIMIT-POWERPELLET-ACTIVE TICK)))
 (define EX-UPPE-PP4 (make-powerpellet-effect #true (+ LIMIT-POWERPELLET-ACTIVE TICK)))
@@ -194,7 +258,7 @@
 (check-expect (update-pp-effect EX-UPPE-PP0 MAP-EMPTY) EX-UPPE-PP1)
 (check-expect (update-pp-effect EX-UPPE-PP3 MAP-EMPTY) EX-UPPE-PP2)
 ; case 2.1 : activate pp effect
-(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT MAP-POWERPELLET) EX-UPPE-PP0) 
+(check-expect (update-pp-effect INIT-POWERPELLET-EFFECT MAP-POWERPELLET) EX-UPPE-PP0)
 ; case 2.2 : return pp
 (check-expect (update-pp-effect INIT-POWERPELLET-EFFECT MAP-EMPTY) INIT-POWERPELLET-EFFECT)
 

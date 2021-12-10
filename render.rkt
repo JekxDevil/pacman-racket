@@ -77,10 +77,10 @@
 ; (define (conversion-pacman appstate) Image)
 
 ;; Examples
-(define TEST-PAC0 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-OVERLAYED-ITEM) #false))
-(define TEST-PAC1 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
-(define TEST-PAC2 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
-(define TEST-PAC3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8) INIT-OVERLAYED-ITEM) #true))
+(define TEST-PAC0 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-ITEM-BELOW) #false))
+(define TEST-PAC1 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-ITEM-BELOW) #true))
+(define TEST-PAC2 (make-pacman (make-character MAP-PACMAN DIRECTION-UP (make-posn 1 8) INIT-ITEM-BELOW) #true))
+(define TEST-PAC3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN (make-posn 1 8) INIT-ITEM-BELOW) #true))
 
 (check-expect (conversion-pacman (appstate-pacman INIT-APPSTATE)) SKIN-PACMAN-OPEN)
 (check-expect (conversion-pacman TEST-PAC0) SKIN-PACMAN-CLOSE)

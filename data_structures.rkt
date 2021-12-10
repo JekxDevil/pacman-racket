@@ -80,7 +80,7 @@
 ;*****************************************************************
 ;; Generic settings
 (define SCORE 0)
-(define TICK 5/10)
+(define TICK 25/100)
 ;(define TICK-PACMAN 3/10)
 ;(define TICK-GHOSTS 5/10)
 (define LIMIT-POWERPELLET-ACTIVE 5)
