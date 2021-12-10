@@ -168,9 +168,9 @@
 ; '.' 236
 (define INIT-PACMAN-POSN (make-posn 13 17))
 (define INIT-GHOST-RED-POSN (make-posn 15 13))
-(define INIT-GHOST-ORANGE-POSN (make-posn 12 14))
+(define INIT-GHOST-ORANGE-POSN (make-posn 12 13))
 (define INIT-GHOST-PINK-POSN (make-posn 12 15))
-(define INIT-GHOST-CYAN-POSN (make-posn 15 15))
+(define INIT-GHOST-CYAN-POSN (make-posn 15 15));TODO EDIT MAP WITH POSN AND MAYBE UPDATE GHOST CAN'T COME BACK TO GATE
 (define INIT-MAP (vector "WWWWWWWWWWWWWWWWWWWWWWWWWWWW";--- 0
                          "W.....Y......WW......Y.....W"
                          "W.WWWW.WWWWW.WW.WWWWW.WWWW.W"
@@ -184,9 +184,9 @@
                          "     W.WWWWW WW WWWWW.W     ";--- 10
                          "     W.WW          WW.W     "
                          "     W.WW WWW__WWW WW.W     "
-                         "WWWWWW.WW W    r W WW.WWWWWW"
-                         "      .   W o    W   .      "
-                         "WWWWWW.WW W p  c W WW.WWWWWW";--- 15
+                         "WWWWWW.WW WW or WW WW.WWWWWW";--- 13
+                         "      .   WW    WW   .      "
+                         "WWWWWW.WW WW pc WW WW.WWWWWW";--- 15
                          "     W.WW WWWWWWWW WW.W     "
                          "     W.WW    P     WW.W     "
                          "     W.WW WWWWWWWW WW.W     "
@@ -202,7 +202,7 @@
                          "W.WWWWWWWWWW.WW.WWWWWWWWWW.W"
                          "W.....Y..............Y.....W"
                          "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"));- 30
-
+; 5*x = x->               0    1    2    3    4    5  
 ;*****************************************************************
 ;; Data type
 ; Direction is an Enumerator
