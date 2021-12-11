@@ -17,6 +17,9 @@
 ;*********************************************************************************
 ;*********************************************************************************
 ;;; CONVERSION CHUNK (low level)
+;Datatypes
+;appstate is an Appstate
+;Char is a char 
 
 ;; Input/Output
 ; conversion-char: Appstate Char -> Image
@@ -69,11 +72,15 @@
          (char=? char MAP-GHOST-CYAN)) (conversion-ghosts appstate char)]))
 
 ;*********************************************************************************
+;CONVERSION-PACMAN
+;Datatypes
+; pacman is a Pacman
+
 ;; Input/Output
 ; conversion-pacman: Pacman -> Image
 ; given pacman struct, returns its image according to the direction he is facing and if his mouth is open or close
 ; header :
-; (define (conversion-pacman appstate) Image)
+; (define (conversion-pacman pacman) Image)
 
 ;; Examples
 (define TEST-PAC0 (make-pacman (make-character MAP-PACMAN DIRECTION-LEFT (make-posn 1 8) INIT-ITEM-BELOW) #false))
@@ -110,6 +117,10 @@
       [(equal? DIRECTION-RIGHT direction) (rotate RIGHTWARDS skin)])))
 
 ;*********************************************************************************
+;CONVERSION-PACMAN-MOUTH
+;Datatypes
+; pacman-mouth is a Boolean
+
 ;; Input/Output
 ; conversion-pacman-mouth: Boolean -> Image
 ; given the mouth boolean state, return the image of pacman with the mouth open or closed 
@@ -129,6 +140,11 @@
   (if mouth SKIN-PACMAN-OPEN SKIN-PACMAN-CLOSE))
 
 ;*********************************************************************************
+;CONVERSION-GHOSTS
+;Datatypes
+;appstate is an Appstate
+; char is a Char
+
 ;; Input/Output
 ; conversion-ghosts: Appstate Char -> Image
 ; given a ghost element as char and appstate, return the correspondent image
@@ -165,8 +181,10 @@
           [(equal? char MAP-GHOST-CYAN) SKIN-GHOST-CYAN]))))
 
 ;*********************************************************************************
+;CONVERSION-ROW
 ;Datatypes
-;List-row is a String
+; list-row is a List<Char>
+; appstate is an Appstate
 
 ;; Input/Output
 ; conversion-row : Appstate List-row -> Image
@@ -192,8 +210,10 @@
     [else (beside (conversion-char appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
 
 ;*********************************************************************************
+;CONVERSION-MAP
 ;Datatypes
-;Map-list is a list representation for Map (Vector<String>)
+;map-list is a Map-list, a list representation for Map (Vector<String>)
+;appstate is an Appstate
 
 ;; Input/Output
 ; conversion-map : Appstate Map-list -> Image
@@ -223,8 +243,9 @@
     [else (above (conversion-row appstate list-row) (conversion-map appstate (rest map-list)))])))
 
 ;*********************************************************************************
+; RENDER-SCORE
 ;Datatype
-;Score is an integer positive number rapresenting the player's score
+;score is a Natural 
 
 ;; Input/Output
 ; render-score : Score -> Image
@@ -245,6 +266,10 @@
   (overlay (text (string-append "SCORE : " (~v score)) 18 "white") SCORE-RECTANGLE))
 
 ;*********************************************************************************
+; RENDER
+;Datatypes
+; appstate is an Appstate
+
 ;; Input/Output
 ; render : Appstate -> Image
 ; given the appstate, return its correponding visual representation as image
@@ -286,6 +311,9 @@
 
 ;*********************************************************************************
 ;;; RENDER GAME OVER
+;Datatypes
+;appstate is an Appstate
+
 ;; Input/Output
 ; render-game-over: Appstate -> Image
 ; take an appstate and return an image with the text "game over" and the score overlayed on the map

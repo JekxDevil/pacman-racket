@@ -15,7 +15,7 @@
 ;*********************************************************************************
 ;;; TICK HANDLER
 ;Datatype
-;Appstate
+; appstate is an Appstate
 
 ;; Input/Output
 ; tick-handler : Appstate -> Appstate
@@ -118,7 +118,7 @@
      (define new-pp-effect (update-pp-effect pp-effect moved-pacman-item))
      (define new-pp-active (powerpellet-effect-active new-pp-effect))
      ; - game over first check -
-     (define quit0 (pre-game-over pacman new-pp-active))
+     (define quit0 (pre-game-over moved-pacman new-pp-active))
      ; - move ghosts struct and update map consequently -
      (define new-ghosts (move-ghosts new-map-pacman new-pp-active ghosts))
      (define new-map (foldl
@@ -144,16 +144,15 @@
 ;*********************************************************************************
 ;;; MOVE PACMAN
 ;Datatypes
-;Active is a Boolean from struct Powerpellet-effect
-; Map is a Vector<String> from struct Appstate (appstate-map)
-;Pacman is a Pacman
+; map is a Map, a Vector<String> from struct Appstate (appstate-map)
+; pacman is a Pacman
 
 ;; Input/Output
-; move-pacman: Map Active Pacman -> Pacman
+; move-pacman: Map Pacman -> Pacman
 ; handles pacman move logic
 ; logic | stops pacman from moving in a wall or a gate, otherwise move and save the item before for score purposes
 ; header :
-; (define (move-pacman appstate character) Pacman)
+; (define (move-pacman map pacman) Pacman)
 
 ;; Examples
 (define EX-MP-PACMAN0 (make-pacman
@@ -295,7 +294,8 @@
 ;*********************************************************************************
 ;;; UPDATE POWERPELLET EFFECT
 ;; Data types
-; Item is a Char from struct Character (character-item-below)
+; item is an Item, a Char from struct Character (character-item-below)
+; pp is a Powerpellet-effect
 
 ;; Input/Output
 ; update-pp-effect : Powerpellet-effect Item -> Powerpellet-effect
@@ -303,7 +303,7 @@
 ; Assumptions | only pacman can ivoke this function 
 ; Collateral  | if pacman gets more than one powerpellet, the effect is not increased
 ; header :
-; (define (update-pp-effect pp) Powerpellet-effect)
+; (define (update-pp-effect pp item) Powerpellet-effect)
 
 ;; Examples
 (define EX-UPPE-PP0 (make-powerpellet-effect #true 0))
@@ -354,15 +354,15 @@
 ;*********************************************************************************
 ;;; MOVE GHOSTS
 ;; Data types
-; Map is a Vector<String> from struct Appstate (appstate-map)
-; Active is a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
-; Ghosts is a List<Character> from struct Character
+; map is a Map, a Vector<String> from struct Appstate (appstate-map)
+; active is an Active, a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
+; ghosts is a Ghosts, a List<Character> from struct Character
 
 ;; Input/Output
 ; move-ghosts : Map Active Ghosts -> Ghosts
 ; update the whole ghosts list at each tick
 ; header :
-; (define (move-ghosts ghosts) Ghosts)
+; (define (move-ghosts map active ghosts) Ghosts)
 
 ;; Examples
 (define EX-MG-MAP0 (vector "WWWW" "Wr.W" "WWWWW" "Wp@W" "WWWW" "WcYW" "WWWW"))
@@ -416,9 +416,9 @@
 ;*********************************************************************************
 ;;; MOVE GHOST
 ;; Data types
-; Map is a Vector<String> from struct Appstate (appstate-map)
-; Active is a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
-; Ghost is a Character
+; map is a Map, a Vector<String> from struct Appstate (appstate-map)
+; active is an Active, a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
+; ghost is a Ghost, a Character
 
 ;; Input/Output
 ; move-ghost : Map Active Ghost -> Ghost
@@ -526,7 +526,7 @@
 ;*********************************************************************************
 ;;; COLLECT POSSIBLE CHOICES
 ;Datatype
-; List<Character>
+; list-choices is a List<Character>
 
 ;; Input/Output
 ; collect-possible-choices : List<Character> -> List<Character>
@@ -556,7 +556,8 @@
 ;*********************************************************************************
 ;;; COLLECT VALID CHOICE
 ;; Data type
-; Ghost
+; ghost is a Ghost
+;looking-for-pacman is a Boolean
 ; Maybe<Ghost> can be either:
 ; - Ghost
 ; - #false
@@ -642,8 +643,8 @@
 ;*********************************************************************************
 ;;; MOVE POSN
 ;; Data types
-; Posn
-; Direction
+; posn is a Posn
+; direction is a Direction
 
 ;; Input/Output
 ; move-posn : Posn Direction -> Posn
@@ -696,8 +697,8 @@
 ;*********************************************************************************
 ;;; FIND ELEMENT CHAR IN MAP
 ;; Data types
-; Map is a Vector<String> from struct Appstate (appstate-map)
-; Posn
+; map is a Map, a Vector<String> from struct Appstate (appstate-map)
+; posn is a Posn
 
 ;; Input/Output
 ; find-in-map : Map Posn -> Char
@@ -723,9 +724,9 @@
 ;*******************************************************************************************************
 ;;; FIND AND REPLACE
 ;; Data types
-; Map is a Vector<String> from struct Appstate (appstate-map)
-; Posn
-; Name is a String from struct Character (character-name)
+; map is a Map, a Vector<String> from struct Appstate (appstate-map)
+; posn is a Posn
+; name is a Name, a String from struct Character (character-name)
 
 ;; Input/Output
 ; find-n-replace : Map Posn Name -> Map
@@ -787,7 +788,9 @@
 ;*******************************************************************************************************
 ;;; UPDATE MAP
 ;; Data types
-; Map
+; map is a Map
+; posn-previous, posn-next are Posn
+; return-item and return-character are Char
 
 ;; Input/Output
 ; update-map : Map Posn Posn Char Char -> Map
@@ -804,12 +807,20 @@
 (check-expect (update-map EX-UM-MAP1 (make-posn 0 1) (make-posn 1 1) MAP-DOT MAP-PACMAN) EX-UM-MAP2)
 
 ;; Template
-; (define (update-map map posn-previous pos-next return-item return-character)
-;   (local [(define los                 ...)
-;           (define map-with-prev-item (find-n-replace ...))]
-;     (list->vector (find-n-replace ...))))
+; (define (update-map map posn-previous posn-next return-item return-character)
+;  (local
+;    [
+;     (define map-with-prev-item (...
+;                                 map
+;                                 posn-previous
+;                                 return-item))]
+;   
+;    (...
+;     map-with-prev-item
+;     posn-next
+;     return-character)))
 
-;; Code - used by (...)
+;; Code - used by (move-ghosts & tick-handler)
 (define (update-map map posn-previous posn-next return-item return-character)
   (local
     [; map with previous item given back
@@ -826,8 +837,8 @@
 ;*******************************************************************************************************
 ;;; UPDATE SCORE
 ;; Data types
-; Score is a Natural from struct Appstate (appstate-score)
-; Item is a Char from struct Character (character-overlayed-item)
+; score is a Score, a Natural from struct Appstate (appstate-score)
+; item is an Item, a Char from struct Character (character-overlayed-item)
 
 ;; Input/Output
 ; update-score : Score Item -> Score
@@ -848,7 +859,7 @@
 ;     [(char=? item MAP-DOT)         ... score ...]
 ;     [(char=? item MAP-CHERRY)      ... score ...]
 ;     [(char=? item MAP-POWERPELLET) ... score ...]
-;     [else                          ... score ...]))
+;     [else                              score ]))
 
 ;; Code - used by (tick-handler)
 (define (update-score score item)
@@ -861,7 +872,7 @@
 ;*******************************************************************************************************
 ;;; POST UPDATE SCORE
 ;; Data types
-; Pacman
+; pacman is a Pacman
 
 ;; Input/Output
 ; post-update-score : Pacman -> Pacman
@@ -891,12 +902,19 @@
 ;; Template
 ;(define (clear-item pacman)
 ;  (local
-;     (define character ...)
-;     (define name      ...)
-;     (define direction ...)
-;     (define position  ...)
-;     (define mouth     ...)]
-;    [make-pacman ...]))
+;    [
+;     (define character (... pacman))
+;     (define name (... character))
+;     (define direction (... character))
+;     (define position (... character))
+;     (define mouth (... pacman))]
+;    [...
+;     (...
+;      name
+;      direction
+;      position
+;      ...)
+;     mouth]))
 
 ;; Code - used by (tick-handler)
 (define (clear-item pacman)
@@ -919,13 +937,12 @@
 ;*******************************************************************************************************
 ;;; PRE GAME OVER
 ;; Data types
-; Pacman
-; Active is a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
-; Quit is a Boolean
+; pacman is a Pacman
+; active is an Active, a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
 
 ;; Input/Output
 ; pre-game-over : Pacman Active -> Quit
-; check if pacman collided with an unvulnerable ghosts, if so quit the game
+; check if pacman collided with an unvulnerable ghosts, if so quit the game returning a Boolean
 ; header :
 ; (define (game-over pacman active) Quit)
 
@@ -947,7 +964,7 @@
 ; (define (pre-game-over pacman active)
 ;   (and
 ;     (not active)
-;     (collision-pacman ...))))
+;     (... pacman))))
 
 ;; Code - used by (tick-handler)
 (define (pre-game-over pacman active)
@@ -957,15 +974,14 @@
 ;*******************************************************************************************************
 ;;; GAME OVER
 ;; Data types
-; Ghosts is a List<Character>
-; Active is a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
-; Score is a Natural
-; Quit is a Boolean
+; ghosts is a Ghosts, a List<Character>
+; active is an Active, a Boolean from struct Powerpellet-effect (powerpellet-effect-active)
+; score is a Natural
 
 
 ;; Input/Output
 ; game-over : Ghosts Active Score -> Quit
-; check all possible causes of game over and if there are any, quit the game :
+; check all possible causes of game over and if there are any, quit the game returning a Boolean :
 ; - collision with unvulnerable ghost
 ; - collection of all points
 ; header :
@@ -989,10 +1005,10 @@
 ;; Template
 ; (define (game-over ghosts active score)
 ;   (or
-;    (is-fullscore ...)
+;    (... score)
 ;    (and
 ;     (not active)
-;     (collision-ghosts ...))))
+;     (... ghosts))))
 
 ;; Code - used by (tick-handler)
 (define (game-over ghosts active score)
@@ -1005,7 +1021,7 @@
 ;*********************************************************************************
 ;;; IS FULL SCORE
 ;; Data types
-; Score is a Natural from struct Appstate (appstate-score)
+; score is a Score, a Natural from struct Appstate (appstate-score)
 ; Quit is a Boolean form struct Appstate (appstate-quit)
 
 ;; Input/Output
@@ -1021,7 +1037,7 @@
 
 ;; Template
 ; (define (is-fullscore score)
-;   (>= score TOTAL-POINTS))
+;   (>= score ...))
 
 ;; Code - used by (game-over)
 (define (is-fullscore score)
@@ -1030,7 +1046,7 @@
 ;*********************************************************************************
 ;;; COLLISION PACMAN
 ;; Data types
-; Pacman
+; pacman is a Pacman
 ; Quit is a Boolean from struct Appstate (appstate-quit)
 
 ;; Input/Output
@@ -1054,11 +1070,11 @@
 ;; Template
 ; (define (collision-pacman pacman)
 ;   (local
-;     [(define item ...)]
-;     [or (char=? item MAP-GHOST-RED)
-;         (char=? item MAP-GHOST-ORANGE)
-;         (char=? item MAP-GHOST-PINK)
-;         (char=? item MAP-GHOST-CYAN)]))
+;     [(define item (... (... pacman))]
+;     [or (char=? item ...)
+;         (char=? item ...)
+;         (char=? item ...)
+;         (char=? item ...)]))
 
 ;; Code - used by (pre-game-over)
 (define (collision-pacman pacman)
@@ -1098,7 +1114,9 @@
 ;; Template
 ; (define (collision-ghosts ghosts)
 ;   (local
-;     [(define possible-collisions ...)]
+;     [(define possible-collisions (map
+;                                  (λ (g) (char=? ... (character-item-below g)))
+;                                  ghosts))]
 ;   [foldl
 ;    (λ (item result) (or item result))
 ;    ...

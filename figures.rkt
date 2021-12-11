@@ -51,15 +51,21 @@
 (define TEETH (beside TOOTH TOOTH TOOTH TOOTH TOOTH))
 (define MOUTH (underlay/offset TEETH 2 3 (rotate 180 TEETH)))
 
+; AUXILIARY FUNCTION
+; make-ghost-body: Color --> Image
+; with a given color, it return an image of a part of a ghost
 (define (make-ghost-body color)
   (overlay/offset (rectangle 50 30 "solid" color) 0 -19 (circle 25 "solid" color)))
-
+; make-ghost-eye Color --> Image
+; with a given color, it return an image of a part of a ghost
 (define (make-ghost-eye color)
   (underlay/offset (make-ghost-body color) 0 -10 (underlay/offset EYE -30 0 EYE)))
-
+; make-ghost-pupils Color --> Image
+; with a given color, it return an image of a part of a ghost
 (define (make-ghost-pupils color)
   (underlay/offset (make-ghost-eye color) 0 -10 (underlay/offset PUPIL -30 0 PUPIL)))
-
+; make-ghost: Color --> Image
+; with a given color, it return an image of a ghost
 (define (make-ghost color)
   (place-image/align (make-ghost-pupils color) 30 30 "center" "center" SKIN-BG))
 

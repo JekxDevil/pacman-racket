@@ -15,10 +15,11 @@
 ;*********************************************************************************
 ;;; KEY HANDLER
 ;; Datatypes
-; Key is a KeyEvent
+; key is a KeyEvent
+; appstate is an Appstate
 
 ;; Input/Output
-; key-handler : Appstate Key -> Appstate
+; key-handler : Appstate KeyEvent -> Appstate
 ; handler keystroke events of the game
 ; header :
 ; (define (key-handler appstate key) Appstate)
@@ -79,8 +80,8 @@
 ;*********************************************************************************
 ;;; CHANGE PACMAN DIRECTION
 ;Datatypes
-;Appstate
-;Direction
+;appstate is an Appstate
+;direction is a Direction
 
 ;; Input/Output
 ; change-pacman-direction : Appstate Direction -> Appstate
