@@ -1027,7 +1027,7 @@
 ;     [(define possible-collisions ...)]
 ;   [foldl
 ;    (λ (item result) (or item result))
-;    #false
+;    ...
 ;    possible-collisions]))
 
 ;; Code - used by (quit)
