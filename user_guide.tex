@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{graphicx}
 
 \title{
 \textbf{pacman-racket} \\
@@ -48,7 +49,7 @@ using the Racket functional programming language.
  \hspace{0.5cm}\textbf{Modularity}\\
  In order for the group to work in parallel on the project we created several files on which each of us worked simultaneously. These files were then interconnected with the built in function of Racket "require" followed by the name of the file.
  
- %\includegraphics{images/dependency_three.png}
+ \includegraphics{images/dependency_three.png}
  
  
  \textbf{Bottom-up approach}\\
@@ -70,35 +71,38 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  
 
  \subsection{UI}
-%\includegraphics{./images/user_interface.png}
+\includegraphics{./images/user_interface.png}
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
  \section{Software Development}
  \subsection{Tools}
+
+ \textit{Racket}\\
+ Programming language
+
+ \textit{drRacket}\\
+ As Integrated development environment (IDE)
  
- racket ling progr
- 
- drRacket IDE
- 
- 
- VCS Git \\
- 
- 
-Hosting Github
-luogo fisico in github servers
+ \textit{VCS Git}\\
+Software that we used to track changes in the project set of files, each of us could develop source code and share it in an easy and reliable way: low risk of data loss and archives with the previus versions ready to back up if needed.
+
+ \textit{Hosting GiHub\\
+The whole project is phisically stored in the GitHub's servers. This granted us to access the work at any time in any place as long as we have internet connection.
 
 \subsection{Libraries}
-Universe \\
-Image
+ \textit{Universe}\\
+ Teachpack that implements and provides the functionality for creating interactive, graphical programs that consist of plain mathematical functions.
+ 
+ \textit{Image}\\
+The image teachpack provides a number of basic image construction functions, along with combinators for building more complex images out of existing images.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
  \section{Usage}
- 
- ==> run
+To run the game the player need a DrRacket IDE
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
