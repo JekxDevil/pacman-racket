@@ -246,7 +246,10 @@
 ;*********************************************************************************
 ; RENDER-SCORE
 ;Datatype
-;score is a Natural 
+;score is a Natural
+; a Natural is one of
+; - 0
+; - (add1 Natural) ; a positive integer
 
 ;; Input/Output
 ; render-score : Score -> Image
