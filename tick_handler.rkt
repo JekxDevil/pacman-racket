@@ -14,6 +14,9 @@
 ;*********************************************************************************
 ;*********************************************************************************
 ;;; TICK HANDLER
+;Datatype
+;Appstate
+
 ;; Input/Output
 ; tick-handler : Appstate -> Appstate
 ; handler general logic events of the game at each tick
@@ -50,19 +53,48 @@
 (check-expect (tick-handler EX-TH-APPSTATE0) EX-TH-APPSTATE1)
 
 ;; Template
-; (define (tick-handler appstate)
-;   (local
-;     [(define moved-pacman (move-pacman ...))
-;      (define new-map-pacman (update-map ...))
-;      (define new-pp-effect (update-pp-effect ...))
-;      (define quit0 (pre-game-over ...))
-;      (define new-ghosts (move-ghosts ...))
-;      (define new-map ... (update-map...) ...)
-;      (define new-score (update-score ...))
-;      (define quit1 (game-over ...))
-;      (define new-quit (or ...))
-;      (define new-pacman (clear-item ...))]
-;     (make-appstate ...)))
+;(define (tick-handler appstate)
+;  (local
+;    [
+;     (define map (...appstate))
+;     (define pacman (... appstate))
+;     (define pacman-posn (... (... pacman)))
+;     (define pacman-item-below (... (... pacman)))
+;     (define ghosts (... appstate))
+;     (define score (... appstate))
+;     (define pp-effect (... appstate))
+;     (define quit (... appstate))
+;
+;     (define moved-pacman (... map pacman))
+;     (define moved-pacman-posn (... (... moved-pacman)))
+;     (define new-map-pacman (... map pacman-posn moved-pacman-posn pacman-item-below ...))
+;
+;     (define moved-pacman-item (... (... moved-pacman)))
+;     (define new-pp-effect (... pp-effect moved-pacman-item))
+;     (define new-pp-active (... new-pp-effect))
+;
+;     (define quit0 (... pacman new-pp-active))
+;
+;     (define new-ghosts (... new-map-pacman new-pp-active ghosts))
+;     (define new-map (...
+;                      (... (g-previous g-next tmp-map) (...
+;                                                      tmp-map
+;                                                      (... g-previous)
+;                                                      (... g-next)
+;                                                      (... g-previous)
+;                                                      (... g-next)))
+;                      new-map-pacman
+;                      ghosts
+;                      new-ghosts))
+;    
+;     (define new-score (... score moved-pacman-item))
+;     
+;     (define quit1 (... new-ghosts new-pp-active new-score))
+;     (define new-quit (... quit0 quit1))
+;  
+;     (define new-pacman (... moved-pacman))]
+;   
+;    (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
 
 ;; Code - used by (big-bang)
 (define (tick-handler appstate)
@@ -111,7 +143,10 @@
 
 ;*********************************************************************************
 ;;; MOVE PACMAN
-;; Data types
+;Datatypes
+;Active is a Boolean from struct Powerpellet-effect
+; Map is a Vector<String> from struct Appstate (appstate-map)
+;Pacman is a Pacman
 
 ;; Input/Output
 ; move-pacman: Map Active Pacman -> Pacman
@@ -207,24 +242,24 @@
 (check-expect (move-pacman INIT-MAP EX-MP-PACMAN-C0) EX-MP-PACMAN-C1) ; vs ghost cyan
 
 ;; Template
-; (define (move-pacman map pp-active pacman)
-;   (local [(define character    ...)
-;           (define direction    ...)
-;           (define posn         ...)
-;           (define mouth        ...)
-;           (define posn-next    ...)
-;           (define element-next ...)
-;           (define mouth-next   ...)]
-;     [cond [(or (char=? element-next MAP-GATE) 
-;                (char=? element-next MAP-WALL))       ...]
-;           [(or (char=? element-next MAP-DOT)
-;                (char=? element-next MAP-CHERRY)
-;                (char=? element-next MAP-POWERPELLET)
-;                (char=? element-next MAP-EMPTY)
-;                (char=? element-next MAP-GHOST-RED)
-;                (char=? element-next MAP-GHOST-PINK)
-;                (char=? element-next MAP-GHOST-ORANGE)
-;                (char=? element-next MAP-GHOST-CYAN)) ...]
+; (define (move-pacman map pacman)
+;   (local [(define character (... pacman))
+;           (define direction  (... character))
+;           (define posn   (... character))
+;           (define mouth  (... pacman))
+;           (define posn-next  (... posn direction))
+;           (define element-next (... map posn-next))
+;           (define mouth-next  ...)]
+;     [cond [(or (char=? element-next ...) 
+;                (char=? element-next ...))       ...]
+;           [(or (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)
+;                (char=? element-next ...)) ...]
 ;           [else (error ...)]]))
 
 ;; Code - used by (tick-handler)
@@ -261,6 +296,7 @@
 ;;; UPDATE POWERPELLET EFFECT
 ;; Data types
 ; Item is a Char from struct Character (character-item-below)
+
 ;; Input/Output
 ; update-pp-effect : Powerpellet-effect Item -> Powerpellet-effect
 ; update powerpellet effect managing ticks and state when powerpellet is active
@@ -290,15 +326,15 @@
 ;; Template
 ; (define (update-pp-effect pp item)
 ;   (local
-;     [(define active ...)
-;      (defien ticks  ...)]
+;     [(define active (... pp))
+;      (defien ticks  (... pp)]
 ;   [cond
-;     [active [cond
-;               [(>= ticks LIMIT-POWERPELLET-EFFECT) ...]
-;               [else                               ...]]]
-;     [else [cond
-;           [(char=? MAP-POWERPELLET item) ...]
-;           [else                          ...]]]]))
+;      [active (cond
+;                [(... ticks ...) ...]
+;                [else (... ... (+ ... ticks))])]
+;      [else (cond
+;              [(char=? ... item) ...]
+;              [else pp])]]))                        
 
 ;; Code - used by (tick-handler)
 (define (update-pp-effect pp item)
@@ -346,19 +382,18 @@
 ;; Template
 ; (define (move-ghosts map active ghosts)
 ;   (cond
-;     [(empty? (rest ghosts)) (update-ghost ...)]
-;     [else (cons (update-ghost ...) (update-ghosts ...))]))
-
+;     [(empty? (rest ghosts)) ...]
+;     [else
 ;(local
-;    [; params abbreviations
+;    [
 ;     (define ghost (first ghosts))
-;     (define name (character-name ghost))
-;     (define posn-previous (character-position ghost))
-;     (define return-item (character-item-below ghost))
-;     ; precalculated abbreviations
-;     (define ghost-post (move-ghost map active ghost))
-;     (define posn-next (character-position ghost-post))
-;     (define map-post (update-map map posn-previous posn-next return-item name))]
+;     (define name (... ghost))
+;     (define posn-previous (... ghost))
+;     (define return-item (... ghost))
+;     (define ghost-post (... map active ghost))
+;     (define posn-next (... ghost-post))
+;     (define map-post (... map posn-previous posn-next return-item name))]
+;     [... ghost-post (move-ghosts map-post active (rest ghosts))])]))
 
 ;; Code - used by (tick-handler) 
 (define (move-ghosts map active ghosts)
@@ -412,28 +447,39 @@
 ;; Template
 ; (define (move-ghost mymap active ghost)
 ;   (local
-;     [(define name                            ...)
-;      (define posn                            ...)
-;      (define posn-up                         (move-posn ...))
-;      (define posn-right                      (move-posn ...))
-;      (define posn-down                       (move-posn ...))
-;      (define posn-left                       (move-posn ...))
-;      (define element-up                      (find-in-map ...))
-;      (define element-right                   (find-in-map ...))
-;      (define element-down                    (find-in-map ...))
-;      (define element-left                    (find-in-map ...))
-;      (define ghost-choices                   ...)
-;      (define choices-with-pacman             ... (collect-valid-choices ...) ...)
-;      (define possible-choices-with-pacman    (collect-possible-choices ...))
-;      (define choices-without-pacman          ... (collect-valid-choices ...) ...)
-;      (define possible-choices-without-pacman (collect-possible-choices ...))
-;      (define possible-without-pacman-length  ...)
-;      (define random-choice-without-pacman    ...)]
+;     [
+;     (define name (... ghost))
+;     (define posn (... ghost))
+;    
+;     (define posn-up (... posn ...))
+;     (define posn-right (... posn ...))
+;     (define posn-down (... posn ...))
+;     (define posn-left (... posn ...))
+;     (define element-up (... mymap posn-up))
+;     (define element-right (... mymap posn-up))
+;     (define element-down (... mymap posn-up))
+;     (define element-left (... mymap posn-up))
+;   
+;     (define ghost-choices (list
+;                            (make-character name ... posn-up element-up)
+;                            (make-character name ... posn-right element-right)
+;                            (make-character name ... posn-down element-down)
+;                            (make-character name ... posn-left element-left)))
+;     (define choices-with-pacman (map (λ (choice) (... choice ...)) ghost-choices))
+;     (define possible-choices-with-pacman (... choices-with-pacman))
+;     (define choices-without-pacman (map (λ (choice) (... choice ...)) ghost-choices))
+;     (define possible-choices-without-pacman (... choices-without-pacman))
+;     (define possible-without-pacman-length (... possible-choices-without-pacman))
+;     (define random-choice-without-pacman (cond
+;                                            [(= ... possible-without-pacman-length) ghost]
+;                                            [else (list-ref
+;                                                   possible-choices-without-pacman
+;                                                   (... possible-without-pacman-length))]))]
 ;     [cond
 ;       [active ...]
 ;       [else (cond
-;               [(not (empty? possible-choices-with-pacman)) ...]
-;               [else                                        ...])]]))
+;               [(not (empty? possible-choices-with-pacman)) (first possible-choices-with-pacman)]
+;               [else random-choice-without-pacman])]]))
 
 ;; Code - used by (move-ghosts) 
 (define (move-ghost mymap active ghost)
@@ -479,6 +525,9 @@
 
 ;*********************************************************************************
 ;;; COLLECT POSSIBLE CHOICES
+;Datatype
+; List<Character>
+
 ;; Input/Output
 ; collect-possible-choices : List<Character> -> List<Character>
 ; group choices available, discarding non-ghost values which are invalid choices
@@ -550,20 +599,20 @@
 ;; Template
 ;(define (collect-valid-choice ghost looking-for-pacman)
 ;  (local
-;    [(define item ...)
-;     (define down ...)]
+;    [(define item (... ghost))
+;     (define down (char=? (... ghost) ...))]
 ;    [cond
 ;      [(and (not looking-for-pacman)
-;            (not (char=? item MAP-WALL))
-;            (not (char=? item MAP-GHOST-RED))
-;            (not (char=? item MAP-GHOST-ORANGE))
-;            (not (char=? item MAP-GHOST-PINK))
-;            (not (char=? item MAP-GHOST-CYAN))
+;            (not (char=? item ...))
+;            (not (char=? item ...))
+;            (not (char=? item ...))
+;            (not (char=? item ...))
+;            (not (char=? item ...))
 ;            (not (and down
-;                      (char=? item MAP-GATE)))) ...]
-;      [(and looking-for-pacman
-;            (char=? item MAP-PACMAN))           ...]
-;      [else                                     ...]]))
+;                      (char=? item ...)))) ghost]
+;      [(and ...
+;            (char=? item ...)) ghost]
+;      [else  ...]]))
 
 ;; Code - used by (move-ghost)
 (define (collect-valid-choice ghost looking-for-pacman)
@@ -624,12 +673,16 @@
 
 ;; Template
 ; (define (move-posn posn direction)
-;   (cond [(char=? direction DIRECTION-UP)    (make-posn ...)]
-;         [(char=? direction DIRECTION-DOWN)  (make-posn ...)]
-;         [(char=? direction DIRECTION-LEFT)  (make-posn ...)]
-;         [(char=? direction DIRECTION-RIGHT) (make-posn ...)]))
+;   (cond [(char=? direction ...)   (make-posn (posn-x posn)
+;                                                    (if [... (... (posn-y posn) ...) ...] ... [... (posn-y posn) ...]))]
+;         [(char=? direction ...)  (make-posn (posn-x posn)
+;                                                    (if [... (... (posn-y posn) ...) ...] ... [... (posn-y posn) ...]))]]
+;         [(char=? direction ...)  (make-posn (if [... (... (posn-x posn) ...) ...]  ... [... (posn-x posn) ...])
+;                                                       (posn-y posn))]
+;         [(char=? direction ...) (make-posn (make-posn (if [... (... (posn-x posn) ...) ...]  ... [... (posn-x posn) ...])
+;                                                       (posn-y posn))]))
 
-;; Code - used by (...)
+;; Code - used by (move-pacman & move-ghost)
 (define (move-posn posn direction)
   (cond [(char=? direction DIRECTION-UP) (make-posn (posn-x posn)
                                                     (if [< (- (posn-y posn) 1) 0] MAP-HEIGHT-INDEX [- (posn-y posn) 1]))]
@@ -644,6 +697,7 @@
 ;;; FIND ELEMENT CHAR IN MAP
 ;; Data types
 ; Map is a Vector<String> from struct Appstate (appstate-map)
+; Posn
 
 ;; Input/Output
 ; find-in-map : Map Posn -> Char
@@ -660,9 +714,9 @@
 
 ;; Template
 ; (define (find-in-map map posn)
-;   (string-ref (vector-ref ....) ...)
+;   (string-ref (vector-ref (... posn)) (... posn))))
 
-;; Code - used by (...)
+;; Code - used by (move-pacman & move-ghost)
 (define (find-in-map map posn)
   (string-ref (vector-ref map (posn-y posn)) (posn-x posn)))
 
@@ -687,8 +741,28 @@
 (check-expect (find-n-replace EX-FNR-PRE-MAP EX-FNR-POSN MAP-PACMAN) EX-FNR-POST-MAP)
 
 ;; Template
+;(define (find-n-replace map posn name)
+;  (local
+;  [
+;     (define rows-number (... map))
+;     (define y (... posn))
+;     (define x (... posn))]
+;    ; body
+;    [for/vector ([i (... rows-number)])
+;      (if
+;       (= i y)
+;       (local
+; 
+;         [(define list (string->list (... map y)))]
+;         [list->string
+;          (for/list ([i (in-range (length list))])
+;            (if
+;             (= i x)
+;             name
+;             (list-ref list i)))])
+;       (... map i))]))
 
-;; Code - used by (...) 
+;; Code - used by (update-map) 
 (define (find-n-replace map posn name)
   (local
     [; pre-calculated param abbreviations

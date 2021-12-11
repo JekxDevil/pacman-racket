@@ -14,8 +14,7 @@
 ;*********************************************************************************
 ;*********************************************************************************
 ;;; KEY HANDLER
-;; Data types
-; Appstate
+;; Datatypes
 ; Key is a KeyEvent
 
 ;; Input/Output
@@ -79,9 +78,9 @@
 
 ;*********************************************************************************
 ;;; CHANGE PACMAN DIRECTION
-;; Data types
-; Appstate
-; Direction
+;Datatypes
+;Appstate
+;Direction
 
 ;; Input/Output
 ; change-pacman-direction : Appstate Direction -> Appstate

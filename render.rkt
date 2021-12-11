@@ -1,8 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname render) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
-; TODO (conversion-char) requires only pacman and pp-active, no need to have full appstate (less memory usage)
-;; plug-in (pause button, music on/off, sxf on/off, quit)
 ;; LIBRARIES
 (require racket/base)
 (require 2htdp/image)
@@ -90,18 +88,18 @@
 (check-expect (conversion-pacman TEST-PAC3) (rotate -90 SKIN-PACMAN-OPEN))
 
 ;; Template
-; (define (conversion-pacman appstate)
-;   (local [(define direction (... (... appstate)))
-;           (define pacman-mouth (... appstate))
-;           (define pacman-skin (... pacman-mouth))]
-;     (cond
-;       [(equal? ... direction) (... .... pacman-skin)]
-;       [(equal? ... direction) (... .... pacman-skin)]
-;       [(equal? ... direction) (... .... pacman-skin)]
-;       [(equal? ... direction) (... .... pacman-skin)])))
+;(define (conversion-pacman pacman)
+;  (local [(define direction (... (... pacman)))
+;          (define skin (... (... pacman)))]
+;    (cond
+;      [(equal? ... direction) (rotate ... skin)]
+;      [(equal? ... direction) (rotate ... skin)]
+;      [(equal? ... direction) (rotate ... skin)]
+;      [(equal? ... direction) (rotate ... skin)])))
 
 ;; Code - used by (conversion-char)
 (define-values (UPWARDS DOWNWARDS LEFTWARDS RIGHTWARDS) (values 90 -90 180 0))
+
 (define (conversion-pacman pacman)
   (local [(define direction (character-direction (pacman-character pacman)))
           (define skin (conversion-pacman-mouth (pacman-mouth pacman)))]
@@ -113,7 +111,7 @@
 
 ;*********************************************************************************
 ;; Input/Output
-; conversion-pacman-mouth: Mouth -> Image
+; conversion-pacman-mouth: Boolean -> Image
 ; given the mouth boolean state, return the image of pacman with the mouth open or closed 
 ; header :
 ; (define (conversion-pacman-mouth pacman-mouth) Image)
@@ -123,8 +121,8 @@
 (check-expect (conversion-pacman-mouth (pacman-mouth TEST-PAC1)) SKIN-PACMAN-OPEN)
 
 ;; Template
-; (define (conversion-pacman-mouth pacman-mouth)
-;   (if pacman-mouth ... ...))
+; (define (conversion-pacman-mouth mouth)
+;   (if mouth ... ...))
 
 ;; Code - used by (conversion-pacman)
 (define (conversion-pacman-mouth mouth)
@@ -146,8 +144,8 @@
 
 ;; Template
 ; (define (conversion-ghosts appstate char)
-;   (local [(define pp-active (... appstate))]
-;     (if pp-active
+;   (local [(define edible (... (... appstate)))]
+;     (if edible
 ;         ...
 ;         (cond
 ;           [(equal? char ...) ...]
@@ -167,6 +165,9 @@
           [(equal? char MAP-GHOST-CYAN) SKIN-GHOST-CYAN]))))
 
 ;*********************************************************************************
+;Datatypes
+;List-row is a String
+
 ;; Input/Output
 ; conversion-row : Appstate List-row -> Image
 ; given the state, converts a row as list of chars, in its correspondent image
@@ -191,6 +192,9 @@
     [else (beside (conversion-char appstate (first list-row)) (conversion-row appstate (rest list-row)))]))
 
 ;*********************************************************************************
+;Datatypes
+;Map-list is a list representation for Map (Vector<String>)
+
 ;; Input/Output
 ; conversion-map : Appstate Map-list -> Image
 ; given the state, converts map to its correspondent image
@@ -219,6 +223,9 @@
     [else (above (conversion-row appstate list-row) (conversion-map appstate (rest map-list)))])))
 
 ;*********************************************************************************
+;Datatype
+;Score is an integer positive number rapresenting the player's score
+
 ;; Input/Output
 ; render-score : Score -> Image
 ; given the score, render the corresponding display image in its rectangle
@@ -231,7 +238,7 @@
 
 ;; Template
 ; (define (render-score score)
-;   (overlay ... SCORE-RECTANGLE)
+;   (... (... (... ... (... score)) ... ...) ...)
 
 ;; Code - used by (render)
 (define (render-score score)
@@ -279,10 +286,6 @@
 
 ;*********************************************************************************
 ;;; RENDER GAME OVER
-;; Data types
-; Appstate
-; Image
-
 ;; Input/Output
 ; render-game-over: Appstate -> Image
 ; take an appstate and return an image with the text "game over" and the score overlayed on the map
@@ -314,16 +317,21 @@
 (check-expect (render-game-over EX-R-APPSTATE-BAD) EX-R-APPSTATE-BAD-IMG)
 
 ;; Template
-;(define (render-game-over appstate-img score-img)
+;(define (render-game-over appstate)
 ;  (local 
-;     [(define appstate-img                  ...)
-;      (define width                         ...)
-;      (define height                        ...)
-;      (define score-img                     ...)
-;      (define mask                          ...)
-;      (define gameover-img                  ...)
-;      (define masked-gameover-without-score ...)]
-;     [underlay/offset                       ...)]))
+;    [
+;     (define appstate-img (... appstate))
+;     (define width (... appstate-img))
+;     (define height (... (... appstate-img)))
+;     (define score-img (... (... appstate)))
+;     (define mask (... width height ... ...))
+;     (define gameover-img (... ... ...))
+;     (define masked-gameover-without-score (... gameover-img mask appstate-img))]
+;    [...
+;     masked-gameover-without-score
+;     ...
+;     ...
+;     (... ... score-img)]))
 
 
 (define (render-game-over appstate)
