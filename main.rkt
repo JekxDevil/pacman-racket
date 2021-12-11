@@ -55,6 +55,8 @@
     [to-draw render]
     [on-tick tick-handler TICK]
     [on-key key-handler]
-    [stop-when quit? render-game-over]))
+    [stop-when quit? render-game-over]
+    ; meta
+    [name "Pacman - Racket"]))
 
 (run INIT-APPSTATE)
