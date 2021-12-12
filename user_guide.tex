@@ -50,14 +50,14 @@ using the Racket functional programming language.
  In order for the group to work in parallel on the project we created several files on which each of us worked simultaneously. These files were then interconnected with the built in function of Racket "require" followed by the name of the file.
  
  \begin{center}
- \includegraphics[width=8cm]{images/dependency_three.png}
+ \includegraphics[width=8cm]{images/dependency_tree.png}
  \end{center}
  
  \textbf{Bottom-up approach}\\
  We developed the code decomposing the functions needed in the simplest possible problems, we then conveyed them in higher grade functions. This allowed a design recepie with more tests making the debugging process easier.
  
  \textbf{Game logic}\\
-The player must guide a yellow spherical creature, called Pac-Man, making it eat all the numerous dots scattered inside the maze and, in doing so, he must avoid being touched by four ghosts, or the game will be over. In order to make the game easier for the player, there are four "power pills" in the corners of the screen that turn the situation making the ghosts unable to touch Pac-Man. Each dot taken will increase the score of 10 points instead the cherries worth 100 points.
+The player must guide a yellow spherical creature, called Pac-Man, making it eat all the numerous dots scattered inside the maze and, in doing so, he must avoid being touched by four ghosts, or the game will be over. In order to make the game easier for the player, there are four "power pellets" in the corners of the screen that turn the situation by making the ghosts unable to touch Pac-Man. Each dot taken will increase the score of 10 points instead the cherries and powerpellets are worth 100 points.
 
  %%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%
@@ -68,7 +68,7 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  Used for the user guide\\
  
  \textit{Flowchart}\\
- Used to create the dependency threes so each member of the group had a clear view of the whole project.
+ Used to create the dependency trees so each member of the group had a clear view of the whole project.
  
 
  \subsection{UI}
@@ -82,13 +82,14 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  \section{Software Development}
 
  \subsection{Source Code}
- The project is developed on the idea of creating a map of squares placed side by side that make up the game world. To run the game we work on a "logic map" which is composed of a series of characters, one next to the other, that form lines, one above the other. This set of lines create a vector that will be the game logic map. All the engine functions that we have developed in the source code operate on the lines of this vector in a recursive manner modifying and moving the various characters.To give life to the game we then have created a render function that takes each character of the logic map and associates the corresponding image.\\
+ The project is developed on the idea of creating a map of squares placed side by side that make up the game world. To run the game we work on a "logic map" which is composed by a strings or list of characters, that form lines, one above the other. This set of lines create a vector that will be the game logic map. All the engine functions that we have developed in the source code operate on the lines of this vector in a recursive manner modifying and moving the various characters.To give life to the game we then have created a render function that takes each character of the logic map and associates the corresponding image.\\
  
  \begin{center}
  \includegraphics[width=12cm]{./images/vector.jpeg}
  \end{center}
 
- Characters such as Pac-Man and ghosts are defined by structures in the code. Pac-Man movement is defined by the key-events (up, down, left, right) while instead the movement of ghosts is defined randomly until Pac-Man is in one of the near cells, when this happens they start to follow him. The key-handler function also verifies the validity of the moves by checking what is in the current and next cell and the event that is about to happen like Pac-Man-ghost, Pac-Man-wall, Pac-man-pellet, etc. For example, when in the next box there is a wall, the key-handler returns pac-man to the same position, if instead there is a ghost the game over event will be triggered. 
+ Characters such as Pac-Man and ghosts are defined by structures in the code. Pac-Man direction movement is defined by the key-events (up, down, left, right) while instead the movement of ghosts is defined randomly until Pac-Man is in one of the near cells, because when this happens they start to follow him.
+ As an example for Pacman, the validity of its moves is verified by checking what is in the current and next cell and the event that is about to happen like collision with a ghost, a wall , a powerpellet, etc. Likewise, at runtime when there is a wall in the next box, the move-pacman function returns pacman to the same position, if instead there is a ghost the game over event will be triggered.
  
  \subsection{Tools}
  
@@ -99,10 +100,10 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  As Integrated development environment (IDE).
  
  \textit{VCS Git}\\
-Software that we used to track changes in the project set of files, each of us could develop source code and share it in an easy and reliable way: low risk of data loss and archives with the previus versions ready to back up if needed.
+Software that we used to track changes in the project set of files, in order to each of us to develop source code and share it in an easy and reliable way: low risk of data loss and archives with the previus versions ready to back up if needed.
 
  \textit{Hosting GiHub}\\
-The whole project is phisically stored in the GitHub's servers. This granted us to access the work at any time in any place as long as we had internet connection.
+The whole project is physically stored in a private repository located on GitHub's servers. This granted us to access the work at any time in any place as long as we had internet connection.
 
 \subsection{Libraries}
  \hspace{0.5cm}\textit{Universe}\\
