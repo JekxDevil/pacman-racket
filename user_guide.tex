@@ -24,7 +24,7 @@ Faculty of Informatics \\
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
 \begin{titlepage}
-\maketitle
+\maketitle  
 
 \end{titlepage}
  %%%%%%%%%%%%%%%%%%%%%%%
@@ -49,8 +49,9 @@ using the Racket functional programming language.
  \hspace{0.5cm}\textbf{Modularity}\\
  In order for the group to work in parallel on the project we created several files on which each of us worked simultaneously. These files were then interconnected with the built in function of Racket "require" followed by the name of the file.
  
- \includegraphics{images/dependency_three.png}
- 
+ \begin{center}
+ \includegraphics[width=8cm]{images/dependency_three.png}
+ \end{center}
  
  \textbf{Bottom-up approach}\\
  We developed the code decomposing the functions needed in the simplest possible problems, we then conveyed them in higher grade functions. This allowed a design recepie with more tests making the debugging process easier.
@@ -71,24 +72,31 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  
 
  \subsection{UI}
-\includegraphics{./images/user_interface.png}
+\begin{center}
+\includegraphics[width=12cm]{./images/user_interface.png}
+\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
  \section{Software Development}
- \subsection{Tools}
 
+ \subsection{Source Code}
+ The project is developed on the idea of creating a map of squares placed side by side that make up the game world. 
+
+ 
+ \subsection{Tools}
+ 
  \textit{Racket}\\
- Programming language
+ Programming language used to develop the game.
 
  \textit{drRacket}\\
- As Integrated development environment (IDE)
+ As Integrated development environment (IDE).
  
  \textit{VCS Git}\\
 Software that we used to track changes in the project set of files, each of us could develop source code and share it in an easy and reliable way: low risk of data loss and archives with the previus versions ready to back up if needed.
 
- \textit{Hosting GiHub\\
+ \textit{Hosting GiHub}\\
 The whole project is phisically stored in the GitHub's servers. This granted us to access the work at any time in any place as long as we have internet connection.
 
 \subsection{Libraries}
@@ -102,7 +110,7 @@ The image teachpack provides a number of basic image construction functions, alo
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
  \section{Usage}
-To run the game the player need a DrRacket IDE
+To run the game the player need a DrRacket IDE. In order to start the game you have to open the \textit{main.rkt} file and press the \textit{run} button or press together the two keys \textit{ctrl} and \textit{R}.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
