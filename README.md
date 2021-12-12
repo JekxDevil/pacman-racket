@@ -219,7 +219,7 @@ Character is a structure `(make-character name direction position item-below)`
 
 
 
-Appstate is a struct `(make-appstate map score pp-active? pacman-mouth)`
+Appstate is a struct `(make-appstate map pacman ghosts score powerpellet-effect quit)`
 - map is `Vector<String>`
 - pacman is `Pacman`
 - (c) ghosts is `List<Character>`
