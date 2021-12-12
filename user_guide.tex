@@ -88,6 +88,7 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  \includegraphics[width=12cm]{./images/vector.jpeg}
  \end{center}
 
+ Characters such as Pac-Man and ghosts are defined by structures in the code. Pac-Man movement is defined by the key-events (up, down, left, right) while instead the movement of ghosts is defined randomly until Pac-Man is in one of the near cells, when this happens they start to follow him. The key-handler function also verifies the validity of the moves by checking what is in the current and next cell and the event that is about to happen like Pac-Man-ghost, Pac-Man-wall, Pac-man-pellet, etc. For example, when in the next box there is a wall, the key-handler returns pac-man to the same position, if instead there is a ghost the game over event will be triggered. 
  
  \subsection{Tools}
  
