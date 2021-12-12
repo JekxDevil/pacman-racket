@@ -82,12 +82,16 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
  \section{Software Development}
 
  \subsection{Source Code}
- The project is developed on the idea of creating a map of squares placed side by side that make up the game world. 
+ The project is developed on the idea of creating a map of squares placed side by side that make up the game world. To run the game we work on a "logic map" which is composed of a series of characters, one next to the other, that form lines, one above the other. This set of lines create a vector that will be the game logic map. All the engine functions that we have developed in the source code operate on the lines of this vector in a recursive manner modifying and moving the various characters.To give life to the game we then have created a render function that takes each character of the logic map and associates the corresponding image.\\
+ 
+ \begin{center}
+ \includegraphics[width=12cm]{./images/vector.jpeg}
+ \end{center}
 
  
  \subsection{Tools}
  
- \textit{Racket}\\
+ \hspace{0.5cm}\textit{Racket}\\
  Programming language used to develop the game.
 
  \textit{drRacket}\\
@@ -97,10 +101,10 @@ The player must guide a yellow spherical creature, called Pac-Man, making it eat
 Software that we used to track changes in the project set of files, each of us could develop source code and share it in an easy and reliable way: low risk of data loss and archives with the previus versions ready to back up if needed.
 
  \textit{Hosting GiHub}\\
-The whole project is phisically stored in the GitHub's servers. This granted us to access the work at any time in any place as long as we have internet connection.
+The whole project is phisically stored in the GitHub's servers. This granted us to access the work at any time in any place as long as we had internet connection.
 
 \subsection{Libraries}
- \textit{Universe}\\
+ \hspace{0.5cm}\textit{Universe}\\
  Teachpack that implements and provides the functionality for creating interactive, graphical programs that consist of plain mathematical functions.
  
  \textit{Image}\\
