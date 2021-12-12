@@ -78,7 +78,7 @@
 ;*****************************************************************
 ;; Generic settings
 (define SCORE 0)
-(define TICK 25/100)
+(define TICK (/ 166 1000)) ; 6 fps - tick each 0.166 seconds
 (define LIMIT-POWERPELLET-ACTIVE 10)
 
 (define POINTS-DOT 10)

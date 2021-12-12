@@ -287,13 +287,13 @@
 
 ;; Examples
 (define EX-R-MAP (vector ".W@YPrcpo"))
-(define EX-R-SCORE (render-score 0))
+(define EX-R-SCORE-IMG (render-score 0))
 (define EX-R-APPSTATE-GOOD (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT INIT-QUIT))
 (define EX-R-APPSTATE-GOOD-IMG (scale RATIO
                                       (underlay/xy (beside SKIN-DOT SKIN-WALL SKIN-POWERPELLET
                                                            SKIN-CHERRY SKIN-PACMAN-OPEN SKIN-GHOST-RED
                                                            SKIN-GHOST-CYAN SKIN-GHOST-PINK SKIN-GHOST-ORANGE)
-                                                   OFFSET-X-SCORE OFFSET-Y-SCORE EX-R-SCORE)))
+                                                   OFFSET-X-SCORE OFFSET-Y-SCORE EX-R-SCORE-IMG)))
 
 (check-expect (render EX-R-APPSTATE-GOOD) EX-R-APPSTATE-GOOD-IMG)
 
@@ -328,25 +328,39 @@
 (define SIZE-GAMEOVER 100)
 (define COLOR-MASK (color 0 0 0 127))
 
+(define LOOSE-TEXT (overlay (text "GAME OVER" 100 "white") (text "GAME OVER" 105 "steel blue")))
+(define WIN-TEXT (overlay (text "YOU WON!" 100 "yellow") (text "YOU WON!" 105 "steel blue")))
+
 ;; Examples
+(define EX-R-APPSTATE-WIN (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS TOTAL-POINTS INIT-POWERPELLET-EFFECT #true))
 (define EX-R-APPSTATE-BAD (make-appstate EX-R-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
-(define EX-R-SCORE-IMG-BAD (overlay (text "SCORE : 0" 36 "white")
-                                    (rectangle 300 80 "solid" "black")
-                                    (rectangle 310 90 "solid" "white")))
+
 (define EX-R-APPSTATE-BAD-IMG (underlay/offset
                                (overlay
-                                (overlay (text "GAME OVER" 100 "white")
-                                         (text "GAME OVER" 105 "steel blue"))
+                                LOOSE-TEXT
                                 (rectangle (image-width EX-R-APPSTATE-GOOD-IMG)
                                            (image-width (rotate 90 EX-R-APPSTATE-GOOD-IMG))
                                            "solid"
-                                           (color 0 0 0 127))
+                                           COLOR-MASK)
                                 EX-R-APPSTATE-GOOD-IMG)
                                0
                                100
-                               (scale 2 EX-R-SCORE)))
+                               (scale RATIO-SCORE EX-R-SCORE-IMG)))
+
+(define EX-R-APPSTATE-WIN-IMG (underlay/offset
+                               (overlay
+                                WIN-TEXT
+                                (rectangle (image-width EX-R-APPSTATE-GOOD-IMG)
+                                           (image-width (rotate 90 EX-R-APPSTATE-GOOD-IMG))
+                                           "solid"
+                                           COLOR-MASK)
+                                (render EX-R-APPSTATE-WIN))
+                               0
+                               100
+                               (scale RATIO-SCORE (render-score TOTAL-POINTS))))
 
 (check-expect (render-game-over EX-R-APPSTATE-BAD) EX-R-APPSTATE-BAD-IMG)
+(check-expect (render-game-over EX-R-APPSTATE-WIN) EX-R-APPSTATE-WIN-IMG)
 
 ;; Template
 ;(define (render-game-over appstate)
@@ -368,14 +382,16 @@
 
 (define (render-game-over appstate)
   (local 
-    [; pre-calculated values
+    [; score abbreviation
+     (define score (appstate-score appstate))
+     ; pre-calculated values
      (define appstate-img (render appstate))
      (define width (image-width appstate-img))
      (define height (image-width (rotate 90 appstate-img)))
-     (define score-img (render-score (appstate-score appstate)))
+     (define score-img (render-score score))
      ; mask elements composition
      (define mask (rectangle width height "solid" COLOR-MASK))
-     (define gameover-img (overlay (text "GAME OVER" SIZE-GAMEOVER "white") (text "GAME OVER" (+ 5 SIZE-GAMEOVER) "steel blue")))
+     (define gameover-img (if (>= score TOTAL-POINTS) WIN-TEXT LOOSE-TEXT))
      (define masked-gameover-without-score (overlay gameover-img mask appstate-img))]
     ; function body - assemble
     [underlay/offset
