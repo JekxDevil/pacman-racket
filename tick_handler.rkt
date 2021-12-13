@@ -137,7 +137,7 @@
      (define quit1 (game-over new-ghosts new-pp-active new-score))
      (define new-quit (or quit0 quit1))
      ; - free pacman from its overlayed item -
-     (define new-pacman (clear-item moved-pacman))]
+     (define new-pacman (clear-item moved-pacman ghosts))]
     ; body
     (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
 
@@ -864,9 +864,11 @@
 ;; Code - used by (tick-handler)
 (define (update-score score item)
   (cond
+    ; update score if it's pacman item below
     [(char=? item MAP-DOT) (+ score POINTS-DOT)]
     [(char=? item MAP-CHERRY) (+ score POINTS-CHERRY)]
     [(char=? item MAP-POWERPELLET) (+ score POINTS-POWERPELLET)]
+    ; else return the same score
     [else score]))
 
 ;*******************************************************************************************************
@@ -875,32 +877,29 @@
 ; pacman is a Pacman
 
 ;; Input/Output
-; post-update-score : Pacman -> Pacman
+; clear-item : Pacman Ghosts -> Pacman
 ; clear the item pacman has overlayed
 ; header :
-; (define (clear-item pacman) Pacman)
+; (define (clear-item pacman ghosts) Pacman)
 
 ;; Examples
-(define EX-PUS-PACMAN0 (make-pacman
-                        (make-character
-                         MAP-PACMAN
-                         DIRECTION-DOWN
-                         INIT-PACMAN-POSN
-                         MAP-CHERRY)
-                        #true))
-(define EX-PUS-PACMAN1 (make-pacman
-                        (make-character
-                         MAP-PACMAN
-                         DIRECTION-DOWN
-                         INIT-PACMAN-POSN
-                         MAP-EMPTY)
-                        #true))
+(define EX-PUS-PACMAN0 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-CHERRY) #true))
+(define EX-PUS-PACMAN1 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-EMPTY) #true))
+(define EX-PUS-PACMAN2 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-GHOST-RED) #true))
+(define EX-PUS-PACMAN3 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-GHOST-ORANGE) #true))
+(define EX-PUS-PACMAN4 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-GHOST-PINK) #true))
+(define EX-PUS-PACMAN5 (make-pacman (make-character MAP-PACMAN DIRECTION-DOWN INIT-PACMAN-POSN MAP-GHOST-CYAN) #true))
 
-(check-expect (clear-item INIT-PACMAN) INIT-PACMAN)
-(check-expect (clear-item EX-PUS-PACMAN0) EX-PUS-PACMAN1)
+(check-expect (clear-item INIT-PACMAN INIT-GHOSTS) INIT-PACMAN)
+(check-expect (clear-item EX-PUS-PACMAN0 INIT-GHOSTS) EX-PUS-PACMAN1)
+; ghost item retriving
+(check-expect (clear-item EX-PUS-PACMAN2 INIT-GHOSTS) EX-PUS-PACMAN1)
+(check-expect (clear-item EX-PUS-PACMAN3 INIT-GHOSTS) EX-PUS-PACMAN1)
+(check-expect (clear-item EX-PUS-PACMAN4 INIT-GHOSTS) EX-PUS-PACMAN1)
+(check-expect (clear-item EX-PUS-PACMAN5 INIT-GHOSTS) EX-PUS-PACMAN1)
 
 ;; Template
-;(define (clear-item pacman)
+;(define (clear-item pacman ghosts)
 ;  (local
 ;    [
 ;     (define character (... pacman))
@@ -917,23 +916,73 @@
 ;     mouth]))
 
 ;; Code - used by (tick-handler)
-(define (clear-item pacman)
+(define (clear-item pacman ghosts)
   (local
     [; param abbreviations
      (define character (pacman-character pacman))
      (define name (character-name character))
      (define direction (character-direction character))
      (define position (character-position character))
-     (define mouth (pacman-mouth pacman))]
+     (define mouth (pacman-mouth pacman))
+     (define item (character-item-below character))
+     ; pre-calculated values
+     (define new-item (cond
+                        ; if a ghost is below pacman
+                        ; return what's underneath the ghost to its place
+                        [(char=? item MAP-GHOST-RED) (return-ghost-item ghosts MAP-GHOST-RED)]
+                        [(char=? item MAP-GHOST-ORANGE) (return-ghost-item ghosts MAP-GHOST-ORANGE)]
+                        [(char=? item MAP-GHOST-PINK) (return-ghost-item ghosts MAP-GHOST-PINK)]
+                        [(char=? item MAP-GHOST-CYAN) (return-ghost-item ghosts MAP-GHOST-CYAN)]
+                        ; otherwise leave an empty cell
+                        [else MAP-EMPTY]))]
     ; body
     [make-pacman
      (make-character
       name
       direction
       position
-      MAP-EMPTY)
+      new-item)
      mouth]))
 
+;*******************************************************************************************************
+;;; RETURN GHOST ITEM
+;; Data types
+; Ghost is a Character
+; Ghosts is a List<Character>
+; Ghost-char is a Char
+; interpretation: ghost in the map is represented as a Char
+
+;; Input/Output
+; return-ghost-item : Ghosts Ghost-char -> Ghost
+; return the item below given a ghost on the map
+; header :
+; (define (return-ghost-item ghosts ghost-char) Ghost 
+
+;; Examples
+(check-expect (return-ghost-item INIT-GHOSTS MAP-GHOST-RED) MAP-EMPTY)
+
+;; Template
+; (define (return-ghost-item ghosts ghost-char)
+;  (character-item-below
+;   (first
+;    (collect-possible-choices
+;     (map
+;      (λ ...))
+;      ghosts)))))
+
+;; Code
+(define (return-ghost-item ghosts ghost-char)
+  ; retrieve the item below
+  (character-item-below
+   ; of the given ghost (first is assumed because for a character corresponds only one ghost)
+   (first
+    ; that matches the ghost-char
+    (collect-possible-choices
+     ; in the list of ghosts in the game
+     (map
+      (λ (g) (if [equal? (character-name g) ghost-char] g #false))
+      ghosts)))))
+  
 ;*******************************************************************************************************
 ;;; PRE GAME OVER
 ;; Data types
