@@ -77,11 +77,13 @@ Using the knowledge developed during the lectures and the guides provided by Rac
  Used to create the dependency trees so each member of the group had a clear view of the whole project.
  
 
- \subsection{UI}
-\begin{center}
-\includegraphics[width=12cm]{./images/user_interface.png}
-\end{center}
-The gaming window is completely occupied by the game screen (figure above), which is composed by the main area and the score display. While the score display keep track of the actual score, the main area is the most important part of the game. It is composed by several images that rapresents the part of the game, such as the ghosts, pac-man, the pellets and the powerpellets.
+ \subsection{Main Functions}
+The main function of the program is the BIG-BANG function (avaible in main.rkt). The BIG-BANG function operates using four principal sub-functions which purpose is explain below:\\\\
+- \textbf{Render} : It is used to render the map as a matrix of images. The function, given a list of lists of images it elaborates them, putting the images beside and above each other to create the map.\\
+- \textbf{Tick-handler} : Given an appstate, he split it in the various parts and, using various functions, it modify the map, the score, the quit status and the positions of Pac-Man and the ghosts in the map. Finally, he puts them all together in an appstate that will be evaluated by the render. \\
+- \textbf{Key-handler} : It change the direction value in the appstate according to Pac-Man moving direction and stops the program is q is pressed.\\
+- \textbf{Render-game-over} : Given an appstate, it returns an image when the games end with the evaluation of the total point and the writte ``GAME OVER'' or ``WIN''.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%
