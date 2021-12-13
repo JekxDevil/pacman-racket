@@ -75,6 +75,7 @@
         [(equal? key "down") (change-pacman-direction appstate DIRECTION-DOWN)]
         [(equal? key "left") (change-pacman-direction appstate DIRECTION-LEFT)]
         [(equal? key "right") (change-pacman-direction appstate DIRECTION-RIGHT)]
+        [(equal? key "q") (quit appstate)]
         [else appstate]))
 
 ;*********************************************************************************
@@ -131,3 +132,27 @@
                          mouth))]
     ; body
     [make-appstate map new-pacman ghosts score pp quit]))
+
+;*********************************************************************************
+;;;QUIT
+;Datatypes
+;appstate is an Appstate
+
+;Input/Output
+; quit: Appstate --> Appstate
+; modified the quit field in the appstate to #true
+; header
+; (define (quit Appstate) Appstate)
+
+(check-expect (quit (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #false))
+              (make-appstate INIT-MAP INIT-PACMAN INIT-GHOSTS INIT-SCORE INIT-POWERPELLET-EFFECT #true))
+
+
+(define (quit appstate)
+  (local (
+          (define map (appstate-map appstate))
+          (define pacman (appstate-pacman appstate))
+          (define ghosts (appstate-ghosts appstate))
+          (define score (appstate-score appstate))
+          (define pp (appstate-powerpellet-effect appstate)))
+    (make-appstate map pacman ghosts score pp #true)))

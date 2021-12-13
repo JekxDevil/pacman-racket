@@ -78,7 +78,7 @@
 ; ORANGE GHOST
 (define SKIN-GHOST-ORANGE (make-ghost "orange"))
 ; EDIBLE GHOST
-(define GHOST-EDIBLE-WB (underlay/offset (make-ghost "blue") 0 7 MOUTH))
+(define GHOST-EDIBLE-WB (underlay/offset (make-ghost "dodger blue") 0 7 MOUTH))
 (define SKIN-GHOST-EDIBLE (place-image/align GHOST-EDIBLE-WB 30 30 "center" "center" SKIN-BG))
 ;************************************************************************************
 ; DOT
@@ -87,7 +87,7 @@
 
 ;************************************************************************************
 ; POWERPELLETS
-(define POWERPELLET-WB (circle 10 "solid" "Khaki"))
+(define POWERPELLET-WB (circle 15 "solid" "Goldenrod"))
 (define SKIN-POWERPELLET (place-image/align POWERPELLET-WB 30 30 "center" "center" SKIN-BG))
 
 ;************************************************************************************
