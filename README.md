@@ -278,7 +278,7 @@ Appstate is a struct `(make-appstate map pacman ghosts score powerpellet-effect 
 #### KEY HANDLER
 
 Following changes are made to satisfy the atomicity principle. Every keystroke corresponds to a change of direction. Key
-handler in so longer in charge of movement. Movements are now implemented by tick_handler.
+handler in no longer in charge of movement. Movements are now implemented by tick_handler.
 
 *(+) ADDED*
 
@@ -336,7 +336,7 @@ Handles all movements. Updates appstate following these steps:
   character
 - (update-score) -> given an item, check if it is a valuable one, and if it is so, add it to the score
 - (clear-item) -> clear the item pacman has overlayed
-- (pre-game-over) -> check if pacman collided with an unvulnerable ghosts, if so quit the game
+- (pre-game-over) -> check if pacman collided with an invulnerable ghosts, if so quit the game
 - (game-over) -> check all possible causes of game over and if there are any, quit the game
 - (is-fullscore) -> check if score is full, if it is return true otherwise false
 - (collision-pacman) -> check if pacman overlayed a ghost
