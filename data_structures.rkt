@@ -241,7 +241,7 @@
 
 ;*******************************************************************
 ;; Data type
-; powerpellet-effect is a struct: (make-powerpellet-effect active active-ticks)
+; powerpellet-effect is a struct: (make-powerpellet-effect active ticks)
 ; where       active : Boolean
 ;       active-ticks : Natural
 (define-struct powerpellet-effect [active ticks] #:transparent)

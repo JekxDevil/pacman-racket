@@ -136,7 +136,7 @@
      ; - game over second check -
      (define quit1 (game-over new-ghosts new-pp-active new-score))
      (define new-quit (or quit0 quit1))
-     ; - free pacman from it's overlayed item -
+     ; - free pacman from its overlayed item -
      (define new-pacman (clear-item moved-pacman))]
     ; body
     (make-appstate new-map new-pacman new-ghosts new-score new-pp-effect new-quit)))
